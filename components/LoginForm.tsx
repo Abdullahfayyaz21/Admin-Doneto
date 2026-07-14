@@ -3,24 +3,54 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock, Mail, Loader2 } from 'lucide-react';
+import Cookies from 'js-cookie';
+
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import api from '@/lib/api';
 
 export function LoginForm() {
   const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     setLoading(true);
-    setTimeout(() => router.push('/dashboard'), 600);
+    setError('');
+
+    try {
+      const response = await api.post('/auth/login', {
+        email,
+        password,
+      });
+
+      console.log('Login Success:', response.data);
+
+      Cookies.set('accessToken', response.data.accessToken);
+      Cookies.set('refreshToken', response.data.refreshToken);
+
+      router.push('/dashboard');
+    } catch (err: any) {
+      console.error(err);
+
+      setError(
+        err.response?.data?.message || 'Invalid email or password.'
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Email */}
       <div className="space-y-2">
         <label
           htmlFor="email"
@@ -28,12 +58,14 @@ export function LoginForm() {
         >
           Email
         </label>
+
         <div className="relative">
           <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
           <Input
             id="email"
             type="email"
-            placeholder="admin@doneto.com"
+            placeholder="admin@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="h-12 rounded-xl pl-10"
@@ -42,6 +74,7 @@ export function LoginForm() {
         </div>
       </div>
 
+      {/* Password */}
       <div className="space-y-2">
         <label
           htmlFor="password"
@@ -49,8 +82,10 @@ export function LoginForm() {
         >
           Password
         </label>
+
         <div className="relative">
           <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
           <Input
             id="password"
             type={showPassword ? 'text' : 'password'}
@@ -60,10 +95,11 @@ export function LoginForm() {
             className="h-12 rounded-xl pl-10 pr-10"
             required
           />
+
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
           >
             {showPassword ? (
               <EyeOff className="h-4 w-4" />
@@ -74,6 +110,14 @@ export function LoginForm() {
         </div>
       </div>
 
+      {/* Error Message */}
+      {error && (
+        <p className="text-sm text-red-500">
+          {error}
+        </p>
+      )}
+
+      {/* Login Button */}
       <Button
         type="submit"
         disabled={loading}
