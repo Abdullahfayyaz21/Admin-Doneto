@@ -8,9 +8,19 @@ import {
   FileText,
   TrendingUp,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { StatCard } from '@/components/StatCard';
-import { DashboardChart } from '@/components/DashboardChart';
 import { ActivityTable } from '@/components/ActivityTable';
+
+const DashboardChart = dynamic(
+  () => import('@/components/DashboardChart'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[350px] w-full animate-pulse rounded-xl bg-muted/50" />
+    ),
+  }
+);
 import {
   Card,
   CardHeader,

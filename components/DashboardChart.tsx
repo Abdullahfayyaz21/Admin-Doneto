@@ -25,7 +25,7 @@ const data = [
   { month: 'Dec', users: 7100, revenue: 3900 },
 ];
 
-export function DashboardChart() {
+export default function DashboardChart() {
   return (
     <div className="h-[350px] w-full">
       <ResponsiveContainer width="100%" height="100%">

@@ -27,7 +27,7 @@ export function LoginForm() {
 
     try {
       const response = await api.post('/auth/login', {
-        email,
+        identifier: email,
         password,
       });
 
