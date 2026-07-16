@@ -80,11 +80,11 @@ interface User {
 }
 
 const avatarColors = [
-  'from-blue-500 to-indigo-600',
+  'from-green-600 to-emerald-700',
   'from-green-500 to-teal-600',
   'from-orange-500 to-red-600',
   'from-purple-500 to-pink-600',
-  'from-cyan-500 to-blue-600',
+  'from-emerald-500 to-green-600',
 ];
 
 const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
@@ -97,7 +97,7 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
 const roleIcons: Record<string, React.ReactNode> = {
   Admin: <Shield className="h-3.5 w-3.5 mr-1 text-purple-600 dark:text-purple-400" />,
   Donor: <UserCheck className="h-3.5 w-3.5 mr-1 text-green-600 dark:text-green-400" />,
-  NGO: <Building2 className="h-3.5 w-3.5 mr-1 text-blue-600 dark:text-blue-400" />,
+  NGO: <Building2 className="h-3.5 w-3.5 mr-1 text-green-600 dark:text-green-400" />,
 };
 
 export default function UsersPage() {

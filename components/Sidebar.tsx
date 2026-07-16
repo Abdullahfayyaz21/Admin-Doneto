@@ -39,13 +39,8 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="flex h-16 items-center justify-between px-4 border-b border-white/10">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/10">
-            <ShieldCheck className="h-5 w-5" />
-          </div>
-          {!collapsed && (
-            <span className="text-xl font-bold tracking-tight">DONETO</span>
-          )}
+        <Link href="/dashboard" className="flex items-center overflow-hidden h-full py-4">
+          <img src="/logo.svg" alt="DONETO" className="h-7 w-auto shrink-0" />
         </Link>
         <button
           onClick={() => setCollapsed(!collapsed)}

@@ -38,8 +38,8 @@ const stats = [
     change: '12.5%',
     trend: 'up' as const,
     icon: Users,
-    iconColor: 'text-blue-600',
-    iconBg: 'bg-blue-50 dark:bg-blue-500/10',
+    iconColor: 'text-green-600',
+    iconBg: 'bg-green-50 dark:bg-green-500/10',
   },
   {
     title: 'Verified Users',

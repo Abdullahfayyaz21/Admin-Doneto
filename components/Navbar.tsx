@@ -55,7 +55,7 @@ export function Navbar() {
         </button>
 
         <div className="flex items-center gap-3 border-l border-border pl-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-bold text-white">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-green-600 to-emerald-700 text-sm font-bold text-white">
             {getInitials(name)}
           </div>
           <div className="hidden sm:block">
