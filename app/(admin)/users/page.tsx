@@ -275,6 +275,10 @@ export default function UsersPage() {
 
   // Open delete dialog
   const openDeleteDialog = (user: User) => {
+    if (user.role === 'Admin') {
+      toast.error('Admin accounts cannot be deleted.');
+      return;
+    }
     setSelectedUser(user);
     setIsDeleteOpen(true);
   };
@@ -547,13 +551,15 @@ export default function UsersPage() {
                               <Pencil className="h-4 w-4 text-muted-foreground" />
                               Edit / Verify
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => openDeleteDialog(user)}
-                              className="cursor-pointer text-red-600 focus:text-red-600 gap-2 focus:bg-red-50 dark:focus:bg-red-950/30"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
+                            {user.role !== 'Admin' && (
+                              <DropdownMenuItem
+                                onClick={() => openDeleteDialog(user)}
+                                className="cursor-pointer text-red-600 focus:text-red-600 gap-2 focus:bg-red-50 dark:focus:bg-red-950/30"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
