@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock, Mail, Loader2 } from 'lucide-react';
-import Cookies from 'js-cookie';
 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
+import { useAuth } from '@/lib/auth-context';
 
 export function LoginForm() {
   const router = useRouter();
+  const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -31,12 +32,8 @@ export function LoginForm() {
         password,
       });
 
-      console.log('Login Success:', response.data);
-
-      Cookies.set('accessToken', response.data.accessToken);
-      Cookies.set('refreshToken', response.data.refreshToken);
-
-      router.push('/dashboard');
+      const resData = response.data.data || response.data;
+      login(resData.accessToken, resData.refreshToken);
     } catch (err: any) {
       console.error(err);
 

@@ -1,8 +1,11 @@
 'use client';
 
-import { useState } from 'react';
-import { Sun, Moon, Globe, Save } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Sun, Moon, Globe, Save, Loader2 } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useAuth } from '@/lib/auth-context';
+import api from '@/lib/api';
+import { toast } from 'sonner';
 import {
   Card,
   CardContent,
@@ -26,6 +29,45 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [notifications, setNotifications] = useState(true);
 
+  const { user, refreshUser } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setEmail(user.email || '');
+    }
+  }, [user]);
+
+  const getInitials = (nameStr: string) => {
+    if (!nameStr) return 'U';
+    const split = nameStr.trim().split(' ');
+    if (split.length > 1) {
+      return (split[0][0] + split[split.length - 1][0]).toUpperCase();
+    }
+    return nameStr.slice(0, 2).toUpperCase();
+  };
+
+  const handleSave = async () => {
+    if (!user) return;
+    try {
+      setSaving(true);
+      await api.patch(`/users/${user.id}`, {
+        name: name.trim(),
+        email: email.trim() || null,
+      });
+      await refreshUser();
+      toast.success('Profile updated successfully!');
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to update profile.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -47,7 +89,7 @@ export default function SettingsPage() {
         <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-xl font-bold text-white">
-              AD
+              {getInitials(name)}
             </div>
             <Button variant="outline" size="sm">
               Change Avatar
@@ -56,14 +98,20 @@ export default function SettingsPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
-              <Input id="name" defaultValue="Alex Doe" className="h-11 rounded-xl" />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="h-11 rounded-xl"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 type="email"
-                defaultValue="admin@doneto.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 className="h-11 rounded-xl"
               />
             </div>
@@ -163,8 +211,16 @@ export default function SettingsPage() {
 
       {/* Save */}
       <div className="flex justify-end">
-        <Button className="h-11 gap-2 px-8">
-          <Save className="h-4 w-4" />
+        <Button
+          onClick={handleSave}
+          disabled={saving}
+          className="h-11 gap-2 px-8"
+        >
+          {saving ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Save className="h-4 w-4" />
+          )}
           Save Changes
         </Button>
       </div>

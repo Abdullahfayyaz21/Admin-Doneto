@@ -3,12 +3,26 @@
 import { Search, Bell, Sun, Moon } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { useAuth } from '@/lib/auth-context';
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  const { user } = useAuth();
+  const name = user?.name || 'Alex Doe';
+  const role = user?.role || 'Administrator';
+
+  const getInitials = (nameStr: string) => {
+    if (!nameStr) return 'U';
+    const split = nameStr.trim().split(' ');
+    if (split.length > 1) {
+      return (split[0][0] + split[split.length - 1][0]).toUpperCase();
+    }
+    return nameStr.slice(0, 2).toUpperCase();
+  };
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6">
@@ -42,11 +56,11 @@ export function Navbar() {
 
         <div className="flex items-center gap-3 border-l border-border pl-4">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 text-sm font-bold text-white">
-            AD
+            {getInitials(name)}
           </div>
           <div className="hidden sm:block">
-            <p className="text-sm font-semibold leading-tight">Alex Doe</p>
-            <p className="text-xs text-muted-foreground">Administrator</p>
+            <p className="text-sm font-semibold leading-tight">{name}</p>
+            <p className="text-xs text-muted-foreground">{role}</p>
           </div>
         </div>
       </div>

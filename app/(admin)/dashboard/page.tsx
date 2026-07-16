@@ -1,3 +1,5 @@
+'use client';
+
 import {
   Users,
   UserCheck,
@@ -11,6 +13,7 @@ import {
 import dynamic from 'next/dynamic';
 import { StatCard } from '@/components/StatCard';
 import { ActivityTable } from '@/components/ActivityTable';
+import { useAuth } from '@/lib/auth-context';
 
 const DashboardChart = dynamic(
   () => import('@/components/DashboardChart'),
@@ -104,13 +107,16 @@ const stats = [
 ];
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const firstName = user?.name ? user.name.trim().split(' ')[0] : 'Alex';
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground">
-          Welcome back, Alex! Here&apos;s what&apos;s happening today.
+          Welcome back, {firstName}! Here&apos;s what&apos;s happening today.
         </p>
       </div>
 

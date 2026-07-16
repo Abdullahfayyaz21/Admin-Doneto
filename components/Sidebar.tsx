@@ -13,6 +13,7 @@ import {
   PanelLeft,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/auth-context';
 
 const navItems = [
   { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -26,6 +27,7 @@ const bottomItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { logout } = useAuth();
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -107,7 +109,7 @@ export function Sidebar() {
           );
         })}
         <button
-          onClick={() => router.push('/')}
+          onClick={logout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition-all hover:bg-red-500/20 hover:text-red-400"
         >
           <LogOut className="h-5 w-5 shrink-0" />
