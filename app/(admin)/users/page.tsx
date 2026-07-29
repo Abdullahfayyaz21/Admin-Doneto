@@ -21,6 +21,10 @@ import {
   MapPin,
   FileText,
   Key,
+  Globe,
+  FileSignature,
+  Briefcase,
+  Award,
 } from 'lucide-react';
 import {
   Card,
@@ -62,6 +66,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 
@@ -70,12 +76,21 @@ interface User {
   name: string;
   email: string | null;
   phoneNumber: string | null;
+  countryCode: string | null;
   role: 'Admin' | 'NGO' | 'Donor';
   accountStatus: 'Not Verified' | 'Pending' | 'Verified' | 'Rejected';
   cnicNumber: string | null;
   address: string | null;
+  description: string | null;
+  ngoName: string | null;
+  ngoRegistrationNumber: string | null;
+  positionInNgo: string | null;
+  directCorrespondentName: string | null;
+  contactForAccreditation: string | null;
+  proofOfAffiliation: string | null;
   isVerified: boolean;
   emailVerified: boolean;
+  phoneVerified: boolean;
   createdAt: string;
 }
 
@@ -124,11 +139,25 @@ export default function UsersPage() {
   const [formName, setFormName] = useState('');
   const [formEmail, setFormEmail] = useState('');
   const [formPhone, setFormPhone] = useState('');
+  const [formCountryCode, setFormCountryCode] = useState('');
   const [formPassword, setFormPassword] = useState('');
   const [formRole, setFormRole] = useState<'Admin' | 'NGO' | 'Donor'>('Donor');
   const [formStatus, setFormStatus] = useState<'Not Verified' | 'Pending' | 'Verified' | 'Rejected'>('Verified');
   const [formCnic, setFormCnic] = useState('');
   const [formAddress, setFormAddress] = useState('');
+  const [formDescription, setFormDescription] = useState('');
+  
+  // NGO-specific form states
+  const [formNgoName, setFormNgoName] = useState('');
+  const [formNgoRegistrationNumber, setFormNgoRegistrationNumber] = useState('');
+  const [formPositionInNgo, setFormPositionInNgo] = useState('');
+  const [formDirectCorrespondentName, setFormDirectCorrespondentName] = useState('');
+  const [formContactForAccreditation, setFormContactForAccreditation] = useState('');
+  const [formProofOfAffiliation, setFormProofOfAffiliation] = useState('');
+
+  // Verification flags
+  const [formEmailVerified, setFormEmailVerified] = useState(false);
+  const [formPhoneVerified, setFormPhoneVerified] = useState(false);
 
   const fetchUsers = async () => {
     try {
@@ -143,8 +172,6 @@ export default function UsersPage() {
 
       const response = await api.get('/users', { params });
       
-      // NestJS wraps backend responses inside { data, total, page, lastPage } 
-      // check if inside nested response from HttpExceptionFilter / TransformInterceptor
       const resData = response.data.data || response.data;
       setUsers(resData.data || []);
       setTotal(resData.total || 0);
@@ -187,9 +214,21 @@ export default function UsersPage() {
     setFormName('');
     setFormEmail('');
     setFormPhone('');
+    setFormCountryCode('');
     setFormPassword('');
     setFormRole('Donor');
     setFormStatus('Verified');
+    setFormCnic('');
+    setFormAddress('');
+    setFormDescription('');
+    setFormNgoName('');
+    setFormNgoRegistrationNumber('');
+    setFormPositionInNgo('');
+    setFormDirectCorrespondentName('');
+    setFormContactForAccreditation('');
+    setFormProofOfAffiliation('');
+    setFormEmailVerified(false);
+    setFormPhoneVerified(false);
     setIsCreateOpen(true);
   };
 
@@ -203,10 +242,25 @@ export default function UsersPage() {
         role: formRole,
         accountStatus: formStatus,
         isVerified: formStatus === 'Verified',
+        emailVerified: formEmailVerified || formStatus === 'Verified',
+        phoneVerified: formPhoneVerified || formStatus === 'Verified',
       };
 
       if (formEmail.trim()) payload.email = formEmail.trim();
       if (formPhone.trim()) payload.phoneNumber = formPhone.trim();
+      if (formCountryCode.trim()) payload.countryCode = formCountryCode.trim();
+      if (formCnic.trim()) payload.cnicNumber = formCnic.trim();
+      if (formAddress.trim()) payload.address = formAddress.trim();
+      if (formDescription.trim()) payload.description = formDescription.trim();
+
+      if (formRole === 'NGO') {
+        if (formNgoName.trim()) payload.ngoName = formNgoName.trim();
+        if (formNgoRegistrationNumber.trim()) payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim();
+        if (formPositionInNgo.trim()) payload.positionInNgo = formPositionInNgo.trim();
+        if (formDirectCorrespondentName.trim()) payload.directCorrespondentName = formDirectCorrespondentName.trim();
+        if (formContactForAccreditation.trim()) payload.contactForAccreditation = formContactForAccreditation.trim();
+        if (formProofOfAffiliation.trim()) payload.proofOfAffiliation = formProofOfAffiliation.trim();
+      }
 
       await api.post('/users', payload);
       toast.success('User created successfully!');
@@ -226,10 +280,20 @@ export default function UsersPage() {
     setFormName(user.name || '');
     setFormEmail(user.email || '');
     setFormPhone(user.phoneNumber || '');
+    setFormCountryCode(user.countryCode || '');
     setFormRole(user.role || 'Donor');
     setFormStatus(user.accountStatus || 'Pending');
     setFormCnic(user.cnicNumber || '');
     setFormAddress(user.address || '');
+    setFormDescription(user.description || '');
+    setFormNgoName(user.ngoName || '');
+    setFormNgoRegistrationNumber(user.ngoRegistrationNumber || '');
+    setFormPositionInNgo(user.positionInNgo || '');
+    setFormDirectCorrespondentName(user.directCorrespondentName || '');
+    setFormContactForAccreditation(user.contactForAccreditation || '');
+    setFormProofOfAffiliation(user.proofOfAffiliation || '');
+    setFormEmailVerified(user.emailVerified || false);
+    setFormPhoneVerified(user.phoneVerified || false);
     setIsEditOpen(true);
   };
 
@@ -244,9 +308,12 @@ export default function UsersPage() {
         role: formRole,
         accountStatus: formStatus,
         isVerified: formStatus === 'Verified',
-        emailVerified: formStatus === 'Verified' ? true : selectedUser.emailVerified,
+        emailVerified: formStatus === 'Verified' ? true : formEmailVerified,
+        phoneVerified: formStatus === 'Verified' ? true : formPhoneVerified,
+        countryCode: formCountryCode.trim() || null,
         cnicNumber: formCnic.trim() || null,
         address: formAddress.trim() || null,
+        description: formDescription.trim() || null,
       };
 
       if (formEmail.trim()) {
@@ -259,6 +326,23 @@ export default function UsersPage() {
         payload.phoneNumber = formPhone.trim();
       } else {
         payload.phoneNumber = null;
+      }
+
+      if (formRole === 'NGO') {
+        payload.ngoName = formNgoName.trim() || null;
+        payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim() || null;
+        payload.positionInNgo = formPositionInNgo.trim() || null;
+        payload.directCorrespondentName = formDirectCorrespondentName.trim() || null;
+        payload.contactForAccreditation = formContactForAccreditation.trim() || null;
+        payload.proofOfAffiliation = formProofOfAffiliation.trim() || null;
+      } else {
+        // Clear NGO fields if role is changed to Donor or Admin
+        payload.ngoName = null;
+        payload.ngoRegistrationNumber = null;
+        payload.positionInNgo = null;
+        payload.directCorrespondentName = null;
+        payload.contactForAccreditation = null;
+        payload.proofOfAffiliation = null;
       }
 
       await api.patch(`/users/${selectedUser.id}`, payload);
@@ -304,16 +388,31 @@ export default function UsersPage() {
       toast.error('No users list found to export.');
       return;
     }
-    const headers = ['User ID', 'Name', 'Email', 'Phone', 'Role', 'Status', 'CNIC', 'Address', 'Joined Date'];
+    const headers = [
+      'User ID', 'Name', 'Email', 'Phone', 'Country Code', 'Role', 'Status', 
+      'CNIC', 'Address', 'Email Verified', 'Phone Verified', 'Description', 
+      'NGO Name', 'NGO Registration Number', 'Position in NGO', 
+      'Direct Correspondent', 'Contact for Accreditation', 'Proof of Affiliation', 'Joined Date'
+    ];
     const rows = users.map((u) => [
       u.id,
       u.name || '',
       u.email || '',
       u.phoneNumber || '',
+      u.countryCode || '',
       u.role || '',
       u.accountStatus || '',
       u.cnicNumber || '',
       u.address || '',
+      u.emailVerified ? 'Yes' : 'No',
+      u.phoneVerified ? 'Yes' : 'No',
+      u.description || '',
+      u.ngoName || '',
+      u.ngoRegistrationNumber || '',
+      u.positionInNgo || '',
+      u.directCorrespondentName || '',
+      u.contactForAccreditation || '',
+      u.proofOfAffiliation || '',
       u.createdAt ? new Date(u.createdAt).toLocaleDateString() : '',
     ]);
 
@@ -605,7 +704,7 @@ export default function UsersPage() {
 
       {/* Creation Modal */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
+        <DialogContent className="sm:max-w-2xl rounded-2xl">
           <form onSubmit={handleCreateUser}>
             <DialogHeader>
               <DialogTitle className="text-lg font-bold">Add New User</DialogTitle>
@@ -614,73 +713,144 @@ export default function UsersPage() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4">
-              {/* Name */}
-              <div className="space-y-1.5">
-                <Label htmlFor="create-name" className="text-xs font-semibold">Full Name *</Label>
-                <div className="relative">
-                  <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="create-name"
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    placeholder="Enter full name"
-                    className="pl-9 h-10 rounded-xl"
-                    required
+            <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto pr-2 scrollbar-thin">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* General Section */}
+                <div className="space-y-1 md:col-span-2">
+                  <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
+                    <UserIcon className="h-4 w-4" /> General Information
+                  </h3>
+                </div>
+
+                {/* Name */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="create-name" className="text-xs font-semibold">Full Name *</Label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="create-name"
+                      value={formName}
+                      onChange={(e) => setFormName(e.target.value)}
+                      placeholder="Enter full name"
+                      className="pl-9 h-10 rounded-xl"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="create-email" className="text-xs font-semibold">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="create-email"
+                      type="email"
+                      value={formEmail}
+                      onChange={(e) => setFormEmail(e.target.value)}
+                      placeholder="name@example.com"
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="create-phone" className="text-xs font-semibold">Phone Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="create-phone"
+                      value={formPhone}
+                      onChange={(e) => setFormPhone(e.target.value)}
+                      placeholder="+923001234567"
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Country Code */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="create-country-code" className="text-xs font-semibold">Country Code</Label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="create-country-code"
+                      value={formCountryCode}
+                      onChange={(e) => setFormCountryCode(e.target.value)}
+                      placeholder="e.g. PK, US"
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Password */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="create-pass" className="text-xs font-semibold">Password *</Label>
+                  <div className="relative">
+                    <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="create-pass"
+                      type="password"
+                      value={formPassword}
+                      onChange={(e) => setFormPassword(e.target.value)}
+                      placeholder="Password (min 6 chars)"
+                      className="pl-9 h-10 rounded-xl"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+
+                {/* CNIC */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="create-cnic" className="text-xs font-semibold">CNIC Number</Label>
+                  <div className="relative">
+                    <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="create-cnic"
+                      value={formCnic}
+                      onChange={(e) => setFormCnic(e.target.value)}
+                      placeholder="e.g. 35201-1234567-1"
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <Label htmlFor="create-address" className="text-xs font-semibold">Residential / Business Address</Label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="create-address"
+                      value={formAddress}
+                      onChange={(e) => setFormAddress(e.target.value)}
+                      placeholder="Enter physical address"
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <Label htmlFor="create-desc" className="text-xs font-semibold">Bio / Description</Label>
+                  <Textarea
+                    id="create-desc"
+                    value={formDescription}
+                    onChange={(e) => setFormDescription(e.target.value)}
+                    placeholder="Brief description about the user..."
+                    className="rounded-xl min-h-[80px]"
                   />
                 </div>
-              </div>
 
-              {/* Email */}
-              <div className="space-y-1.5">
-                <Label htmlFor="create-email" className="text-xs font-semibold">Email Address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="create-email"
-                    type="email"
-                    value={formEmail}
-                    onChange={(e) => setFormEmail(e.target.value)}
-                    placeholder="name@example.com"
-                    className="pl-9 h-10 rounded-xl"
-                  />
+                {/* Role and Account Section */}
+                <div className="space-y-1 md:col-span-2 pt-2">
+                  <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
+                    <Shield className="h-4 w-4" /> Account & Verification
+                  </h3>
                 </div>
-              </div>
 
-              {/* Phone */}
-              <div className="space-y-1.5">
-                <Label htmlFor="create-phone" className="text-xs font-semibold">Phone Number</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="create-phone"
-                    value={formPhone}
-                    onChange={(e) => setFormPhone(e.target.value)}
-                    placeholder="+923001234567"
-                    className="pl-9 h-10 rounded-xl"
-                  />
-                </div>
-              </div>
-
-              {/* Password */}
-              <div className="space-y-1.5">
-                <Label htmlFor="create-pass" className="text-xs font-semibold">Password *</Label>
-                <div className="relative">
-                  <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="create-pass"
-                    type="password"
-                    value={formPassword}
-                    onChange={(e) => setFormPassword(e.target.value)}
-                    placeholder="Password (min 6 chars)"
-                    className="pl-9 h-10 rounded-xl"
-                    required
-                    minLength={6}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 {/* Role */}
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold">System Role</Label>
@@ -711,10 +881,137 @@ export default function UsersPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Verification Toggles */}
+                <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 p-3 bg-muted/20 border border-border/50 rounded-xl">
+                  <div className="flex items-center justify-between flex-1">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="create-email-verified" className="text-xs font-semibold cursor-pointer">Email Verified</Label>
+                      <p className="text-[10px] text-muted-foreground">Mark email as verified</p>
+                    </div>
+                    <Switch
+                      id="create-email-verified"
+                      checked={formEmailVerified}
+                      onCheckedChange={setFormEmailVerified}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between flex-1">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="create-phone-verified" className="text-xs font-semibold cursor-pointer">Phone Verified</Label>
+                      <p className="text-[10px] text-muted-foreground">Mark phone number as verified</p>
+                    </div>
+                    <Switch
+                      id="create-phone-verified"
+                      checked={formPhoneVerified}
+                      onCheckedChange={setFormPhoneVerified}
+                    />
+                  </div>
+                </div>
+
+                {/* NGO specific details */}
+                {formRole === 'NGO' && (
+                  <>
+                    <div className="space-y-1 md:col-span-2 pt-2">
+                      <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
+                        <Building2 className="h-4 w-4" /> NGO Accreditation Details
+                      </h3>
+                    </div>
+
+                    {/* NGO Name */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="create-ngo-name" className="text-xs font-semibold">NGO Official Name</Label>
+                      <div className="relative">
+                        <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="create-ngo-name"
+                          value={formNgoName}
+                          onChange={(e) => setFormNgoName(e.target.value)}
+                          placeholder="e.g. Save The Children"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* NGO Registration Number */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="create-ngo-reg" className="text-xs font-semibold">NGO Registration Number</Label>
+                      <div className="relative">
+                        <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="create-ngo-reg"
+                          value={formNgoRegistrationNumber}
+                          onChange={(e) => setFormNgoRegistrationNumber(e.target.value)}
+                          placeholder="e.g. REG-12345"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Position in NGO */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="create-ngo-pos" className="text-xs font-semibold">Your Position in NGO</Label>
+                      <div className="relative">
+                        <Briefcase className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="create-ngo-pos"
+                          value={formPositionInNgo}
+                          onChange={(e) => setFormPositionInNgo(e.target.value)}
+                          placeholder="e.g. Director, Volunteer"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Direct Correspondent Name */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="create-ngo-corr" className="text-xs font-semibold">Direct Correspondent Name</Label>
+                      <div className="relative">
+                        <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="create-ngo-corr"
+                          value={formDirectCorrespondentName}
+                          onChange={(e) => setFormDirectCorrespondentName(e.target.value)}
+                          placeholder="e.g. John Doe"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Contact for Accreditation */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="create-ngo-contact" className="text-xs font-semibold">Contact Email/Phone for Accreditation</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="create-ngo-contact"
+                          value={formContactForAccreditation}
+                          onChange={(e) => setFormContactForAccreditation(e.target.value)}
+                          placeholder="email@ngo.org or phone"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Proof of Affiliation */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="create-ngo-proof" className="text-xs font-semibold">Proof of Affiliation (URL / Text)</Label>
+                      <div className="relative">
+                        <Award className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="create-ngo-proof"
+                          value={formProofOfAffiliation}
+                          onChange={(e) => setFormProofOfAffiliation(e.target.value)}
+                          placeholder="URL to registration docs / proof"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-0">
+            <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-border/50">
               <Button
                 type="button"
                 variant="outline"
@@ -738,7 +1035,7 @@ export default function UsersPage() {
 
       {/* Edit Modal */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-md rounded-2xl">
+        <DialogContent className="sm:max-w-2xl rounded-2xl">
           <form onSubmit={handleEditUser}>
             <DialogHeader>
               <DialogTitle className="text-lg font-bold">Edit User Profiles & Status</DialogTitle>
@@ -747,82 +1044,123 @@ export default function UsersPage() {
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4 py-4 max-h-[60vh] overflow-y-auto pr-2 scrollbar-thin">
-              {/* Name */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-name" className="text-xs font-semibold">Full Name *</Label>
-                <div className="relative">
-                  <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="edit-name"
-                    value={formName}
-                    onChange={(e) => setFormName(e.target.value)}
-                    className="pl-9 h-10 rounded-xl"
-                    required
+            <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto pr-2 scrollbar-thin">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* General Section */}
+                <div className="space-y-1 md:col-span-2">
+                  <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
+                    <UserIcon className="h-4 w-4" /> General Information
+                  </h3>
+                </div>
+
+                {/* Name */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-name" className="text-xs font-semibold">Full Name *</Label>
+                  <div className="relative">
+                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="edit-name"
+                      value={formName}
+                      onChange={(e) => setFormName(e.target.value)}
+                      className="pl-9 h-10 rounded-xl"
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-email" className="text-xs font-semibold">Email Address</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="edit-email"
+                      type="email"
+                      value={formEmail}
+                      onChange={(e) => setFormEmail(e.target.value)}
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-phone" className="text-xs font-semibold">Phone Number</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="edit-phone"
+                      value={formPhone}
+                      onChange={(e) => setFormPhone(e.target.value)}
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Country Code */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-country-code" className="text-xs font-semibold">Country Code</Label>
+                  <div className="relative">
+                    <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="edit-country-code"
+                      value={formCountryCode}
+                      onChange={(e) => setFormCountryCode(e.target.value)}
+                      placeholder="e.g. PK, US"
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* CNIC */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-cnic" className="text-xs font-semibold">CNIC Number</Label>
+                  <div className="relative">
+                    <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="edit-cnic"
+                      value={formCnic}
+                      onChange={(e) => setFormCnic(e.target.value)}
+                      placeholder="35201-XXXXXXX-X"
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <Label htmlFor="edit-address" className="text-xs font-semibold">Residential / NGO Address</Label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="edit-address"
+                      value={formAddress}
+                      onChange={(e) => setFormAddress(e.target.value)}
+                      placeholder="Enter physical address"
+                      className="pl-9 h-10 rounded-xl"
+                    />
+                  </div>
+                </div>
+
+                {/* Description */}
+                <div className="space-y-1.5 md:col-span-2">
+                  <Label htmlFor="edit-desc" className="text-xs font-semibold">Bio / Description</Label>
+                  <Textarea
+                    id="edit-desc"
+                    value={formDescription}
+                    onChange={(e) => setFormDescription(e.target.value)}
+                    placeholder="Brief description about the user..."
+                    className="rounded-xl min-h-[80px]"
                   />
                 </div>
-              </div>
 
-              {/* Email */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-email" className="text-xs font-semibold">Email Address</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="edit-email"
-                    type="email"
-                    value={formEmail}
-                    onChange={(e) => setFormEmail(e.target.value)}
-                    className="pl-9 h-10 rounded-xl"
-                  />
+                {/* Role and Account Section */}
+                <div className="space-y-1 md:col-span-2 pt-2">
+                  <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
+                    <Shield className="h-4 w-4" /> Account & Verification
+                  </h3>
                 </div>
-              </div>
 
-              {/* Phone */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-phone" className="text-xs font-semibold">Phone Number</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="edit-phone"
-                    value={formPhone}
-                    onChange={(e) => setFormPhone(e.target.value)}
-                    className="pl-9 h-10 rounded-xl"
-                  />
-                </div>
-              </div>
-
-              {/* CNIC (Only useful for NGO/Donor verification) */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-cnic" className="text-xs font-semibold">CNIC Number</Label>
-                <div className="relative">
-                  <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="edit-cnic"
-                    value={formCnic}
-                    onChange={(e) => setFormCnic(e.target.value)}
-                    placeholder="35201-XXXXXXX-X"
-                    className="pl-9 h-10 rounded-xl"
-                  />
-                </div>
-              </div>
-
-              {/* Address */}
-              <div className="space-y-1.5">
-                <Label htmlFor="edit-address" className="text-xs font-semibold">Residential / NGO Address</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="edit-address"
-                    value={formAddress}
-                    onChange={(e) => setFormAddress(e.target.value)}
-                    placeholder="Enter physical address"
-                    className="pl-9 h-10 rounded-xl"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
                 {/* Role */}
                 <div className="space-y-1.5">
                   <Label className="text-xs font-semibold">User Role</Label>
@@ -853,6 +1191,133 @@ export default function UsersPage() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                {/* Verification Toggles */}
+                <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 p-3 bg-muted/20 border border-border/50 rounded-xl">
+                  <div className="flex items-center justify-between flex-1">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="edit-email-verified" className="text-xs font-semibold cursor-pointer">Email Verified</Label>
+                      <p className="text-[10px] text-muted-foreground">Toggle email verification status</p>
+                    </div>
+                    <Switch
+                      id="edit-email-verified"
+                      checked={formEmailVerified}
+                      onCheckedChange={setFormEmailVerified}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between flex-1">
+                    <div className="space-y-0.5">
+                      <Label htmlFor="edit-phone-verified" className="text-xs font-semibold cursor-pointer">Phone Verified</Label>
+                      <p className="text-[10px] text-muted-foreground">Toggle phone verification status</p>
+                    </div>
+                    <Switch
+                      id="edit-phone-verified"
+                      checked={formPhoneVerified}
+                      onCheckedChange={setFormPhoneVerified}
+                    />
+                  </div>
+                </div>
+
+                {/* NGO specific details */}
+                {formRole === 'NGO' && (
+                  <>
+                    <div className="space-y-1 md:col-span-2 pt-2">
+                      <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
+                        <Building2 className="h-4 w-4" /> NGO Accreditation Details
+                      </h3>
+                    </div>
+
+                    {/* NGO Name */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-ngo-name" className="text-xs font-semibold">NGO Official Name</Label>
+                      <div className="relative">
+                        <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="edit-ngo-name"
+                          value={formNgoName}
+                          onChange={(e) => setFormNgoName(e.target.value)}
+                          placeholder="e.g. Save The Children"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* NGO Registration Number */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-ngo-reg" className="text-xs font-semibold">NGO Registration Number</Label>
+                      <div className="relative">
+                        <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="edit-ngo-reg"
+                          value={formNgoRegistrationNumber}
+                          onChange={(e) => setFormNgoRegistrationNumber(e.target.value)}
+                          placeholder="e.g. REG-12345"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Position in NGO */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-ngo-pos" className="text-xs font-semibold">Your Position in NGO</Label>
+                      <div className="relative">
+                        <Briefcase className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="edit-ngo-pos"
+                          value={formPositionInNgo}
+                          onChange={(e) => setFormPositionInNgo(e.target.value)}
+                          placeholder="e.g. Director, Volunteer"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Direct Correspondent Name */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-ngo-corr" className="text-xs font-semibold">Direct Correspondent Name</Label>
+                      <div className="relative">
+                        <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="edit-ngo-corr"
+                          value={formDirectCorrespondentName}
+                          onChange={(e) => setFormDirectCorrespondentName(e.target.value)}
+                          placeholder="e.g. John Doe"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Contact for Accreditation */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-ngo-contact" className="text-xs font-semibold">Contact Email/Phone for Accreditation</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="edit-ngo-contact"
+                          value={formContactForAccreditation}
+                          onChange={(e) => setFormContactForAccreditation(e.target.value)}
+                          placeholder="email@ngo.org or phone"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Proof of Affiliation */}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="edit-ngo-proof" className="text-xs font-semibold">Proof of Affiliation (URL / Text)</Label>
+                      <div className="relative">
+                        <Award className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="edit-ngo-proof"
+                          value={formProofOfAffiliation}
+                          onChange={(e) => setFormProofOfAffiliation(e.target.value)}
+                          placeholder="URL to registration docs / proof"
+                          className="pl-9 h-10 rounded-xl"
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 
