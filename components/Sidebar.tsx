@@ -21,6 +21,7 @@ import {
   Building2,
   FileCheck,
   Filter,
+  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
@@ -48,6 +49,7 @@ const navItems: NavItem[] = [
       { label: 'NGOs', href: '/users/ngos', icon: Building2 },
       { label: 'Donors', href: '/users/donors', icon: UserCheck },
       { label: 'KYC Requests', href: '/users/kyc', icon: FileCheck },
+      { label: 'KYC Categories', href: '/users/kyc-categories', icon: Layers },
     ],
   },
   {
