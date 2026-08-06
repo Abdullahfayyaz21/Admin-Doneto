@@ -95,7 +95,6 @@ export default function KycCategoriesPage() {
 
   // Form states
   const [formName, setFormName] = useState('');
-  const [formDescription, setFormDescription] = useState('');
   const [formIcon, setFormIcon] = useState('');
   const [formIsActive, setFormIsActive] = useState(true);
 
@@ -119,7 +118,6 @@ export default function KycCategoriesPage() {
 
   const handleCreateOpen = () => {
     setFormName('');
-    setFormDescription('');
     setFormIcon('');
     setFormIsActive(true);
     setIsCreateOpen(true);
@@ -128,7 +126,6 @@ export default function KycCategoriesPage() {
   const handleEditOpen = (category: Category) => {
     setSelectedCategory(category);
     setFormName(category.name);
-    setFormDescription(category.description || '');
     setFormIcon(category.icon || '');
     setFormIsActive(category.isActive);
     setIsEditOpen(true);
@@ -150,7 +147,6 @@ export default function KycCategoriesPage() {
       setSubmitLoading(true);
       await api.post('/kyc/admin/categories', {
         name: formName.trim(),
-        description: formDescription.trim() || undefined,
         icon: formIcon.trim() || undefined,
         isActive: formIsActive,
       });
@@ -177,7 +173,6 @@ export default function KycCategoriesPage() {
       setSubmitLoading(true);
       await api.patch(`/kyc/admin/categories/${selectedCategory.id}`, {
         name: formName.trim(),
-        description: formDescription.trim() || null,
         icon: formIcon.trim() || null,
         isActive: formIsActive,
       });
@@ -238,8 +233,7 @@ export default function KycCategoriesPage() {
 
   // Filtered categories
   const filteredCategories = categories.filter((cat) =>
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (cat.description && cat.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getGradientIndex = (id: number) => {
@@ -263,7 +257,7 @@ export default function KycCategoriesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-in fade-in-50 slide-in-from-left-4 duration-300">
         <div>
           <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
             KYC / NGO Categories
@@ -274,7 +268,7 @@ export default function KycCategoriesPage() {
         </div>
         <Button 
           onClick={handleCreateOpen}
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 flex items-center gap-2 self-start sm:self-auto rounded-xl py-6 px-5"
+          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 flex items-center gap-2 self-start sm:self-auto rounded-xl py-6 px-5 transition-transform duration-200 hover:scale-105 active:scale-95"
         >
           <Plus className="h-5 w-5" />
           Add Category
@@ -282,8 +276,8 @@ export default function KycCategoriesPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total NGO Classifications</CardTitle>
             <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
@@ -300,7 +294,7 @@ export default function KycCategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active Categories</CardTitle>
             <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl">
@@ -317,7 +311,7 @@ export default function KycCategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Hidden Categories</CardTitle>
             <div className="p-2 bg-red-500/10 text-red-500 rounded-xl">
@@ -336,7 +330,7 @@ export default function KycCategoriesPage() {
       </div>
 
       {/* Filter Row */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl shadow-md">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl shadow-md animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -412,15 +406,15 @@ export default function KycCategoriesPage() {
             return (
               <Card 
                 key={category.id} 
-                className={`group border bg-white/5 backdrop-blur-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between ${
-                  category.isActive ? 'border-white/10 hover:border-primary/40' : 'border-red-500/20 bg-red-950/5 opacity-80 hover:opacity-100 hover:border-red-500/40'
+                className={`group border bg-white/5 backdrop-blur-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between animate-in fade-in-50 slide-in-from-bottom-4 duration-300 ${
+                  category.isActive ? 'border-white/10 hover:border-primary/40 hover:-translate-y-1' : 'border-red-500/20 bg-red-950/5 opacity-80 hover:opacity-100 hover:border-red-500/40 hover:-translate-y-1'
                 }`}
               >
                 <div className="p-6 space-y-4">
                   {/* Card Header */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center text-white shadow-md font-bold text-lg shrink-0`}>
+                      <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center text-white shadow-md font-bold text-lg shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                         {category.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -472,11 +466,6 @@ export default function KycCategoriesPage() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-
-                  {/* Description */}
-                  <p className="text-muted-foreground text-sm line-clamp-3 min-h-[60px] leading-relaxed">
-                    {category.description || 'No description provided.'}
-                  </p>
                 </div>
 
                 {/* Card Footer */}
@@ -500,14 +489,13 @@ export default function KycCategoriesPage() {
         </div>
       ) : (
         /* Table View */
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
           <Table>
             <TableHeader className="bg-white/5 border-b border-white/10">
               <TableRow className="border-b border-white/10 hover:bg-transparent">
                 <TableHead className="w-16 text-muted-foreground py-4">Icon</TableHead>
                 <TableHead className="w-16 text-muted-foreground py-4">ID</TableHead>
                 <TableHead className="font-semibold text-muted-foreground py-4">Category Name</TableHead>
-                <TableHead className="text-muted-foreground py-4 max-w-md">Description</TableHead>
                 <TableHead className="text-muted-foreground py-4">Status</TableHead>
                 <TableHead className="text-muted-foreground py-4">Created Date</TableHead>
                 <TableHead className="w-24 text-right text-muted-foreground py-4 pr-6">Actions</TableHead>
@@ -517,7 +505,7 @@ export default function KycCategoriesPage() {
               {filteredCategories.map((category) => {
                 const grad = avatarGradients[getGradientIndex(category.id)];
                 return (
-                  <TableRow key={category.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <TableRow key={category.id} className="border-b border-white/5 hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-[1px]">
                     <TableCell className="py-3">
                       <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${grad} flex items-center justify-center text-white text-xs font-bold`}>
                         {category.name.charAt(0).toUpperCase()}
@@ -525,9 +513,6 @@ export default function KycCategoriesPage() {
                     </TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">#{category.id}</TableCell>
                     <TableCell className="font-semibold text-white">{category.name}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm max-w-md truncate">
-                      {category.description || 'No description provided.'}
-                    </TableCell>
                     <TableCell>
                       <Badge 
                         className={`text-[10px] border px-2 py-0.5 ${
@@ -602,19 +587,6 @@ export default function KycCategoriesPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="create-description" className="text-sm font-medium text-muted-foreground">
-                  Description
-                </Label>
-                <Textarea
-                  id="create-description"
-                  placeholder="Optional details outlining this NGO classification scope..."
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  rows={3}
-                  className="bg-white/5 border-white/10 focus:border-primary rounded-xl text-sm text-white"
-                />
-              </div>
-              <div className="space-y-2">
                 <Label htmlFor="create-icon" className="text-sm font-medium text-muted-foreground">
                   Icon Key/Label
                 </Label>
@@ -651,7 +623,7 @@ export default function KycCategoriesPage() {
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2"
+                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Create Category
@@ -686,18 +658,6 @@ export default function KycCategoriesPage() {
                   maxLength={100}
                   className="bg-white/5 border-white/10 focus:border-primary rounded-xl py-5 text-sm text-white"
                   required
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-description" className="text-sm font-medium text-muted-foreground">
-                  Description
-                </Label>
-                <Textarea
-                  id="edit-description"
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  rows={3}
-                  className="bg-white/5 border-white/10 focus:border-primary rounded-xl text-sm text-white"
                 />
               </div>
               <div className="space-y-2">
@@ -736,7 +696,7 @@ export default function KycCategoriesPage() {
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2"
+                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save Changes

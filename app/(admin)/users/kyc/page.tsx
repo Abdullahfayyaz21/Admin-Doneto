@@ -233,7 +233,7 @@ export default function KYCRequestsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
+      <div className="animate-in fade-in-50 slide-in-from-left-4 duration-300">
         <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
           KYC Requests Queue
         </h1>
@@ -243,8 +243,8 @@ export default function KYCRequestsPage() {
       </div>
 
       {/* Stats Widgets */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending Review</CardTitle>
             <div className="p-2 bg-amber-500/10 text-amber-500 rounded-xl">
@@ -257,7 +257,7 @@ export default function KYCRequestsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Approved Verification</CardTitle>
             <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl">
@@ -270,7 +270,7 @@ export default function KYCRequestsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Rejected Application</CardTitle>
             <div className="p-2 bg-red-500/10 text-red-500 rounded-xl">
@@ -285,7 +285,7 @@ export default function KYCRequestsPage() {
       </div>
 
       {/* Filter Row */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl shadow-md">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl shadow-md animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -333,7 +333,7 @@ export default function KYCRequestsPage() {
       </div>
 
       {/* Main Table */}
-      <Card className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl">
+      <Card className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
         {loading ? (
           <div className="p-6 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -373,7 +373,7 @@ export default function KYCRequestsPage() {
               </TableHeader>
               <TableBody>
                 {requests.map((req) => (
-                  <TableRow key={req.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <TableRow key={req.id} className="border-b border-white/5 hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-[1px]">
                     <TableCell className="py-4 font-semibold text-white">
                       <div className="flex items-center gap-3">
                         <div className="h-9 w-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
@@ -399,12 +399,12 @@ export default function KYCRequestsPage() {
                     <TableCell>
                       <Badge
                         variant={statusVariants[req.status]}
-                        className={`text-[10px] px-2 py-0.5 border font-semibold uppercase tracking-wider ${
-                          req.status === KycStatus.APPROVED && 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                        className={`text-[10px] px-2.5 py-1 border font-semibold uppercase tracking-wider rounded-full shadow-[0_0_8px_rgba(255,255,255,0.02)] transition-all ${
+                          req.status === KycStatus.APPROVED && 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
                         } ${
-                          req.status === KycStatus.PENDING && 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                          req.status === KycStatus.PENDING && 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.15)]'
                         } ${
-                          req.status === KycStatus.REJECTED && 'bg-red-500/10 text-red-400 border-red-500/20'
+                          req.status === KycStatus.REJECTED && 'bg-red-500/10 text-red-400 border-red-500/20 shadow-[0_0_12px_rgba(239,68,68,0.15)]'
                         }`}
                       >
                         {statusLabels[req.status]}
@@ -414,7 +414,7 @@ export default function KYCRequestsPage() {
                     <TableCell className="text-right py-4 pr-6">
                       <Button
                         onClick={() => handleInspect(req.id)}
-                        className="bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 text-xs font-semibold py-1.5 px-3 rounded-lg"
+                        className="bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 text-xs font-semibold py-1.5 px-3 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md hover:shadow-primary/10"
                       >
                         Review
                       </Button>
@@ -489,7 +489,7 @@ export default function KYCRequestsPage() {
               <p>Failed to retrieve verification details.</p>
             </div>
           ) : (
-            <div className="py-4 space-y-6 text-sm">
+            <div className="py-4 space-y-6 text-sm animate-in fade-in zoom-in-95 duration-200">
               
               {/* Header Profile */}
               <div className="flex flex-col sm:flex-row gap-4 justify-between bg-white/5 border border-white/5 p-4 rounded-xl">
@@ -630,7 +630,7 @@ export default function KYCRequestsPage() {
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                   
                   {detailedRequest.registrationCertificate && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/40 transition-all rounded-xl p-3 flex flex-col justify-between">
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Document</span>
                         <span className="font-semibold block truncate">Registration Cert</span>
@@ -645,7 +645,7 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.ntnCertificate && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/40 transition-all rounded-xl p-3 flex flex-col justify-between">
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Document</span>
                         <span className="font-semibold block truncate">NTN Certificate</span>
@@ -660,7 +660,7 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.proofOfAffiliation && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/40 transition-all rounded-xl p-3 flex flex-col justify-between">
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Document</span>
                         <span className="font-semibold block truncate">Proof of Affiliation</span>
@@ -675,7 +675,7 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.cnicFrontImage && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/40 transition-all rounded-xl p-3 flex flex-col justify-between">
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Scan</span>
                         <span className="font-semibold block truncate">CNIC Front Side</span>
@@ -690,7 +690,7 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.cnicBackImage && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/40 transition-all rounded-xl p-3 flex flex-col justify-between">
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Scan</span>
                         <span className="font-semibold block truncate">CNIC Back Side</span>
@@ -705,7 +705,7 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.selfieImage && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/40 transition-all rounded-xl p-3 flex flex-col justify-between">
+                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Scan</span>
                         <span className="font-semibold block truncate">Selfie Identity Scan</span>

@@ -124,7 +124,7 @@ export function Sidebar() {
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-4 scrollbar-thin">
+      <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-4 no-scrollbar">
         {!collapsed && (
           <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-white/40">
             Menu
@@ -141,10 +141,10 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href!}
                 className={cn(
-                  'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                  'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:translate-x-1',
                   active
-                    ? 'bg-primary text-white shadow-lg shadow-primary/30'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
+                    ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-[1.02]'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white hover:shadow-md'
                 )}
               >
                 <Icon className="h-5 w-5 shrink-0" />
@@ -162,7 +162,7 @@ export function Sidebar() {
               <button
                 onClick={() => toggleMenu(item.label)}
                 className={cn(
-                  'flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                  'flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:translate-x-0.5',
                   hasActiveSub
                     ? 'bg-white/5 text-white'
                     : 'text-white/70 hover:bg-white/10 hover:text-white'
@@ -183,7 +183,7 @@ export function Sidebar() {
               
               {/* Sub-items */}
               {!collapsed && isOpen && (
-                <div className="pl-4 pr-1 py-1 space-y-1 border-l border-white/10 ml-5 transition-all">
+                <div className="pl-4 pr-1 py-1 space-y-1 border-l border-white/10 ml-5 transition-all animate-in fade-in-50 slide-in-from-top-1 duration-150 ease-out">
                   {item.subItems.map((sub) => {
                     const SubIcon = sub.icon;
                     const subActive = pathname === sub.href;
@@ -192,9 +192,9 @@ export function Sidebar() {
                         key={sub.href}
                         href={sub.href}
                         className={cn(
-                          'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all',
+                          'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all duration-200 hover:translate-x-1',
                           subActive
-                            ? 'bg-primary text-white shadow-md'
+                            ? 'bg-primary text-white shadow-md scale-[1.02]'
                             : 'text-white/60 hover:bg-white/5 hover:text-white'
                         )}
                       >
@@ -220,9 +220,9 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
+                'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:translate-x-1',
                 active
-                  ? 'bg-primary text-white shadow-lg shadow-primary/30'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-[1.02]'
                   : 'text-white/70 hover:bg-white/10 hover:text-white'
               )}
             >

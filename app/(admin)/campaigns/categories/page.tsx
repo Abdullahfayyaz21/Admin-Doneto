@@ -86,7 +86,6 @@ export default function CategoriesPage() {
 
   // Form states
   const [formName, setFormName] = useState('');
-  const [formDescription, setFormDescription] = useState('');
 
   const fetchCategories = async () => {
     try {
@@ -108,14 +107,12 @@ export default function CategoriesPage() {
 
   const handleCreateOpen = () => {
     setFormName('');
-    setFormDescription('');
     setIsCreateOpen(true);
   };
 
   const handleEditOpen = (category: Category) => {
     setSelectedCategory(category);
     setFormName(category.name);
-    setFormDescription(category.description || '');
     setIsEditOpen(true);
   };
 
@@ -126,8 +123,8 @@ export default function CategoriesPage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formName.trim() || !formDescription.trim()) {
-      toast.error('Please fill in all required fields.');
+    if (!formName.trim()) {
+      toast.error('Please fill in required fields.');
       return;
     }
 
@@ -135,7 +132,6 @@ export default function CategoriesPage() {
       setSubmitLoading(true);
       await api.post('/campaign-categories', {
         name: formName.trim(),
-        description: formDescription.trim(),
       });
       toast.success('Campaign category created successfully.');
       setIsCreateOpen(false);
@@ -151,8 +147,8 @@ export default function CategoriesPage() {
   const handleEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCategory) return;
-    if (!formName.trim() || !formDescription.trim()) {
-      toast.error('Please fill in all required fields.');
+    if (!formName.trim()) {
+      toast.error('Please fill in required fields.');
       return;
     }
 
@@ -160,7 +156,6 @@ export default function CategoriesPage() {
       setSubmitLoading(true);
       await api.patch(`/campaign-categories/${selectedCategory.id}`, {
         name: formName.trim(),
-        description: formDescription.trim(),
       });
       toast.success('Campaign category updated successfully.');
       setIsEditOpen(false);
@@ -198,8 +193,7 @@ export default function CategoriesPage() {
 
   // Filtered categories
   const filteredCategories = categories.filter((cat) =>
-    cat.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (cat.description && cat.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    cat.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getGradientIndex = (id: number) => {
@@ -224,7 +218,7 @@ export default function CategoriesPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-in fade-in-50 slide-in-from-left-4 duration-300">
         <div>
           <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
             Campaign Categories
@@ -235,7 +229,7 @@ export default function CategoriesPage() {
         </div>
         <Button 
           onClick={handleCreateOpen}
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 flex items-center gap-2 self-start sm:self-auto rounded-xl py-6 px-5"
+          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 flex items-center gap-2 self-start sm:self-auto rounded-xl py-6 px-5 transition-transform duration-200 hover:scale-105 active:scale-95"
         >
           <Plus className="h-5 w-5" />
           Create Category
@@ -243,8 +237,8 @@ export default function CategoriesPage() {
       </div>
 
       {/* Stats Widgets */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Categories</CardTitle>
             <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
@@ -261,7 +255,7 @@ export default function CategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Latest Classification</CardTitle>
             <div className="p-2 bg-pink-500/10 text-pink-500 rounded-xl">
@@ -278,7 +272,7 @@ export default function CategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Status</CardTitle>
             <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl">
@@ -299,11 +293,11 @@ export default function CategoriesPage() {
       </div>
 
       {/* Controls Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl shadow-md">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl shadow-md animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search categories by name or description..."
+            placeholder="Search categories by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10 py-5 rounded-xl bg-white/5 border-white/10 focus:border-primary text-sm shadow-inner placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 text-white"
@@ -375,13 +369,13 @@ export default function CategoriesPage() {
             return (
               <Card 
                 key={category.id} 
-                className="group border border-white/10 bg-white/5 backdrop-blur-sm hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between"
+                className="group border border-white/10 bg-white/5 backdrop-blur-sm hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between animate-in fade-in-50 slide-in-from-bottom-4 duration-300"
               >
                 <div className="p-6 space-y-4">
                   {/* Card Header Info */}
                   <div className="flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center text-white shadow-md font-bold text-lg shrink-0`}>
+                      <div className={`h-12 w-12 rounded-2xl bg-gradient-to-br ${grad} flex items-center justify-center text-white shadow-md font-bold text-lg shrink-0 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
                         {category.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -412,11 +406,6 @@ export default function CategoriesPage() {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-
-                  {/* Description */}
-                  <p className="text-muted-foreground text-sm line-clamp-3 min-h-[60px] leading-relaxed">
-                    {category.description || 'No description provided.'}
-                  </p>
                 </div>
 
                 {/* Card Footer */}
@@ -432,14 +421,13 @@ export default function CategoriesPage() {
         </div>
       ) : (
         /* Table View */
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl">
+        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
           <Table>
             <TableHeader className="bg-white/5 border-b border-white/10">
               <TableRow className="border-b border-white/10 hover:bg-transparent">
                 <TableHead className="w-16 text-muted-foreground py-4">Icon</TableHead>
                 <TableHead className="w-16 text-muted-foreground py-4">ID</TableHead>
                 <TableHead className="font-semibold text-muted-foreground py-4">Category Name</TableHead>
-                <TableHead className="text-muted-foreground py-4 max-w-md">Description</TableHead>
                 <TableHead className="text-muted-foreground py-4">Created Date</TableHead>
                 <TableHead className="w-20 text-right text-muted-foreground py-4 pr-6">Actions</TableHead>
               </TableRow>
@@ -448,7 +436,7 @@ export default function CategoriesPage() {
               {filteredCategories.map((category) => {
                 const grad = avatarGradients[getGradientIndex(category.id)];
                 return (
-                  <TableRow key={category.id} className="border-b border-white/5 hover:bg-white/[0.02] transition-colors">
+                  <TableRow key={category.id} className="border-b border-white/5 hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-[1px]">
                     <TableCell className="py-3">
                       <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${grad} flex items-center justify-center text-white text-xs font-bold`}>
                         {category.name.charAt(0).toUpperCase()}
@@ -456,9 +444,6 @@ export default function CategoriesPage() {
                     </TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">#{category.id}</TableCell>
                     <TableCell className="font-semibold text-white">{category.name}</TableCell>
-                    <TableCell className="text-muted-foreground text-sm max-w-md truncate">
-                      {category.description || 'No description provided.'}
-                    </TableCell>
                     <TableCell className="text-muted-foreground text-xs">{formatDate(category.createdAt)}</TableCell>
                     <TableCell className="text-right py-3 pr-6">
                       <div className="flex justify-end gap-1.5">
@@ -516,20 +501,6 @@ export default function CategoriesPage() {
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="create-description" className="text-sm font-medium text-muted-foreground">
-                  Description <span className="text-red-500">*</span>
-                </Label>
-                <Textarea
-                  id="create-description"
-                  placeholder="Describe what kinds of campaigns belong in this category..."
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  rows={4}
-                  className="bg-white/5 border-white/10 focus:border-primary rounded-xl text-sm text-white"
-                  required
-                />
-              </div>
             </div>
             <DialogFooter className="gap-2 sm:gap-0 border-t border-white/5 pt-4">
               <Button
@@ -543,7 +514,7 @@ export default function CategoriesPage() {
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2"
+                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Create Category
@@ -580,19 +551,6 @@ export default function CategoriesPage() {
                   required
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-description" className="text-sm font-medium text-muted-foreground">
-                  Description <span className="text-red-500">*</span>
-                </Label>
-                <Textarea
-                  id="edit-description"
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  rows={4}
-                  className="bg-white/5 border-white/10 focus:border-primary rounded-xl text-sm text-white"
-                  required
-                />
-              </div>
             </div>
             <DialogFooter className="gap-2 sm:gap-0 border-t border-white/5 pt-4">
               <Button
@@ -606,7 +564,7 @@ export default function CategoriesPage() {
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2"
+                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save Changes
