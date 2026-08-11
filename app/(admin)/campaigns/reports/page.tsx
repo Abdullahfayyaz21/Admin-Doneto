@@ -207,7 +207,7 @@ export default function ReportedCampaignsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-650 bg-clip-text text-transparent">
             Reported Campaigns
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -218,7 +218,7 @@ export default function ReportedCampaignsPage() {
 
       {/* Stats Widgets */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl hover:border-primary/30 transition-all duration-300">
+        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-primary/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Active Reports</CardTitle>
             <div className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">
@@ -226,12 +226,12 @@ export default function ReportedCampaignsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{totalCount}</div>
+            <div className="text-2xl font-bold text-foreground">{totalCount}</div>
             <p className="text-[10px] text-muted-foreground mt-1">Requires audit resolution</p>
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl hover:border-rose-500/30 transition-all duration-300">
+        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-rose-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fraud Allegations</CardTitle>
             <div className="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg">
@@ -239,42 +239,42 @@ export default function ReportedCampaignsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-rose-500">{reports.filter(r => r.reason === 'Fraud').length}</div>
+            <div className="text-2xl font-bold text-rose-650">{reports.filter(r => r.reason === 'Fraud').length}</div>
             <p className="text-[10px] text-muted-foreground mt-1">High priority audits</p>
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
+        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Spam / Abuse</CardTitle>
-            <div className="p-1.5 bg-yellow-500/10 text-yellow-500 rounded-lg">
+            <div className="p-1.5 bg-yellow-500/10 text-yellow-600 rounded-lg">
               <AlertTriangle className="h-4.5 w-4.5" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-500">
+            <div className="text-2xl font-bold text-yellow-600">
               {reports.filter(r => r.reason === 'Spam' || r.reason === 'Abusive').length}
             </div>
             <p className="text-[10px] text-muted-foreground mt-1">Guideline compliance issues</p>
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl hover:border-slate-500/30 transition-all duration-300">
+        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-slate-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resolved this session</CardTitle>
-            <div className="p-1.5 bg-emerald-500/10 text-emerald-500 rounded-lg">
+            <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
               <CheckCircle className="h-4.5 w-4.5" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-400">0</div>
+            <div className="text-2xl font-bold text-emerald-650">0</div>
             <p className="text-[10px] text-muted-foreground mt-1">Reports resolved in current view</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filter and Search Bar */}
-      <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl p-4">
+      <Card className="border-border bg-card shadow-sm rounded-2xl p-4">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -282,17 +282,17 @@ export default function ReportedCampaignsPage() {
               placeholder="Search by campaign title or reporter email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 rounded-xl border-white/10 bg-white/5 text-white placeholder:text-muted-foreground"
+              className="pl-10 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground"
             />
           </div>
 
           <div className="flex items-center gap-2">
             <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Reason</Label>
             <Select value={reasonFilter} onValueChange={(val) => { setReasonFilter(val); setPage(1); }}>
-              <SelectTrigger className="w-[160px] rounded-xl border-white/10 bg-white/5 text-white">
+              <SelectTrigger className="w-[160px] rounded-xl border-border bg-muted/50 text-foreground">
                 <SelectValue placeholder="Reason Type" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-white/10 bg-slate-900 text-white">
+              <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
                 <SelectItem value="ALL">All Reasons</SelectItem>
                 <SelectItem value="Fraud">Fraud</SelectItem>
                 <SelectItem value="Spam">Spam</SelectItem>
@@ -307,43 +307,43 @@ export default function ReportedCampaignsPage() {
 
       {/* Reports Table list */}
       {loading ? (
-        <Card className="border-white/10 bg-white/5 p-6 space-y-4 rounded-2xl">
+        <Card className="border-border bg-card p-6 space-y-4 rounded-2xl">
           {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="h-12 w-full rounded-xl" />
           ))}
         </Card>
       ) : filteredReports.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-xl">
+        <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-sm">
           <CheckCircle className="h-10 w-10 mx-auto text-emerald-500 mb-4" />
-          <h3 className="font-semibold text-lg text-white mb-2">No reports to review</h3>
+          <h3 className="font-semibold text-lg text-foreground mb-2">No reports to review</h3>
           <p className="text-sm">Excellent! The system has no pending reports under these criteria.</p>
         </div>
       ) : (
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
+        <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden">
           <Table>
-            <TableHeader className="bg-white/5">
-              <TableRow className="border-white/5 hover:bg-transparent">
-                <TableHead className="text-white font-semibold">Campaign ID</TableHead>
-                <TableHead className="text-white font-semibold">Campaign Title</TableHead>
-                <TableHead className="text-white font-semibold">Reason</TableHead>
-                <TableHead className="text-white font-semibold">Details</TableHead>
-                <TableHead className="text-white font-semibold">Reporter Name</TableHead>
-                <TableHead className="text-white font-semibold">Reporter Email</TableHead>
-                <TableHead className="text-white font-semibold">Date Reported</TableHead>
-                <TableHead className="text-right text-white font-semibold">Actions</TableHead>
+            <TableHeader className="bg-muted/50 border-b border-border">
+              <TableRow className="border-b border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground font-semibold">Campaign ID</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Campaign Title</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Reason</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Details</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Reporter Name</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Reporter Email</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Date Reported</TableHead>
+                <TableHead className="text-right text-muted-foreground font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredReports.map((report) => (
-                <TableRow key={report.id} className="border-white/5 hover:bg-white/5 text-slate-300">
-                  <TableCell className="font-medium text-white">#{report.campaignId}</TableCell>
-                  <TableCell className="max-w-[200px] truncate font-semibold text-white">{report.campaignTitle}</TableCell>
+                <TableRow key={report.id} className="border-b border-border hover:bg-muted/50 text-muted-foreground">
+                  <TableCell className="font-semibold text-foreground">#{report.campaignId}</TableCell>
+                  <TableCell className="max-w-[200px] truncate font-semibold text-foreground">{report.campaignTitle}</TableCell>
                   <TableCell>
                     <Badge 
                       className={`border-none rounded-lg py-0.5 px-2 font-semibold text-xs ${
-                        report.reason === 'Fraud' ? 'bg-rose-500/20 text-rose-400' :
-                        report.reason === 'Spam' ? 'bg-amber-500/20 text-amber-400' :
-                        'bg-slate-500/20 text-slate-400'
+                        report.reason === 'Fraud' ? 'bg-rose-500/20 text-rose-600' :
+                        report.reason === 'Spam' ? 'bg-amber-500/20 text-amber-600' :
+                        'bg-muted text-muted-foreground'
                       }`}
                     >
                       {report.reason}
@@ -359,7 +359,7 @@ export default function ReportedCampaignsPage() {
                         variant="ghost" 
                         size="icon" 
                         onClick={() => handleOpenDetails(report)} 
-                        className="h-8 w-8 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-white"
+                        className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
                         title="View details"
                       >
                         <Eye className="h-4 w-4" />
@@ -368,7 +368,7 @@ export default function ReportedCampaignsPage() {
                         variant="ghost" 
                         size="icon" 
                         onClick={() => handleOpenResolve(report)} 
-                        className="h-8 w-8 rounded-lg hover:bg-white/5 text-emerald-400 hover:text-emerald-300"
+                        className="h-8 w-8 rounded-lg hover:bg-muted text-emerald-600 hover:text-emerald-500"
                         title="Resolve/Dismiss"
                       >
                         <CheckCircle className="h-4 w-4" />
@@ -377,7 +377,7 @@ export default function ReportedCampaignsPage() {
                         variant="ghost" 
                         size="icon" 
                         onClick={() => handleOpenBlock(report)} 
-                        className="h-8 w-8 rounded-lg hover:bg-white/5 text-rose-500 hover:text-rose-400"
+                        className="h-8 w-8 rounded-lg hover:bg-muted text-rose-550 hover:text-rose-500"
                         title="Pause/Block campaign"
                       >
                         <FolderLock className="h-4 w-4" />
@@ -391,12 +391,12 @@ export default function ReportedCampaignsPage() {
 
           {/* Pagination controls */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-white/5 p-4 bg-white/5 text-xs text-muted-foreground">
+            <div className="flex items-center justify-between border-t border-border p-4 bg-muted/20 text-xs text-muted-foreground">
               <Button 
                 variant="ghost" 
                 onClick={() => setPage(p => Math.max(p - 1, 1))} 
                 disabled={page === 1}
-                className="hover:text-white"
+                className="hover:text-foreground hover:bg-muted"
               >
                 <ChevronLeft className="h-4 w-4 mr-1" /> Previous
               </Button>
@@ -405,7 +405,7 @@ export default function ReportedCampaignsPage() {
                 variant="ghost" 
                 onClick={() => setPage(p => Math.min(p + 1, totalPages))} 
                 disabled={page === totalPages}
-                className="hover:text-white"
+                className="hover:text-foreground hover:bg-muted"
               >
                 Next <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
@@ -418,9 +418,9 @@ export default function ReportedCampaignsPage() {
 
       {/* 1. REPORT DETAILS MODAL */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-md border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl space-y-4">
+        <DialogContent className="max-w-md border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl space-y-4">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-rose-500">
+            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-rose-650">
               <Flag className="h-5 w-5" /> Detailed Violation Report
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -430,32 +430,32 @@ export default function ReportedCampaignsPage() {
 
           {selectedReport && (
             <div className="space-y-4 my-2 text-xs">
-              <div className="bg-white/5 border border-white/10 rounded-xl p-3.5 space-y-2">
+              <div className="bg-muted/40 border border-border rounded-xl p-3.5 space-y-2">
                 <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Target Campaign</span>
-                <p className="font-bold text-white text-sm line-clamp-1">{selectedReport.campaignTitle}</p>
+                <p className="font-bold text-foreground text-sm line-clamp-1">{selectedReport.campaignTitle}</p>
                 <p className="text-muted-foreground">Campaign ID: #{selectedReport.campaignId}</p>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-xl p-3.5 space-y-2">
+              <div className="bg-muted/40 border border-border rounded-xl p-3.5 space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Report Details</span>
-                  <Badge className="border-none rounded-lg bg-rose-500/10 text-rose-400 font-semibold">{selectedReport.reason}</Badge>
+                  <Badge className="border-none rounded-lg bg-rose-500/10 text-rose-600 font-semibold">{selectedReport.reason}</Badge>
                 </div>
-                <p className="text-slate-200 leading-relaxed font-medium bg-slate-950 p-2.5 rounded-lg border border-white/5 min-h-[60px] overflow-y-auto">
+                <p className="text-foreground leading-relaxed font-medium bg-muted p-2.5 rounded-lg border border-border min-h-[60px] overflow-y-auto">
                   {selectedReport.details}
                 </p>
                 <p className="text-[10px] text-muted-foreground">Logged on: {formatDate(selectedReport.createdAt)}</p>
               </div>
 
-              <div className="bg-white/5 border border-white/10 rounded-xl p-3.5 space-y-2">
+              <div className="bg-muted/40 border border-border rounded-xl p-3.5 space-y-2">
                 <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider block">Reporter Profile</span>
                 <div className="space-y-1">
-                  <p className="flex items-center gap-1.5 text-slate-200">
-                    <User className="h-3.5 w-3.5 text-indigo-400" />
+                  <p className="flex items-center gap-1.5 text-foreground">
+                    <User className="h-3.5 w-3.5 text-indigo-500" />
                     <span>{selectedReport.reporterName || 'Anonymous User'}</span>
                   </p>
-                  <p className="flex items-center gap-1.5 text-slate-200">
-                    <Mail className="h-3.5 w-3.5 text-indigo-400" />
+                  <p className="flex items-center gap-1.5 text-foreground">
+                    <Mail className="h-3.5 w-3.5 text-indigo-500" />
                     <span>{selectedReport.reporterEmail || 'No email attached'}</span>
                   </p>
                 </div>
@@ -463,17 +463,17 @@ export default function ReportedCampaignsPage() {
             </div>
           )}
 
-          <DialogFooter className="gap-2 pt-2 border-t border-white/10">
+          <DialogFooter className="gap-2 pt-2 border-t border-border">
             <Button 
               variant="outline"
               onClick={() => handleOpenBlock(selectedReport!)} 
-              className="bg-rose-950/20 hover:bg-rose-900 border-rose-500/20 text-rose-400 rounded-xl text-xs h-10 px-4"
+              className="bg-rose-500/10 hover:bg-rose-500 hover:text-white border-rose-500/20 text-rose-650 rounded-xl text-xs h-10 px-4"
             >
               Block/Pause Campaign
             </Button>
             <Button 
               onClick={() => handleOpenResolve(selectedReport!)}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold h-10 px-4"
+              className="bg-emerald-650 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold h-10 px-4"
             >
               Resolve / Dismiss
             </Button>
@@ -483,7 +483,7 @@ export default function ReportedCampaignsPage() {
 
       {/* 2. RESOLVE CONFIRMATION */}
       <Dialog open={isResolveOpen} onOpenChange={setIsResolveOpen}>
-        <DialogContent className="max-w-sm border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl">
+        <DialogContent className="max-w-sm border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold">Dismiss Violation Report?</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -491,11 +491,11 @@ export default function ReportedCampaignsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 mt-4">
-            <Button variant="ghost" onClick={() => setIsResolveOpen(false)} className="rounded-xl text-xs">Cancel</Button>
+            <Button variant="ghost" onClick={() => setIsResolveOpen(false)} className="rounded-xl text-xs border border-border">Cancel</Button>
             <Button 
               onClick={handleResolveReport} 
               disabled={submitLoading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold px-4"
+              className="bg-emerald-650 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold px-4"
             >
               {submitLoading ? 'Resolving...' : 'Confirm Dismissal'}
             </Button>
@@ -505,19 +505,19 @@ export default function ReportedCampaignsPage() {
 
       {/* 3. BLOCK CAMPAIGN CONFIRMATION */}
       <Dialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
-        <DialogContent className="max-w-sm border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl">
+        <DialogContent className="max-w-sm border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-rose-500">Pause Campaign & Resolve Report?</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-rose-650">Pause Campaign & Resolve Report?</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
               This will immediately transition the campaign status to <strong>Paused</strong> (stopping public donations) and resolve the report.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 mt-4">
-            <Button variant="ghost" onClick={() => setIsBlockOpen(false)} className="rounded-xl text-xs">Cancel</Button>
+            <Button variant="ghost" onClick={() => setIsBlockOpen(false)} className="rounded-xl text-xs border border-border">Cancel</Button>
             <Button 
               onClick={handleBlockCampaign} 
               disabled={submitLoading}
-              className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold px-4"
+              className="bg-rose-650 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold px-4"
             >
               {submitLoading ? 'Auditing...' : 'Confirm Block'}
             </Button>

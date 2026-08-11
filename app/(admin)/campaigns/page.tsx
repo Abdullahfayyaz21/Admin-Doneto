@@ -537,7 +537,7 @@ export default function CampaignsPage() {
       {loading ? (
         <div className="grid gap-4 md:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl p-6">
+            <Card key={i} className="border-border bg-card shadow-sm rounded-2xl p-6">
               <Skeleton className="h-4 w-24 mb-2" />
               <Skeleton className="h-8 w-36" />
             </Card>
@@ -546,7 +546,7 @@ export default function CampaignsPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-4">
           {/* Card 1 */}
-          <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
+          <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Campaigns</CardTitle>
               <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
@@ -554,41 +554,41 @@ export default function CampaignsPage() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-white">{stats?.totalCampaigns || 0}</div>
+              <div className="text-2xl font-bold text-foreground">{stats?.totalCampaigns || 0}</div>
               <p className="text-xs text-muted-foreground mt-1">Submitted in total</p>
             </CardContent>
           </Card>
 
           {/* Card 2 */}
-          <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-emerald-500/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-emerald-500/5 transition-all duration-300">
+          <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-emerald-500/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Active Campaigns</CardTitle>
-              <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl">
+              <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
                 <TrendingUp className="h-5 w-5" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-emerald-500">{activeCount}</div>
+              <div className="text-2xl font-bold text-emerald-650">{activeCount}</div>
               <p className="text-xs text-muted-foreground mt-1">Currently raising funds</p>
             </CardContent>
           </Card>
 
           {/* Card 3 */}
-          <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-yellow-500/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-yellow-500/5 transition-all duration-300">
+          <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-yellow-500/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Awaiting Review</CardTitle>
-              <div className="p-2 bg-yellow-500/10 text-yellow-500 rounded-xl">
+              <div className="p-2 bg-yellow-500/10 text-yellow-600 rounded-xl">
                 <Clock className="h-5 w-5" />
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-500">{pendingCount}</div>
+              <div className="text-2xl font-bold text-yellow-600">{pendingCount}</div>
               <p className="text-xs text-muted-foreground mt-1">Requires approval audit</p>
             </CardContent>
           </Card>
 
           {/* Card 4 */}
-          <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
+          <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Funds Raised</CardTitle>
               <div className="p-2 bg-primary/10 text-primary rounded-xl">
@@ -604,7 +604,7 @@ export default function CampaignsPage() {
       )}
 
       {/* Filters and Searching Toolbar */}
-      <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl p-4">
+      <Card className="border-border bg-card shadow-sm rounded-2xl p-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           {/* Search bar */}
           <div className="relative flex-1 max-w-md">
@@ -613,7 +613,7 @@ export default function CampaignsPage() {
               placeholder="Search campaigns by title or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 rounded-xl border-white/10 bg-white/5 hover:bg-white/10 focus:bg-white/10 text-white placeholder:text-muted-foreground"
+              className="pl-10 rounded-xl border-border bg-muted/50 hover:bg-muted focus:bg-muted text-foreground placeholder:text-muted-foreground"
             />
           </div>
 
@@ -622,10 +622,10 @@ export default function CampaignsPage() {
             <div className="flex items-center gap-2">
               <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Approval</Label>
               <Select value={approvalFilter} onValueChange={setApprovalFilter}>
-                <SelectTrigger className="w-[140px] rounded-xl border-white/10 bg-white/5 text-white">
+                <SelectTrigger className="w-[140px] rounded-xl border-border bg-muted/50 text-foreground">
                   <SelectValue placeholder="Approval Status" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-white/10 bg-slate-900 text-white">
+                <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
                   <SelectItem value="ALL">All Statuses</SelectItem>
                   <SelectItem value="Pending">Pending</SelectItem>
                   <SelectItem value="Approved">Approved</SelectItem>
@@ -637,10 +637,10 @@ export default function CampaignsPage() {
             <div className="flex items-center gap-2">
               <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Status</Label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px] rounded-xl border-white/10 bg-white/5 text-white">
+                <SelectTrigger className="w-[140px] rounded-xl border-border bg-muted/50 text-foreground">
                   <SelectValue placeholder="Campaign Status" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-white/10 bg-slate-900 text-white">
+                <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
                   <SelectItem value="ALL">All States</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Paused">Paused</SelectItem>
@@ -651,12 +651,12 @@ export default function CampaignsPage() {
             </div>
 
             {/* Layout view buttons */}
-            <div className="flex items-center border border-white/10 rounded-xl overflow-hidden p-1 bg-white/5">
+            <div className="flex items-center border border-border rounded-xl overflow-hidden p-1 bg-muted/50">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setViewMode('grid')}
-                className={`h-8 w-8 rounded-lg ${viewMode === 'grid' ? 'bg-primary text-white' : 'text-muted-foreground'}`}
+                className={`h-8 w-8 rounded-lg ${viewMode === 'grid' ? 'bg-primary text-white hover:bg-primary/90' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
               >
                 <Grid className="h-4 w-4" />
               </Button>
@@ -677,7 +677,7 @@ export default function CampaignsPage() {
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="border-white/10 bg-white/5 shadow-xl rounded-2xl p-4 space-y-4">
+            <Card key={i} className="border-border bg-card p-4 space-y-4">
               <Skeleton className="h-40 rounded-xl w-full" />
               <Skeleton className="h-6 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
@@ -690,9 +690,9 @@ export default function CampaignsPage() {
           ))}
         </div>
       ) : filteredCampaigns.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 bg-white/5 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-xl">
+        <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-sm">
           <AlertCircle className="h-10 w-10 mx-auto text-primary mb-4" />
-          <h3 className="font-semibold text-lg text-white mb-2">No campaigns found</h3>
+          <h3 className="font-semibold text-lg text-foreground mb-2">No campaigns found</h3>
           <p className="text-sm">Try broadening your search criteria or review the filters settings.</p>
         </div>
       ) : viewMode === 'grid' ? (
@@ -703,10 +703,10 @@ export default function CampaignsPage() {
             return (
               <Card 
                 key={camp.id} 
-                className="group relative overflow-hidden border-white/10 bg-white/5 backdrop-blur-sm hover:border-primary/40 shadow-xl rounded-2xl flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300"
+                className="group relative overflow-hidden border-border bg-card hover:border-primary/40 shadow-sm rounded-2xl flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300"
               >
                 {/* Cover Image */}
-                <div className="relative h-44 w-full overflow-hidden bg-slate-800">
+                <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                   {camp.imageUrl ? (
                     <img 
                       src={camp.imageUrl} 
@@ -750,7 +750,7 @@ export default function CampaignsPage() {
                 {/* Content info */}
                 <CardContent className="p-5 flex-1 flex flex-col justify-between">
                   <div className="space-y-2">
-                    <h3 className="font-bold text-lg text-white leading-snug group-hover:text-primary transition-colors line-clamp-1">
+                    <h3 className="font-bold text-lg text-foreground leading-snug line-clamp-1">
                       {camp.title}
                     </h3>
                     <p className="text-muted-foreground text-xs line-clamp-2 min-h-[32px]">
@@ -761,10 +761,10 @@ export default function CampaignsPage() {
                   {/* Progress info */}
                   <div className="mt-5 space-y-2">
                     <div className="flex justify-between text-xs font-medium">
-                      <span className="text-muted-foreground">Raised: <strong className="text-white">{formatCurrency(camp.collectedAmount)}</strong></span>
+                      <span className="text-muted-foreground">Raised: <strong className="text-foreground">{formatCurrency(camp.collectedAmount)}</strong></span>
                       <span className="text-primary">{percentage}%</span>
                     </div>
-                    <Progress value={percentage} className="h-1.5 bg-white/10" />
+                    <Progress value={percentage} className="h-1.5 bg-muted" />
                     <div className="text-[10px] text-muted-foreground flex justify-between">
                       <span>Goal: {formatCurrency(camp.goalAmount)}</span>
                       <span>Ends: {formatDate(camp.endDate) || 'Manual completion'}</span>
@@ -773,11 +773,11 @@ export default function CampaignsPage() {
                 </CardContent>
 
                 {/* Card Actions Footer */}
-                <div className="p-5 pt-4 flex items-center justify-between border-t border-white/5 bg-white/5">
+                <div className="p-5 pt-4 flex items-center justify-between border-t border-border bg-muted/20">
                   <Button 
                     variant="ghost" 
                     onClick={() => handleOpenDetails(camp)} 
-                    className="text-xs hover:text-primary flex items-center gap-1.5 py-0 px-2 h-9 text-muted-foreground hover:bg-white/5 rounded-xl"
+                    className="text-xs hover:text-primary flex items-center gap-1.5 py-0 px-2 h-9 text-muted-foreground hover:bg-muted rounded-xl"
                   >
                     <Eye className="h-4 w-4" />
                     View Details
@@ -788,7 +788,7 @@ export default function CampaignsPage() {
                     {isAdmin && camp.approvalStatus === 'Pending' && (
                       <Button
                         onClick={() => handleOpenReview(camp)}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white text-[11px] h-8 rounded-xl px-3 flex items-center gap-1"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-white text-[11px] h-8 rounded-xl px-3 flex items-center gap-1 shadow-sm"
                       >
                         <Sparkles className="h-3.5 w-3.5" />
                         Audit
@@ -798,30 +798,30 @@ export default function CampaignsPage() {
                     {/* Options drop menu */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/5 text-muted-foreground hover:text-white">
+                        <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-muted text-muted-foreground hover:text-foreground">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="rounded-xl border-white/10 bg-slate-900 text-white min-w-[160px]">
-                        <DropdownMenuLabel>Campaign Options</DropdownMenuLabel>
-                        <DropdownMenuSeparator className="bg-white/10" />
+                      <DropdownMenuContent align="end" className="rounded-xl border-border bg-popover text-popover-foreground min-w-[160px]">
+                        <DropdownMenuLabel className="text-muted-foreground">Campaign Options</DropdownMenuLabel>
+                        <DropdownMenuSeparator className="bg-border" />
                         
-                        <DropdownMenuItem onClick={() => handleOpenDetails(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpenDetails(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer hover:bg-muted">
                           <Eye className="h-4 w-4 text-muted-foreground" /> View Audit details
                         </DropdownMenuItem>
 
-                        <DropdownMenuItem onClick={() => handleOpenEdit(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer">
+                        <DropdownMenuItem onClick={() => handleOpenEdit(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer hover:bg-muted">
                           <Pencil className="h-4 w-4 text-muted-foreground" /> Edit Campaign
                         </DropdownMenuItem>
 
                         {/* Moderation pauses */}
                         {camp.approvalStatus === 'Approved' && (
                           <>
-                            <DropdownMenuItem onClick={() => handleTogglePause(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer">
+                            <DropdownMenuItem onClick={() => handleTogglePause(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer hover:bg-muted">
                               {camp.campaignStatus === 'Paused' ? (
                                 <>
-                                  <Play className="h-4 w-4 text-emerald-500" /> Resume Campaign
-                                </>
+                                  <Play className="h-4 w-4 text-emerald-600" /> Resume Campaign
+                                  </>
                               ) : (
                                 <>
                                   <Pause className="h-4 w-4 text-amber-500" /> Pause Campaign
@@ -830,7 +830,7 @@ export default function CampaignsPage() {
                             </DropdownMenuItem>
 
                             {camp.campaignStatus !== 'Completed' && (
-                              <DropdownMenuItem onClick={() => handleCompleteCampaign(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer text-blue-400 focus:text-blue-300">
+                              <DropdownMenuItem onClick={() => handleCompleteCampaign(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer text-blue-600 hover:bg-muted focus:text-blue-500">
                                 <CheckCircle className="h-4 w-4" /> Mark Completed
                               </DropdownMenuItem>
                             )}
@@ -838,7 +838,7 @@ export default function CampaignsPage() {
                         )}
 
                         {isAdmin && camp.approvalStatus === 'Pending' && (
-                          <DropdownMenuItem onClick={() => handleOpenReview(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer text-yellow-400">
+                          <DropdownMenuItem onClick={() => handleOpenReview(camp)} className="flex items-center gap-2 rounded-lg cursor-pointer text-yellow-600 hover:bg-muted">
                             <Sparkles className="h-4 w-4" /> Review approval
                           </DropdownMenuItem>
                         )}
@@ -852,38 +852,38 @@ export default function CampaignsPage() {
         </div>
       ) : (
         /* TABLE VIEW */
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
+        <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden">
           <Table>
-            <TableHeader className="bg-white/5">
-              <TableRow className="border-white/5 hover:bg-transparent">
-                <TableHead className="text-white font-semibold">Title</TableHead>
-                <TableHead className="text-white font-semibold">Category</TableHead>
-                <TableHead className="text-white font-semibold">Goal</TableHead>
-                <TableHead className="text-white font-semibold">Collected</TableHead>
-                <TableHead className="text-white font-semibold">Approval</TableHead>
-                <TableHead className="text-white font-semibold">Status</TableHead>
-                <TableHead className="text-white font-semibold">Created Date</TableHead>
-                <TableHead className="text-right text-white font-semibold">Actions</TableHead>
+            <TableHeader className="bg-muted/50 border-b border-border">
+              <TableRow className="border-b border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground font-semibold">Title</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Category</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Goal</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Collected</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Approval</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Status</TableHead>
+                <TableHead className="text-muted-foreground font-semibold">Created Date</TableHead>
+                <TableHead className="text-right text-muted-foreground font-semibold">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredCampaigns.map((camp) => (
-                <TableRow key={camp.id} className="border-white/5 hover:bg-white/5 text-slate-300">
-                  <TableCell className="font-medium text-white max-w-xs truncate">{camp.title}</TableCell>
+                <TableRow key={camp.id} className="border-b border-border hover:bg-muted/50 text-muted-foreground">
+                  <TableCell className="font-semibold text-foreground max-w-xs truncate">{camp.title}</TableCell>
                   <TableCell>{camp.categoryName}</TableCell>
                   <TableCell>{formatCurrency(camp.goalAmount)}</TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-emerald-500">{formatCurrency(camp.collectedAmount)}</span>
+                      <span className="font-semibold text-emerald-600">{formatCurrency(camp.collectedAmount)}</span>
                       <span className="text-[10px] text-muted-foreground">({getProgressPercentage(camp.collectedAmount, camp.goalAmount)}%)</span>
                     </div>
                   </TableCell>
                   <TableCell>
                     <Badge 
                       className={`border-none rounded-lg font-semibold py-0.5 px-2 ${
-                        camp.approvalStatus === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' :
-                        camp.approvalStatus === 'Pending' ? 'bg-amber-500/20 text-amber-400 animate-pulse' :
-                        'bg-rose-500/20 text-rose-400'
+                        camp.approvalStatus === 'Approved' ? 'bg-emerald-500/20 text-emerald-600' :
+                        camp.approvalStatus === 'Pending' ? 'bg-amber-500/20 text-amber-600 animate-pulse' :
+                        'bg-rose-500/20 text-rose-600'
                       }`}
                     >
                       {camp.approvalStatus}
@@ -892,10 +892,10 @@ export default function CampaignsPage() {
                   <TableCell>
                     <Badge 
                       className={`border-none rounded-lg font-semibold py-0.5 px-2 ${
-                        camp.campaignStatus === 'Active' ? 'bg-emerald-500/25 text-emerald-400' :
-                        camp.campaignStatus === 'Paused' ? 'bg-amber-500/25 text-amber-400' :
-                        camp.campaignStatus === 'Completed' ? 'bg-blue-500/25 text-blue-400' :
-                        'bg-rose-500/25 text-rose-400'
+                        camp.campaignStatus === 'Active' ? 'bg-emerald-500/25 text-emerald-600' :
+                        camp.campaignStatus === 'Paused' ? 'bg-amber-500/25 text-amber-655' :
+                        camp.campaignStatus === 'Completed' ? 'bg-blue-500/25 text-blue-600' :
+                        'bg-rose-500/25 text-rose-600'
                       }`}
                     >
                       {camp.campaignStatus}
@@ -904,31 +904,31 @@ export default function CampaignsPage() {
                   <TableCell>{formatDate(camp.createdAt)}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end items-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleOpenDetails(camp)} className="h-8 w-8 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-white">
+                      <Button variant="ghost" size="icon" onClick={() => handleOpenDetails(camp)} className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground">
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(camp)} className="h-8 w-8 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-white">
+                      <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(camp)} className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground">
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-white/5 text-muted-foreground hover:text-white">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground">
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="rounded-xl border-white/10 bg-slate-900 text-white">
+                        <DropdownMenuContent align="end" className="rounded-xl border-border bg-popover text-popover-foreground">
                           {camp.approvalStatus === 'Approved' && (
                             <>
-                              <DropdownMenuItem onClick={() => handleTogglePause(camp)} className="cursor-pointer">
+                              <DropdownMenuItem onClick={() => handleTogglePause(camp)} className="cursor-pointer hover:bg-muted">
                                 {camp.campaignStatus === 'Paused' ? 'Resume' : 'Pause'}
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => handleCompleteCampaign(camp)} className="cursor-pointer text-blue-400">
+                              <DropdownMenuItem onClick={() => handleCompleteCampaign(camp)} className="cursor-pointer text-blue-500 hover:bg-muted">
                                 Mark Completed
                               </DropdownMenuItem>
                             </>
                           )}
                           {isAdmin && camp.approvalStatus === 'Pending' && (
-                            <DropdownMenuItem onClick={() => handleOpenReview(camp)} className="cursor-pointer text-yellow-400">
+                            <DropdownMenuItem onClick={() => handleOpenReview(camp)} className="cursor-pointer text-yellow-600 hover:bg-muted">
                               Audit Review
                             </DropdownMenuItem>
                           )}
@@ -947,16 +947,16 @@ export default function CampaignsPage() {
 
       {/* 1. CAMPAIGN DETAILS DIALOG */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
-        <DialogContent className="max-w-4xl border-white/10 bg-slate-950 text-white rounded-2xl overflow-hidden p-0 max-h-[90vh] flex flex-col shadow-2xl">
+        <DialogContent className="max-w-4xl border-border bg-background text-foreground rounded-2xl overflow-hidden p-0 max-h-[90vh] flex flex-col shadow-2xl">
           {selectedCampaign && (
             <>
               {/* Header Title with image/gradient background */}
-              <div className="relative p-6 bg-gradient-to-br from-indigo-950 to-slate-900 flex justify-between items-start border-b border-white/10">
+              <div className="relative p-6 bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-indigo-950 dark:to-slate-900 flex justify-between items-start border-b border-border">
                 <div className="space-y-1 max-w-[80%]">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-400 bg-indigo-500/10 py-1 px-2.5 rounded-lg border border-indigo-500/25">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-650 bg-indigo-500/10 dark:text-indigo-400 py-1 px-2.5 rounded-lg border border-indigo-500/25">
                     {selectedCampaign.categoryName}
                   </span>
-                  <DialogTitle className="text-2xl font-bold text-white tracking-tight line-clamp-1">{selectedCampaign.title}</DialogTitle>
+                  <DialogTitle className="text-2xl font-bold tracking-tight line-clamp-1">{selectedCampaign.title}</DialogTitle>
                   <DialogDescription className="text-muted-foreground text-xs line-clamp-1 mt-1">
                     Created by NGO ID: {selectedCampaign.createdById} &bull; Submitted: {formatDate(selectedCampaign.createdAt)}
                   </DialogDescription>
@@ -975,9 +975,9 @@ export default function CampaignsPage() {
                   </Badge>
                   <Badge 
                     className={`border-none rounded-lg text-[10px] font-semibold py-0.5 px-2 ${
-                      selectedCampaign.approvalStatus === 'Approved' ? 'bg-emerald-600/30 text-emerald-400 border border-emerald-500/20' :
-                      selectedCampaign.approvalStatus === 'Pending' ? 'bg-amber-500/30 text-amber-400 border border-amber-500/20' :
-                      'bg-rose-500/30 text-rose-400 border border-rose-500/20'
+                      selectedCampaign.approvalStatus === 'Approved' ? 'bg-emerald-500/20 text-emerald-600 border border-emerald-500/20' :
+                      selectedCampaign.approvalStatus === 'Pending' ? 'bg-amber-500/20 text-amber-600 border border-amber-500/20' :
+                      'bg-rose-500/20 text-rose-600 border border-rose-500/20'
                     }`}
                   >
                     {selectedCampaign.approvalStatus}
@@ -986,7 +986,7 @@ export default function CampaignsPage() {
               </div>
 
               {/* Tab Selector Nav */}
-              <div className="px-6 border-b border-white/5 bg-slate-950/40">
+              <div className="px-6 border-b border-border bg-muted/20">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                   <TabsList className="w-full justify-start bg-transparent border-none p-0 h-12 flex gap-4">
                     <TabsTrigger value="general" className="relative h-full bg-transparent px-1 pb-3 pt-3 text-sm font-semibold rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary text-muted-foreground">General Info</TabsTrigger>
@@ -1005,18 +1005,18 @@ export default function CampaignsPage() {
                     <div className="space-y-4">
                       <div>
                         <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Short Summary</Label>
-                        <p className="text-sm mt-1 text-slate-200 bg-white/5 border border-white/10 rounded-xl p-3">{selectedCampaign.shortSummary || 'No short summary provided.'}</p>
+                        <p className="text-sm mt-1 text-foreground bg-muted/40 border border-border rounded-xl p-3">{selectedCampaign.shortSummary || 'No short summary provided.'}</p>
                       </div>
 
                       <div>
                         <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Description</Label>
-                        <div className="text-sm mt-1 text-slate-300 bg-white/5 border border-white/10 rounded-xl p-4 min-h-[120px] max-h-[220px] overflow-y-auto leading-relaxed">
+                        <div className="text-sm mt-1 text-foreground bg-muted/40 border border-border rounded-xl p-4 min-h-[120px] max-h-[220px] overflow-y-auto leading-relaxed">
                           {selectedCampaign.description}
                         </div>
                       </div>
 
                       {selectedCampaign.rejectionReason && (
-                        <div className="bg-rose-500/10 border border-rose-500/25 rounded-xl p-4 text-rose-400 space-y-1">
+                        <div className="bg-rose-500/10 border border-rose-500/25 rounded-xl p-4 text-rose-600 space-y-1">
                           <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wide">
                             <XCircle className="h-4 w-4" />
                             Rejection Audit Notes
@@ -1029,38 +1029,38 @@ export default function CampaignsPage() {
                     {/* Right Column */}
                     <div className="space-y-4">
                       {/* Financial info widget */}
-                      <div className="bg-white/5 border border-white/10 rounded-xl p-4 grid grid-cols-2 gap-4">
+                      <div className="bg-muted/40 border border-border rounded-xl p-4 grid grid-cols-2 gap-4">
                         <div>
                           <Label className="text-xs text-muted-foreground">Collected Amount</Label>
-                          <div className="text-lg font-bold text-emerald-400 mt-0.5">{formatCurrency(selectedCampaign.collectedAmount)}</div>
+                          <div className="text-lg font-bold text-emerald-650 mt-0.5">{formatCurrency(selectedCampaign.collectedAmount)}</div>
                         </div>
                         <div>
                           <Label className="text-xs text-muted-foreground">Goal Target</Label>
-                          <div className="text-lg font-bold text-white mt-0.5">{formatCurrency(selectedCampaign.goalAmount)}</div>
+                          <div className="text-lg font-bold text-foreground mt-0.5">{formatCurrency(selectedCampaign.goalAmount)}</div>
                         </div>
                         <div className="col-span-2">
                           <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
                             <span>Campaign funding progress</span>
                             <span>{getProgressPercentage(selectedCampaign.collectedAmount, selectedCampaign.goalAmount)}%</span>
                           </div>
-                          <Progress value={getProgressPercentage(selectedCampaign.collectedAmount, selectedCampaign.goalAmount)} className="h-2 bg-white/10" />
+                          <Progress value={getProgressPercentage(selectedCampaign.collectedAmount, selectedCampaign.goalAmount)} className="h-2 bg-muted" />
                         </div>
                       </div>
 
                       {/* Campaign parameters */}
-                      <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+                      <div className="bg-muted/40 border border-border rounded-xl p-4 space-y-3">
                         <div className="grid grid-cols-2 gap-2 text-xs">
                           <div>
                             <span className="text-muted-foreground block">Beneficiary type</span>
-                            <span className="font-semibold text-slate-200 mt-0.5 block">{selectedCampaign.beneficiaryType || 'Not specified'}</span>
+                            <span className="font-semibold text-foreground mt-0.5 block">{selectedCampaign.beneficiaryType || 'Not specified'}</span>
                           </div>
                           <div>
                             <span className="text-muted-foreground block">Beneficiary name</span>
-                            <span className="font-semibold text-slate-200 mt-0.5 block">{selectedCampaign.beneficiaryName || 'Not specified'}</span>
+                            <span className="font-semibold text-foreground mt-0.5 block">{selectedCampaign.beneficiaryName || 'Not specified'}</span>
                           </div>
                           <div className="mt-2">
                             <span className="text-muted-foreground block">City / Province</span>
-                            <span className="font-semibold text-slate-200 mt-0.5 block">
+                            <span className="font-semibold text-foreground mt-0.5 block">
                               {selectedCampaign.beneficiaryCity && selectedCampaign.beneficiaryProvince 
                                 ? `${selectedCampaign.beneficiaryCity}, ${selectedCampaign.beneficiaryProvince}`
                                 : 'Not specified'}
@@ -1068,35 +1068,35 @@ export default function CampaignsPage() {
                           </div>
                           <div className="mt-2">
                             <span className="text-muted-foreground block">Duration Type</span>
-                            <span className="font-semibold text-slate-200 mt-0.5 block">{selectedCampaign.endType}</span>
+                            <span className="font-semibold text-foreground mt-0.5 block">{selectedCampaign.endType}</span>
                           </div>
                           <div className="mt-2">
                             <span className="text-muted-foreground block">Starts / Ends At</span>
-                            <span className="font-semibold text-slate-200 mt-0.5 block">
+                            <span className="font-semibold text-foreground mt-0.5 block">
                               {formatDate(selectedCampaign.startDate)} - {formatDate(selectedCampaign.endDate) || 'Manual completion'}
                             </span>
                           </div>
                           <div className="mt-2">
                             <span className="text-muted-foreground block">Accepts Zakat</span>
-                            <span className="font-semibold text-slate-200 mt-0.5 block">{selectedCampaign.acceptZakatDonations ? 'Yes' : 'No'}</span>
+                            <span className="font-semibold text-foreground mt-0.5 block">{selectedCampaign.acceptZakatDonations ? 'Yes' : 'No'}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Contact details */}
-                      <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-2">
+                      <div className="bg-muted/40 border border-border rounded-xl p-4 space-y-2">
                         <span className="text-xs text-muted-foreground uppercase font-bold tracking-wider block">Campaign Point of Contact</span>
-                        <div className="space-y-1.5 text-xs text-slate-200">
+                        <div className="space-y-1.5 text-xs text-foreground">
                           <div className="flex items-center gap-2">
-                            <User className="h-3.5 w-3.5 text-indigo-400" />
+                            <User className="h-3.5 w-3.5 text-indigo-500" />
                             <span>{selectedCampaign.contactPerson || 'N/A'}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Mail className="h-3.5 w-3.5 text-indigo-400" />
+                            <Mail className="h-3.5 w-3.5 text-indigo-500" />
                             <span>{selectedCampaign.contactEmail || 'N/A'}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Phone className="h-3.5 w-3.5 text-indigo-400" />
+                            <Phone className="h-3.5 w-3.5 text-indigo-500" />
                             <span>{selectedCampaign.contactPhone || 'N/A'}</span>
                           </div>
                         </div>
@@ -1106,17 +1106,17 @@ export default function CampaignsPage() {
                 )}
 
                 {activeTab === 'media' && (
-                  <div className="space-y-6">
+                  <div className="space-y-6 text-foreground">
                     {/* Images Section */}
                     <div>
                       <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-2 block">Campaign Photos</Label>
                       <div className="grid gap-4 sm:grid-cols-3">
-                        <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-900 border border-white/10">
+                        <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-border">
                           <img src={selectedCampaign.imageUrl} alt="Cover image" className="h-full w-full object-cover" />
                           <div className="absolute bottom-2 left-2 bg-slate-950/70 py-0.5 px-2 text-[9px] rounded text-primary">Cover Photo</div>
                         </div>
                         {selectedCampaign.additionalImages?.map((img, i) => (
-                          <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-slate-900 border border-white/10">
+                          <div key={i} className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 border border-border">
                             <img src={img.url} alt={`Image ${i}`} className="h-full w-full object-cover" />
                             <a href={img.url} target="_blank" rel="noreferrer" className="absolute top-2 right-2 bg-slate-950/70 p-1 rounded-lg hover:text-primary transition-colors text-white">
                               <ExternalLink className="h-3.5 w-3.5" />
@@ -1130,20 +1130,20 @@ export default function CampaignsPage() {
                     <div>
                       <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-2 block">Verified Supporting Documents</Label>
                       {selectedCampaign.supportingDocuments?.length === 0 ? (
-                        <div className="text-center text-xs text-muted-foreground bg-white/5 border border-dashed border-white/10 rounded-xl p-6">
+                        <div className="text-center text-xs text-muted-foreground bg-muted/40 border border-dashed border-border rounded-xl p-6">
                           No supporting documentation attached.
                         </div>
                       ) : (
                         <div className="grid gap-3 sm:grid-cols-2">
                           {selectedCampaign.supportingDocuments?.map((doc, idx) => (
-                            <div key={idx} className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3">
+                            <div key={idx} className="flex items-center justify-between bg-muted/40 border border-border rounded-xl p-3">
                               <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-lg">
+                                <div className="p-2 bg-indigo-500/10 text-indigo-650 rounded-lg">
                                   <FileText className="h-4 w-4" />
                                 </div>
                                 <div className="space-y-0.5 text-xs">
-                                  <p className="font-semibold text-white truncate max-w-[200px]">{doc.fileName}</p>
-                                  <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 text-[9px] py-0 px-1 rounded-sm">
+                                  <p className="font-semibold text-foreground truncate max-w-[200px]">{doc.fileName}</p>
+                                  <Badge variant="outline" className="border-indigo-500/30 text-indigo-600 text-[9px] py-0 px-1 rounded-sm">
                                     {doc.type}
                                   </Badge>
                                 </div>
@@ -1152,7 +1152,7 @@ export default function CampaignsPage() {
                                 href={doc.url} 
                                 target="_blank" 
                                 rel="noreferrer" 
-                                className="p-2 bg-white/5 hover:bg-primary/20 hover:text-white rounded-lg text-muted-foreground text-xs flex items-center gap-1 transition-colors"
+                                className="p-2 bg-muted hover:bg-primary/20 hover:text-primary rounded-lg text-muted-foreground text-xs flex items-center gap-1 transition-colors"
                               >
                                 View File <ExternalLink className="h-3.5 w-3.5" />
                               </a>
@@ -1166,17 +1166,17 @@ export default function CampaignsPage() {
                     {selectedCampaign.video && (
                       <div>
                         <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider mb-2 block">Campaign Video Presentation</Label>
-                        <div className="flex items-center justify-between bg-white/5 border border-white/10 rounded-xl p-3">
+                        <div className="flex items-center justify-between bg-muted/40 border border-border rounded-xl p-3">
                           <div className="flex items-center gap-3">
                             <div className="p-2 bg-rose-500/10 text-rose-500 rounded-lg">
                               <Video className="h-4 w-4" />
                             </div>
                             <div className="text-xs">
-                              <p className="font-semibold text-white">{selectedCampaign.video.fileName}</p>
+                              <p className="font-semibold text-foreground">{selectedCampaign.video.fileName}</p>
                               <p className="text-[10px] text-muted-foreground">Click to watch or download.</p>
                             </div>
                           </div>
-                          <a href={selectedCampaign.video.url} target="_blank" rel="noreferrer" className="bg-primary hover:bg-primary/95 text-white font-semibold py-1.5 px-3 rounded-lg text-xs flex items-center gap-1.5 transition-colors shadow-lg shadow-primary/25">
+                          <a href={selectedCampaign.video.url} target="_blank" rel="noreferrer" className="bg-primary hover:bg-primary/95 text-white font-semibold py-1.5 px-3 rounded-lg text-xs flex items-center gap-1.5 transition-colors shadow-sm">
                             Play Video <ArrowUpRight className="h-3.5 w-3.5" />
                           </a>
                         </div>
@@ -1186,9 +1186,9 @@ export default function CampaignsPage() {
                 )}
 
                 {activeTab === 'donors' && (
-                  <div className="space-y-4">
+                  <div className="space-y-4 text-foreground">
                     <div className="flex justify-between items-center">
-                      <span className="text-xs text-muted-foreground">Total donations: <strong className="text-white">{donorTotal}</strong></span>
+                      <span className="text-xs text-muted-foreground">Total donations: <strong className="text-foreground">{donorTotal}</strong></span>
                     </div>
 
                     {donorsLoading ? (
@@ -1198,25 +1198,25 @@ export default function CampaignsPage() {
                         ))}
                       </div>
                     ) : donors.length === 0 ? (
-                      <div className="text-center text-xs text-muted-foreground bg-white/5 border border-dashed border-white/10 rounded-xl p-8 text-slate-400">
+                      <div className="text-center text-xs text-muted-foreground bg-muted/40 border border-dashed border-border rounded-xl p-8 text-muted-foreground">
                         No donations received yet for this campaign.
                       </div>
                     ) : (
                       <>
-                        <div className="border border-white/10 rounded-xl overflow-hidden bg-white/5">
+                        <div className="border border-border rounded-xl overflow-hidden bg-card">
                           <Table>
-                            <TableHeader>
-                              <TableRow className="border-white/5 bg-white/5">
-                                <TableHead className="text-white text-xs font-semibold">Donor Name</TableHead>
-                                <TableHead className="text-white text-xs font-semibold">Amount Contributed</TableHead>
-                                <TableHead className="text-white text-xs font-semibold">Date</TableHead>
+                            <TableHeader className="bg-muted/50 border-b border-border">
+                              <TableRow className="border-b border-border hover:bg-transparent">
+                                <TableHead className="text-muted-foreground text-xs font-semibold">Donor Name</TableHead>
+                                <TableHead className="text-muted-foreground text-xs font-semibold">Amount Contributed</TableHead>
+                                <TableHead className="text-muted-foreground text-xs font-semibold">Date</TableHead>
                               </TableRow>
                             </TableHeader>
                             <TableBody>
                               {donors.map((donor) => (
-                                <TableRow key={donor.id} className="border-white/5 hover:bg-white/5 text-slate-300">
-                                  <TableCell className="font-medium">{donor.donorName}</TableCell>
-                                  <TableCell className="text-emerald-400 font-bold">{formatCurrency(donor.amount)}</TableCell>
+                                <TableRow key={donor.id} className="border-b border-border hover:bg-muted/50 text-muted-foreground">
+                                  <TableCell className="font-semibold text-foreground">{donor.donorName}</TableCell>
+                                  <TableCell className="text-emerald-600 font-bold">{formatCurrency(donor.amount)}</TableCell>
                                   <TableCell className="text-muted-foreground text-xs">{formatDate(donor.createdAt)}</TableCell>
                                 </TableRow>
                               ))}
@@ -1234,7 +1234,7 @@ export default function CampaignsPage() {
                                 fetchDonors(selectedCampaign.id, Math.max(donorPage - 1, 1));
                               }} 
                               disabled={donorPage === 1}
-                              className="text-xs text-muted-foreground hover:text-white"
+                              className="text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
                             >
                               <ChevronLeft className="h-4 w-4 mr-1" /> Previous
                             </Button>
@@ -1247,7 +1247,7 @@ export default function CampaignsPage() {
                                 fetchDonors(selectedCampaign.id, next);
                               }} 
                               disabled={donorPage >= Math.ceil(donorTotal / 5)}
-                              className="text-xs text-muted-foreground hover:text-white"
+                              className="text-xs text-muted-foreground hover:text-foreground hover:bg-muted"
                             >
                               Next <ChevronRight className="h-4 w-4 ml-1" />
                             </Button>
@@ -1259,16 +1259,16 @@ export default function CampaignsPage() {
                 )}
 
                 {activeTab === 'withdrawals' && (
-                  <div className="space-y-5">
+                  <div className="space-y-5 text-foreground">
                     {/* Add withdraw button for NGO */}
                     <div className="flex justify-between items-center">
                       <span className="text-xs text-muted-foreground flex gap-1 items-center">
-                        Collected: <strong className="text-white">{formatCurrency(selectedCampaign.collectedAmount)}</strong>
+                        Collected: <strong className="text-foreground">{formatCurrency(selectedCampaign.collectedAmount)}</strong>
                       </span>
                       {isNGO && selectedCampaign.approvalStatus === 'Approved' && (
                         <Button 
                           onClick={() => setIsWithdrawDialogOpen(true)}
-                          className="bg-primary hover:bg-primary/95 text-white py-1 px-3 text-xs rounded-xl shadow-lg shadow-primary/20 flex items-center gap-1.5 h-9"
+                          className="bg-primary hover:bg-primary/95 text-white py-1 px-3 text-xs rounded-xl shadow-md flex items-center gap-1.5 h-9"
                         >
                           <DollarSign className="h-4 w-4" /> Request Fund Withdrawal
                         </Button>
@@ -1282,44 +1282,44 @@ export default function CampaignsPage() {
                         ))}
                       </div>
                     ) : withdrawals.length === 0 ? (
-                      <div className="text-center text-xs text-muted-foreground bg-white/5 border border-dashed border-white/10 rounded-xl p-8">
+                      <div className="text-center text-xs text-muted-foreground bg-muted/40 border border-dashed border-border rounded-xl p-8">
                         No withdrawal requests recorded.
                       </div>
                     ) : (
-                      <div className="border border-white/10 rounded-xl overflow-hidden bg-white/5">
+                      <div className="border border-border rounded-xl overflow-hidden bg-card">
                         <Table>
-                          <TableHeader>
-                            <TableRow className="border-white/5 bg-white/5">
-                              <TableHead className="text-white text-xs font-semibold">Amount</TableHead>
-                              <TableHead className="text-white text-xs font-semibold">Status</TableHead>
-                              <TableHead className="text-white text-xs font-semibold">Bank details</TableHead>
-                              <TableHead className="text-white text-xs font-semibold">Date</TableHead>
-                              {isAdmin && <TableHead className="text-white text-xs font-semibold text-right">Action</TableHead>}
+                          <TableHeader className="bg-muted/50 border-b border-border">
+                            <TableRow className="border-b border-border">
+                              <TableHead className="text-muted-foreground text-xs font-semibold">Amount</TableHead>
+                              <TableHead className="text-muted-foreground text-xs font-semibold">Status</TableHead>
+                              <TableHead className="text-muted-foreground text-xs font-semibold">Bank details</TableHead>
+                              <TableHead className="text-muted-foreground text-xs font-semibold">Date</TableHead>
+                              {isAdmin && <TableHead className="text-muted-foreground text-xs font-semibold text-right">Action</TableHead>}
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {withdrawals.map((req) => (
-                              <TableRow key={req.id} className="border-white/5 hover:bg-white/5 text-xs text-slate-300">
-                                <TableCell className="font-bold text-white text-sm">{formatCurrency(req.amount)}</TableCell>
+                              <TableRow key={req.id} className="border-b border-border hover:bg-muted/50 text-xs text-muted-foreground">
+                                <TableCell className="font-bold text-foreground text-sm">{formatCurrency(req.amount)}</TableCell>
                                 <TableCell>
                                   <Badge 
                                     className={`border-none rounded-lg font-semibold py-0.5 px-2 ${
-                                      req.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-400' :
-                                      req.status === 'Pending' ? 'bg-amber-500/20 text-amber-400 animate-pulse' :
-                                      'bg-rose-500/20 text-rose-400'
+                                      req.status === 'Approved' ? 'bg-emerald-500/20 text-emerald-600' :
+                                      req.status === 'Pending' ? 'bg-amber-500/20 text-amber-600 animate-pulse' :
+                                      'bg-rose-500/20 text-rose-600'
                                     }`}
                                   >
                                     {req.status}
                                   </Badge>
                                   {req.rejectionReason && (
-                                    <p className="text-[10px] text-rose-400 mt-1 max-w-[150px] truncate" title={req.rejectionReason}>
+                                    <p className="text-[10px] text-rose-600 mt-1 max-w-[150px] truncate" title={req.rejectionReason}>
                                       {req.rejectionReason}
                                     </p>
                                   )}
                                 </TableCell>
                                 <TableCell>
                                   <div className="space-y-0.5">
-                                    <p className="font-semibold text-slate-200">{req.bankName}</p>
+                                    <p className="font-semibold text-foreground">{req.bankName}</p>
                                     <p className="text-[10px] text-muted-foreground">{req.accountTitle} &bull; {req.accountNumber}</p>
                                   </div>
                                 </TableCell>
@@ -1350,19 +1350,19 @@ export default function CampaignsPage() {
               </div>
 
               {/* Close Button Footer */}
-              <div className="p-4 bg-slate-900/50 flex justify-end border-t border-white/10 gap-3">
+              <div className="p-4 bg-muted/50 flex justify-end border-t border-border gap-3">
                 {isAdmin && selectedCampaign.approvalStatus === 'Pending' && (
                   <Button 
                     onClick={() => {
                       setIsDetailsOpen(false);
                       handleOpenReview(selectedCampaign);
                     }}
-                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl shadow-lg transition-transform hover:scale-105 active:scale-95 animate-pulse"
+                    className="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-xl shadow-md transition-transform hover:scale-105 active:scale-95 animate-pulse"
                   >
                     Approve/Reject Campaign
                   </Button>
                 )}
-                <Button onClick={() => setIsDetailsOpen(false)} className="bg-slate-800 hover:bg-slate-700 text-white font-semibold py-2 px-4 rounded-xl">
+                <Button onClick={() => setIsDetailsOpen(false)} className="bg-muted hover:bg-muted/80 text-foreground border border-border font-semibold py-2 px-4 rounded-xl">
                   Close Details
                 </Button>
               </div>
@@ -1373,7 +1373,7 @@ export default function CampaignsPage() {
 
       {/* 2. ADMIN MODERATOR REVIEW DIALOG */}
       <Dialog open={isReviewOpen} onOpenChange={setIsReviewOpen}>
-        <DialogContent className="max-w-md border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl">
+        <DialogContent className="max-w-md border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Audit Approval Review</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -1385,12 +1385,12 @@ export default function CampaignsPage() {
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Select Decision</Label>
               <Select value={reviewStatus} onValueChange={(val: any) => setReviewStatus(val)}>
-                <SelectTrigger className="w-full rounded-xl border-white/10 bg-white/5 text-white">
+                <SelectTrigger className="w-full rounded-xl border-border bg-muted/50 text-foreground">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-white/10 bg-slate-900 text-white">
-                  <SelectItem value="Approved" className="text-emerald-400">Approve Campaign</SelectItem>
-                  <SelectItem value="Rejected" className="text-rose-400">Reject Campaign</SelectItem>
+                <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
+                  <SelectItem value="Approved" className="text-emerald-600">Approve Campaign</SelectItem>
+                  <SelectItem value="Rejected" className="text-rose-600">Reject Campaign</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1402,18 +1402,18 @@ export default function CampaignsPage() {
                   placeholder="Provide explicit reasons for the rejection of this campaign so the NGO knows what to fix..."
                   value={rejectionReason}
                   onChange={(e) => setRejectionReason(e.target.value)}
-                  className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 focus:bg-white/10 text-sm text-white min-h-[100px] placeholder:text-muted-foreground"
+                  className="rounded-xl border-border bg-muted/50 hover:bg-muted focus:bg-muted text-sm text-foreground min-h-[100px] placeholder:text-muted-foreground"
                 />
               </div>
             )}
           </div>
 
           <DialogFooter className="gap-2">
-            <Button variant="ghost" onClick={() => setIsReviewOpen(false)} className="rounded-xl">Cancel</Button>
+            <Button variant="ghost" onClick={() => setIsReviewOpen(false)} className="rounded-xl border border-border">Cancel</Button>
             <Button 
               onClick={submitReview}
               disabled={submitLoading}
-              className={`rounded-xl px-5 py-2 font-semibold shadow-lg ${
+              className={`rounded-xl px-5 py-2 font-semibold shadow-sm ${
                 reviewStatus === 'Approved' 
                   ? 'bg-emerald-500 hover:bg-emerald-600 text-white shadow-emerald-500/20' 
                   : 'bg-rose-500 hover:bg-rose-600 text-white shadow-rose-500/20'
@@ -1427,7 +1427,7 @@ export default function CampaignsPage() {
 
       {/* 3. REQUEST WITHDRAWAL DIALOG (NGO) */}
       <Dialog open={isWithdrawDialogOpen} onOpenChange={setIsWithdrawDialogOpen}>
-        <DialogContent className="max-w-md border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl">
+        <DialogContent className="max-w-md border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Request Fund Disbursement</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -1444,7 +1444,7 @@ export default function CampaignsPage() {
                 value={withdrawAmount}
                 onChange={(e) => setWithdrawAmount(e.target.value)}
                 required
-                className="rounded-xl border-white/10 bg-white/5 text-white"
+                className="rounded-xl border-border bg-muted/50 text-foreground"
               />
             </div>
 
@@ -1456,7 +1456,7 @@ export default function CampaignsPage() {
                   value={bankName}
                   onChange={(e) => setBankName(e.target.value)}
                   required
-                  className="rounded-xl border-white/10 bg-white/5 text-white"
+                  className="rounded-xl border-border bg-muted/50 text-foreground"
                 />
               </div>
               <div className="space-y-1.5">
@@ -1466,7 +1466,7 @@ export default function CampaignsPage() {
                   value={accountTitle}
                   onChange={(e) => setAccountTitle(e.target.value)}
                   required
-                  className="rounded-xl border-white/10 bg-white/5 text-white"
+                  className="rounded-xl border-border bg-muted/50 text-foreground"
                 />
               </div>
             </div>
@@ -1478,7 +1478,7 @@ export default function CampaignsPage() {
                 value={accountNumber}
                 onChange={(e) => setAccountNumber(e.target.value)}
                 required
-                className="rounded-xl border-white/10 bg-white/5 text-white"
+                className="rounded-xl border-border bg-muted/50 text-foreground"
               />
             </div>
 
@@ -1488,13 +1488,13 @@ export default function CampaignsPage() {
                 placeholder="Specify the utilization scope for the disbursed funds..."
                 value={withdrawNotes}
                 onChange={(e) => setWithdrawNotes(e.target.value)}
-                className="rounded-xl border-white/10 bg-white/5 text-white min-h-[60px]"
+                className="rounded-xl border-border bg-muted/50 text-foreground min-h-[60px]"
               />
             </div>
 
             <DialogFooter className="pt-2">
-              <Button type="button" variant="ghost" onClick={() => setIsWithdrawDialogOpen(false)} className="rounded-xl">Cancel</Button>
-              <Button type="submit" disabled={submitLoading} className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 shadow-lg shadow-primary/20">
+              <Button type="button" variant="ghost" onClick={() => setIsWithdrawDialogOpen(false)} className="rounded-xl border border-border">Cancel</Button>
+              <Button type="submit" disabled={submitLoading} className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 shadow-sm">
                 {submitLoading ? 'Submitting...' : 'Disburse Funds'}
               </Button>
             </DialogFooter>
@@ -1504,7 +1504,7 @@ export default function CampaignsPage() {
 
       {/* 4. ADMIN WITHDRAWAL REVIEW DIALOG */}
       <Dialog open={isWithdrawReviewOpen} onOpenChange={setIsWithdrawReviewOpen}>
-        <DialogContent className="max-w-md border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl">
+        <DialogContent className="max-w-md border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold">Audit Withdrawal Request</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -1514,7 +1514,7 @@ export default function CampaignsPage() {
 
           <div className="space-y-4 my-4">
             {selectedWithdrawal && (
-              <div className="text-xs bg-white/5 border border-white/10 rounded-xl p-3 space-y-1.5 text-slate-300">
+              <div className="text-xs bg-muted/40 border border-border rounded-xl p-3 space-y-1.5 text-muted-foreground">
                 <p><strong>Bank:</strong> {selectedWithdrawal.bankName}</p>
                 <p><strong>Title:</strong> {selectedWithdrawal.accountTitle}</p>
                 <p><strong>Number/IBAN:</strong> {selectedWithdrawal.accountNumber}</p>
@@ -1525,12 +1525,12 @@ export default function CampaignsPage() {
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Audit Action</Label>
               <Select value={withdrawReviewStatus} onValueChange={(val: any) => setWithdrawReviewStatus(val)}>
-                <SelectTrigger className="w-full rounded-xl border-white/10 bg-white/5 text-white">
+                <SelectTrigger className="w-full rounded-xl border-border bg-muted/50 text-foreground">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-white/10 bg-slate-900 text-white">
-                  <SelectItem value="Approved" className="text-emerald-400">Approve & Disburse</SelectItem>
-                  <SelectItem value="Rejected" className="text-rose-400">Reject Withdrawal</SelectItem>
+                <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
+                  <SelectItem value="Approved" className="text-emerald-600">Approve & Disburse</SelectItem>
+                  <SelectItem value="Rejected" className="text-rose-600">Reject Withdrawal</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -1542,14 +1542,14 @@ export default function CampaignsPage() {
                   placeholder="State guidelines or validation issues preventing withdrawal..."
                   value={withdrawRejectionReason}
                   onChange={(e) => setWithdrawRejectionReason(e.target.value)}
-                  className="rounded-xl border-white/10 bg-white/5 hover:bg-white/10 text-white text-sm min-h-[80px]"
+                  className="rounded-xl border-border bg-muted/50 text-foreground text-sm min-h-[80px]"
                 />
               </div>
             )}
           </div>
 
           <DialogFooter className="gap-2">
-            <Button variant="ghost" onClick={() => setIsWithdrawReviewOpen(false)} className="rounded-xl">Cancel</Button>
+            <Button variant="ghost" onClick={() => setIsWithdrawReviewOpen(false)} className="rounded-xl border border-border">Cancel</Button>
             <Button 
               onClick={submitWithdrawReview}
               disabled={submitLoading}
@@ -1567,8 +1567,8 @@ export default function CampaignsPage() {
 
       {/* 5. EDIT CAMPAIGN DETAILS DIALOG */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="max-w-2xl border-white/10 bg-slate-950 text-white rounded-2xl overflow-hidden p-0 max-h-[90vh] flex flex-col shadow-2xl">
-          <DialogHeader className="p-6 bg-gradient-to-br from-indigo-950 to-slate-900 border-b border-white/10 shrink-0">
+        <DialogContent className="max-w-2xl border-border bg-background text-foreground rounded-2xl overflow-hidden p-0 max-h-[90vh] flex flex-col shadow-2xl">
+          <DialogHeader className="p-6 bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-indigo-950 dark:to-slate-900 border-b border-border shrink-0">
             <DialogTitle className="text-xl font-bold">Edit Campaign Details</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
               Modify details for campaign &ldquo;{selectedCampaign?.title}&rdquo;.
@@ -1583,7 +1583,7 @@ export default function CampaignsPage() {
                 value={editTitle}
                 onChange={(e) => setEditTitle(e.target.value)}
                 required
-                className="rounded-xl border-white/10 bg-white/5 text-white"
+                className="rounded-xl border-border bg-muted/50 text-foreground"
               />
             </div>
 
@@ -1592,7 +1592,7 @@ export default function CampaignsPage() {
               <Input
                 value={editSummary}
                 onChange={(e) => setEditSummary(e.target.value)}
-                className="rounded-xl border-white/10 bg-white/5 text-white"
+                className="rounded-xl border-border bg-muted/50 text-foreground"
               />
             </div>
 
@@ -1602,7 +1602,7 @@ export default function CampaignsPage() {
                 value={editDescription}
                 onChange={(e) => setEditDescription(e.target.value)}
                 required
-                className="rounded-xl border-white/10 bg-white/5 text-white min-h-[100px]"
+                className="rounded-xl border-border bg-muted/50 text-foreground min-h-[100px]"
               />
             </div>
 
@@ -1615,17 +1615,17 @@ export default function CampaignsPage() {
                   value={editGoal}
                   onChange={(e) => setEditGoal(e.target.value)}
                   required
-                  className="rounded-xl border-white/10 bg-white/5 text-white"
+                  className="rounded-xl border-border bg-muted/50 text-foreground"
                 />
               </div>
 
               <div className="space-y-1.5">
                 <Label className="font-semibold text-muted-foreground">Category</Label>
                 <Select value={editCategory} onValueChange={setEditCategory}>
-                  <SelectTrigger className="w-full rounded-xl border-white/10 bg-white/5 text-white">
+                  <SelectTrigger className="w-full rounded-xl border-border bg-muted/50 text-foreground">
                     <SelectValue placeholder="Select Category" />
                   </SelectTrigger>
-                  <SelectContent className="rounded-xl border-white/10 bg-slate-900 text-white">
+                  <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
                     {categories.map((cat) => (
                       <SelectItem key={cat.id} value={String(cat.id)}>
                         {cat.name}
@@ -1637,16 +1637,16 @@ export default function CampaignsPage() {
             </div>
 
             {/* Beneficiary details */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-4">
-              <span className="font-bold text-indigo-400 uppercase tracking-wider block">Beneficiary Settings</span>
+            <div className="bg-muted/40 border border-border rounded-xl p-4 space-y-4">
+              <span className="font-bold text-indigo-650 dark:text-indigo-400 uppercase tracking-wider block">Beneficiary Settings</span>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-muted-foreground font-semibold">Beneficiary Type</Label>
                   <Select value={editBeneficiaryType} onValueChange={setEditBeneficiaryType}>
-                    <SelectTrigger className="w-full rounded-xl border-white/10 bg-white/5 text-white">
+                    <SelectTrigger className="w-full rounded-xl border-border bg-muted/50 text-foreground">
                       <SelectValue placeholder="Type" />
                     </SelectTrigger>
-                    <SelectContent className="rounded-xl border-white/10 bg-slate-900 text-white">
+                    <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
                       <SelectItem value="Individual">Individual</SelectItem>
                       <SelectItem value="Family">Family</SelectItem>
                       <SelectItem value="Community">Community</SelectItem>
@@ -1659,7 +1659,7 @@ export default function CampaignsPage() {
                   <Input
                     value={editBeneficiaryName}
                     onChange={(e) => setEditBeneficiaryName(e.target.value)}
-                    className="rounded-xl border-white/10 bg-white/5 text-white"
+                    className="rounded-xl border-border bg-muted/50 text-foreground"
                   />
                 </div>
               </div>
@@ -1670,7 +1670,7 @@ export default function CampaignsPage() {
                   <Input
                     value={editBeneficiaryCity}
                     onChange={(e) => setEditBeneficiaryCity(e.target.value)}
-                    className="rounded-xl border-white/10 bg-white/5 text-white"
+                    className="rounded-xl border-border bg-muted/50 text-foreground"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -1678,7 +1678,7 @@ export default function CampaignsPage() {
                   <Input
                     value={editBeneficiaryProvince}
                     onChange={(e) => setEditBeneficiaryProvince(e.target.value)}
-                    className="rounded-xl border-white/10 bg-white/5 text-white"
+                    className="rounded-xl border-border bg-muted/50 text-foreground"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -1687,15 +1687,15 @@ export default function CampaignsPage() {
                     type="number"
                     value={editBeneficiaryCount}
                     onChange={(e) => setEditBeneficiaryCount(e.target.value)}
-                    className="rounded-xl border-white/10 bg-white/5 text-white"
+                    className="rounded-xl border-border bg-muted/50 text-foreground"
                   />
                 </div>
               </div>
             </div>
 
             {/* POC information */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
-              <span className="font-bold text-indigo-400 uppercase tracking-wider block">Point of Contact Details</span>
+            <div className="bg-muted/40 border border-border rounded-xl p-4 space-y-3">
+              <span className="font-bold text-indigo-650 dark:text-indigo-400 uppercase tracking-wider block">Point of Contact Details</span>
               <div className="space-y-2">
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5 col-span-1">
@@ -1703,7 +1703,7 @@ export default function CampaignsPage() {
                     <Input
                       value={editContactPerson}
                       onChange={(e) => setEditContactPerson(e.target.value)}
-                      className="rounded-xl border-white/10 bg-white/5 text-white"
+                      className="rounded-xl border-border bg-muted/50 text-foreground"
                     />
                   </div>
                   <div className="space-y-1.5 col-span-1">
@@ -1711,7 +1711,7 @@ export default function CampaignsPage() {
                     <Input
                       value={editContactEmail}
                       onChange={(e) => setEditContactEmail(e.target.value)}
-                      className="rounded-xl border-white/10 bg-white/5 text-white"
+                      className="rounded-xl border-border bg-muted/50 text-foreground"
                     />
                   </div>
                   <div className="space-y-1.5 col-span-1">
@@ -1719,7 +1719,7 @@ export default function CampaignsPage() {
                     <Input
                       value={editContactPhone}
                       onChange={(e) => setEditContactPhone(e.target.value)}
-                      className="rounded-xl border-white/10 bg-white/5 text-white"
+                      className="rounded-xl border-border bg-muted/50 text-foreground"
                     />
                   </div>
                 </div>
@@ -1727,7 +1727,7 @@ export default function CampaignsPage() {
             </div>
 
             {/* Settings checkboxes */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex gap-6">
+            <div className="bg-muted/40 border border-border rounded-xl p-4 flex gap-6">
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
@@ -1736,7 +1736,7 @@ export default function CampaignsPage() {
                   onChange={(e) => setEditZakat(e.target.checked)}
                   className="accent-primary h-4 w-4 rounded"
                 />
-                <Label htmlFor="zakat" className="font-semibold text-slate-200 cursor-pointer">Accept Zakat contributions</Label>
+                <Label htmlFor="zakat" className="font-semibold text-foreground cursor-pointer">Accept Zakat contributions</Label>
               </div>
 
               <div className="flex items-center gap-2">
@@ -1747,13 +1747,13 @@ export default function CampaignsPage() {
                   onChange={(e) => setEditAnonymous(e.target.checked)}
                   className="accent-primary h-4 w-4 rounded"
                 />
-                <Label htmlFor="anon" className="font-semibold text-slate-200 cursor-pointer">Allow Anonymous donors</Label>
+                <Label htmlFor="anon" className="font-semibold text-foreground cursor-pointer">Allow Anonymous donors</Label>
               </div>
             </div>
 
-            <div className="p-4 bg-slate-900/50 flex justify-end gap-3 shrink-0 rounded-xl">
-              <Button type="button" variant="ghost" onClick={() => setIsEditOpen(false)} className="rounded-xl">Cancel</Button>
-              <Button type="submit" disabled={submitLoading} className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 shadow-lg shadow-primary/20">
+            <div className="p-4 bg-muted/50 flex justify-end gap-3 shrink-0 rounded-xl">
+              <Button type="button" variant="ghost" onClick={() => setIsEditOpen(false)} className="rounded-xl border border-border">Cancel</Button>
+              <Button type="submit" disabled={submitLoading} className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl px-5 shadow-sm">
                 {submitLoading ? 'Saving...' : 'Save Changes'}
               </Button>
             </div>

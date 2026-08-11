@@ -277,7 +277,7 @@ export default function KycCategoriesPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
+        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total NGO Classifications</CardTitle>
             <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
@@ -294,10 +294,10 @@ export default function KycCategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
+        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active Categories</CardTitle>
-            <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl">
+            <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
               <CheckCircle2 className="h-5 w-5" />
             </div>
           </CardHeader>
@@ -305,16 +305,16 @@ export default function KycCategoriesPage() {
             {loading ? (
               <Skeleton className="h-9 w-20" />
             ) : (
-              <div className="text-3xl font-bold text-emerald-400">{activeCategories}</div>
+              <div className="text-3xl font-bold text-emerald-650">{activeCategories}</div>
             )}
             <p className="text-xs text-muted-foreground mt-1">Selectable by NGOs during sign up</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
+        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Hidden Categories</CardTitle>
-            <div className="p-2 bg-red-500/10 text-red-500 rounded-xl">
+            <div className="p-2 bg-red-500/10 text-red-650 rounded-xl">
               <XCircle className="h-5 w-5" />
             </div>
           </CardHeader>
@@ -322,7 +322,7 @@ export default function KycCategoriesPage() {
             {loading ? (
               <Skeleton className="h-9 w-20" />
             ) : (
-              <div className="text-3xl font-bold text-red-400">{inactiveCategories}</div>
+              <div className="text-3xl font-bold text-red-600">{inactiveCategories}</div>
             )}
             <p className="text-xs text-muted-foreground mt-1">Deactivated / Hidden from selection</p>
           </CardContent>
@@ -330,14 +330,14 @@ export default function KycCategoriesPage() {
       </div>
 
       {/* Filter Row */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl shadow-md animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search categories..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 py-5 rounded-xl bg-white/5 border-white/10 focus:border-primary text-sm shadow-inner placeholder:text-muted-foreground/60 text-white focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="pl-10 py-5 rounded-xl bg-muted/50 border-border focus:border-primary text-sm shadow-sm placeholder:text-muted-foreground/60 text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export default function KycCategoriesPage() {
             variant="outline"
             size="icon"
             onClick={() => setViewMode('grid')}
-            className={`rounded-xl border-white/10 p-2.5 ${viewMode === 'grid' ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-white/5 hover:text-white'}`}
+            className={`rounded-xl border-border p-2.5 ${viewMode === 'grid' ? 'bg-primary text-white border-primary shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           >
             <Grid className="h-4 w-4" />
           </Button>
@@ -353,7 +353,7 @@ export default function KycCategoriesPage() {
             variant="outline"
             size="icon"
             onClick={() => setViewMode('table')}
-            className={`rounded-xl border-white/10 p-2.5 ${viewMode === 'table' ? 'bg-primary text-white border-primary shadow-lg shadow-primary/20 hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-white/5 hover:text-white'}`}
+            className={`rounded-xl border-border p-2.5 ${viewMode === 'table' ? 'bg-primary text-white border-primary shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -364,7 +364,7 @@ export default function KycCategoriesPage() {
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="border border-white/10 bg-white/5 p-6 rounded-2xl space-y-4">
+            <Card key={i} className="border-border bg-card p-6 rounded-2xl space-y-4">
               <div className="flex items-center gap-3">
                 <Skeleton className="h-12 w-12 rounded-xl" />
                 <Skeleton className="h-6 w-28" />
@@ -379,7 +379,7 @@ export default function KycCategoriesPage() {
           ))}
         </div>
       ) : filteredCategories.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-white/10 rounded-2xl bg-white/5 text-center">
+        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-border rounded-2xl bg-muted/20 text-center">
           <div className="p-4 bg-muted/20 text-muted-foreground rounded-full mb-4">
             <FolderOpen className="h-10 w-10 text-muted-foreground" />
           </div>
@@ -406,8 +406,8 @@ export default function KycCategoriesPage() {
             return (
               <Card 
                 key={category.id} 
-                className={`group border bg-white/5 backdrop-blur-sm hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between animate-in fade-in-50 slide-in-from-bottom-4 duration-300 ${
-                  category.isActive ? 'border-white/10 hover:border-primary/40 hover:-translate-y-1' : 'border-red-500/20 bg-red-950/5 opacity-80 hover:opacity-100 hover:border-red-500/40 hover:-translate-y-1'
+                className={`group border bg-card hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between animate-in fade-in-50 slide-in-from-bottom-4 duration-300 ${
+                  category.isActive ? 'border-border hover:border-primary/40 hover:-translate-y-1' : 'border-red-500/20 bg-red-500/5 opacity-80 hover:opacity-100 hover:border-red-500/40 hover:-translate-y-1'
                 }`}
               >
                 <div className="p-6 space-y-4">
@@ -418,15 +418,15 @@ export default function KycCategoriesPage() {
                         {category.name.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <h3 className="font-semibold text-white text-base group-hover:text-primary transition-colors">
+                        <h3 className="font-semibold text-foreground text-base">
                           {category.name}
                         </h3>
                         <Badge 
                           variant={category.isActive ? 'default' : 'secondary'} 
                           className={`text-[10px] px-2 py-0.5 mt-1 border ${
                             category.isActive 
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                              : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                              ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+                              : 'bg-muted text-muted-foreground border-border'
                           }`}
                         >
                           {category.isActive ? 'Active' : 'Inactive'}
@@ -437,12 +437,12 @@ export default function KycCategoriesPage() {
                     {/* Action Dropdown */}
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-white hover:bg-white/10">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted">
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40 bg-zinc-900 border-white/10 text-white">
-                        <DropdownMenuItem onClick={() => handleToggleActive(category)} className="flex items-center gap-2 hover:bg-white/5 cursor-pointer text-sm py-2">
+                      <DropdownMenuContent align="end" className="w-40 bg-popover border-border text-popover-foreground">
+                        <DropdownMenuItem onClick={() => handleToggleActive(category)} className="flex items-center gap-2 hover:bg-muted cursor-pointer text-sm py-2">
                           {category.isActive ? (
                             <>
                               <EyeOff className="h-4 w-4 text-amber-500" />
@@ -455,7 +455,7 @@ export default function KycCategoriesPage() {
                             </>
                           )}
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEditOpen(category)} className="flex items-center gap-2 hover:bg-white/5 cursor-pointer text-sm py-2">
+                        <DropdownMenuItem onClick={() => handleEditOpen(category)} className="flex items-center gap-2 hover:bg-muted cursor-pointer text-sm py-2">
                           <Pencil className="h-4 w-4 text-primary" />
                           Edit Details
                         </DropdownMenuItem>
@@ -469,7 +469,7 @@ export default function KycCategoriesPage() {
                 </div>
 
                 {/* Card Footer */}
-                <div className="px-6 py-4 bg-white/[0.02] border-t border-white/5 flex items-center justify-between text-xs text-muted-foreground">
+                <div className="px-6 py-4 bg-muted/20 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
                     <span>Created: {formatDate(category.createdAt)}</span>
@@ -489,10 +489,10 @@ export default function KycCategoriesPage() {
         </div>
       ) : (
         /* Table View */
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
+        <Card className="border border-border bg-card rounded-2xl overflow-hidden shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
           <Table>
-            <TableHeader className="bg-white/5 border-b border-white/10">
-              <TableRow className="border-b border-white/10 hover:bg-transparent">
+            <TableHeader className="bg-muted/50 border-b border-border">
+              <TableRow className="border-b border-border hover:bg-transparent">
                 <TableHead className="w-16 text-muted-foreground py-4">Icon</TableHead>
                 <TableHead className="w-16 text-muted-foreground py-4">ID</TableHead>
                 <TableHead className="font-semibold text-muted-foreground py-4">Category Name</TableHead>
@@ -505,20 +505,20 @@ export default function KycCategoriesPage() {
               {filteredCategories.map((category) => {
                 const grad = avatarGradients[getGradientIndex(category.id)];
                 return (
-                  <TableRow key={category.id} className="border-b border-white/5 hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-[1px]">
+                  <TableRow key={category.id} className="border-b border-border hover:bg-muted/50 transition-all duration-200 hover:-translate-y-[1px]">
                     <TableCell className="py-3">
                       <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${grad} flex items-center justify-center text-white text-xs font-bold`}>
                         {category.name.charAt(0).toUpperCase()}
                       </div>
                     </TableCell>
                     <TableCell className="text-muted-foreground font-mono text-xs">#{category.id}</TableCell>
-                    <TableCell className="font-semibold text-white">{category.name}</TableCell>
+                    <TableCell className="font-semibold text-foreground">{category.name}</TableCell>
                     <TableCell>
                       <Badge 
                         className={`text-[10px] border px-2 py-0.5 ${
                           category.isActive 
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' 
-                            : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                            ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' 
+                            : 'bg-muted text-muted-foreground border-border'
                         }`}
                       >
                         {category.isActive ? 'Active' : 'Inactive'}
@@ -536,7 +536,7 @@ export default function KycCategoriesPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleEditOpen(category)}
-                          className="h-8 w-8 text-primary hover:text-white hover:bg-primary/20 rounded-lg"
+                          className="h-8 w-8 text-primary hover:text-primary-foreground hover:bg-primary rounded-lg"
                         >
                           <Pencil className="h-4 w-4 text-primary" />
                         </Button>
@@ -544,7 +544,7 @@ export default function KycCategoriesPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleDeleteOpen(category)}
-                          className="h-8 w-8 text-red-400 hover:text-white hover:bg-red-500/20 rounded-lg"
+                          className="h-8 w-8 text-red-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg"
                         >
                           <Trash2 className="h-4 w-4 text-red-400" />
                         </Button>
@@ -560,14 +560,14 @@ export default function KycCategoriesPage() {
 
       {/* CREATE DIALOG */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-zinc-950 border-white/10 text-white rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
           <form onSubmit={handleCreate}>
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-2">
                 <Plus className="h-5 w-5 text-primary" />
                 Create NGO Category
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground/80 mt-1 text-sm">
+              <DialogDescription className="text-muted-foreground mt-1 text-sm">
                 Add a new classifications category for validating registered NGOs.
               </DialogDescription>
             </DialogHeader>
@@ -578,11 +578,11 @@ export default function KycCategoriesPage() {
                 </Label>
                 <Input
                   id="create-name"
-                  placeholder="e.g. Advocacy, Healthcare, Environmental, Education"
+                  placeholder="e.g. Health Support, Human Rights, Education"
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   maxLength={100}
-                  className="bg-white/5 border-white/10 focus:border-primary rounded-xl py-5 text-sm text-white"
+                  className="bg-muted/50 border-border focus:border-primary rounded-xl py-5 text-sm text-foreground"
                   required
                 />
               </div>
@@ -592,17 +592,17 @@ export default function KycCategoriesPage() {
                 </Label>
                 <Input
                   id="create-icon"
-                  placeholder="e.g. education, heart, leaf (optional)"
+                  placeholder="e.g. building, heart, award"
                   value={formIcon}
                   onChange={(e) => setFormIcon(e.target.value)}
                   maxLength={255}
-                  className="bg-white/5 border-white/10 focus:border-primary rounded-xl py-5 text-sm text-white"
+                  className="bg-muted/50 border-border focus:border-primary rounded-xl py-5 text-sm text-foreground"
                 />
               </div>
-              <div className="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/5 mt-2">
+              <div className="flex items-center justify-between bg-muted/50 p-4 rounded-xl border border-border mt-2">
                 <div className="space-y-0.5">
-                  <Label className="text-sm font-medium">Activate Category</Label>
-                  <p className="text-xs text-muted-foreground">If active, this option will immediately be visible to NGOs during KYC registration.</p>
+                  <Label className="text-sm font-medium">Is Category Active</Label>
+                  <p className="text-xs text-muted-foreground">NGOs will only see active classifications when filling out their validation profiles.</p>
                 </div>
                 <Switch
                   checked={formIsActive}
@@ -611,19 +611,19 @@ export default function KycCategoriesPage() {
                 />
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0 border-t border-white/5 pt-4">
+            <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setIsCreateOpen(false)}
-                className="rounded-xl border border-white/10 hover:bg-white/5 hover:text-white"
+                className="rounded-xl border border-border hover:bg-muted hover:text-foreground"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
+                className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Create Category
@@ -635,14 +635,14 @@ export default function KycCategoriesPage() {
 
       {/* EDIT DIALOG */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-zinc-950 border-white/10 text-white rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
           <form onSubmit={handleEdit}>
             <DialogHeader>
               <DialogTitle className="text-xl font-bold flex items-center gap-2">
                 <Pencil className="h-5 w-5 text-primary" />
                 Edit Category
               </DialogTitle>
-              <DialogDescription className="text-muted-foreground/80 mt-1 text-sm">
+              <DialogDescription className="text-muted-foreground mt-1 text-sm">
                 Update classification details for this NGO category.
               </DialogDescription>
             </DialogHeader>
@@ -656,7 +656,7 @@ export default function KycCategoriesPage() {
                   value={formName}
                   onChange={(e) => setFormName(e.target.value)}
                   maxLength={100}
-                  className="bg-white/5 border-white/10 focus:border-primary rounded-xl py-5 text-sm text-white"
+                  className="bg-muted/50 border-border focus:border-primary rounded-xl py-5 text-sm text-foreground"
                   required
                 />
               </div>
@@ -669,10 +669,10 @@ export default function KycCategoriesPage() {
                   value={formIcon}
                   onChange={(e) => setFormIcon(e.target.value)}
                   maxLength={255}
-                  className="bg-white/5 border-white/10 focus:border-primary rounded-xl py-5 text-sm text-white"
+                  className="bg-muted/50 border-border focus:border-primary rounded-xl py-5 text-sm text-foreground"
                 />
               </div>
-              <div className="flex items-center justify-between bg-white/5 p-4 rounded-xl border border-white/5 mt-2">
+              <div className="flex items-center justify-between bg-muted/50 p-4 rounded-xl border border-border mt-2">
                 <div className="space-y-0.5">
                   <Label className="text-sm font-medium">Is Category Active</Label>
                   <p className="text-xs text-muted-foreground">NGOs will only see active classifications when filling out their validation profiles.</p>
@@ -684,19 +684,19 @@ export default function KycCategoriesPage() {
                 />
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0 border-t border-white/5 pt-4">
+            <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4">
               <Button
                 type="button"
                 variant="ghost"
                 onClick={() => setIsEditOpen(false)}
-                className="rounded-xl border border-white/10 hover:bg-white/5 hover:text-white"
+                className="rounded-xl border border-border hover:bg-muted hover:text-foreground"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/95 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
+                className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save Changes
@@ -708,26 +708,26 @@ export default function KycCategoriesPage() {
 
       {/* DELETE DIALOG */}
       <Dialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-zinc-950 border-white/10 text-white rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[420px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold flex items-center gap-2 text-red-500">
               <AlertCircle className="h-5.5 w-5.5" />
               Delete NGO Category?
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground/80 mt-2 text-sm leading-relaxed">
-              Are you sure you want to delete category <span className="text-white font-semibold">"{selectedCategory?.name}"</span>?
+            <DialogDescription className="text-muted-foreground mt-2 text-sm leading-relaxed">
+              Are you sure you want to delete category <span className="text-foreground font-semibold">"{selectedCategory?.name}"</span>?
               This action is permanent and cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3 rounded-xl text-xs leading-relaxed mt-2">
             <strong>Warning:</strong> NGO categories that are already assigned to users or KYC requests cannot be deleted to protect historical record relationships.
           </div>
-          <DialogFooter className="gap-2 sm:gap-0 border-t border-white/5 pt-4 mt-2">
+          <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4 mt-2">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setIsDeleteOpen(false)}
-              className="rounded-xl border border-white/10 hover:bg-white/5 hover:text-white"
+              className="rounded-xl border border-border hover:bg-muted hover:text-foreground"
             >
               Cancel
             </Button>

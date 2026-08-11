@@ -211,7 +211,7 @@ export default function BoostRequestsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-650 bg-clip-text text-transparent">
             Boost Requests
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -222,7 +222,7 @@ export default function BoostRequestsPage() {
 
       {/* Stats Widgets */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl hover:border-primary/30 transition-all duration-300">
+        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-primary/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Active Boosts</CardTitle>
             <div className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">
@@ -230,38 +230,38 @@ export default function BoostRequestsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">{activeBoosts.length}</div>
+            <div className="text-2xl font-bold text-foreground">{activeBoosts.length}</div>
             <p className="text-[10px] text-muted-foreground mt-1">Currently promoted on discovery</p>
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
+        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Applications</CardTitle>
-            <div className="p-1.5 bg-yellow-500/10 text-yellow-500 rounded-lg">
+            <div className="p-1.5 bg-yellow-500/10 text-yellow-600 rounded-lg">
               <Clock className="h-4.5 w-4.5" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-yellow-500">{requests.length}</div>
+            <div className="text-2xl font-bold text-yellow-600">{requests.length}</div>
             <p className="text-[10px] text-muted-foreground mt-1">Awaiting approval review</p>
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl hover:border-emerald-500/30 transition-all duration-300">
+        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-emerald-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Simulated Revenue</CardTitle>
-            <div className="p-1.5 bg-emerald-500/10 text-emerald-500 rounded-lg">
+            <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
               <DollarSign className="h-4.5 w-4.5" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-400">{formatCurrency(totalRevenue + 40000)}</div>
+            <div className="text-2xl font-bold text-emerald-650">{formatCurrency(totalRevenue + 40000)}</div>
             <p className="text-[10px] text-muted-foreground mt-1">Collected from campaign promotion</p>
           </CardContent>
         </Card>
 
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl hover:border-indigo-500/30 transition-all duration-300">
+        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-indigo-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Discovery Conversion</CardTitle>
             <div className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">
@@ -269,7 +269,7 @@ export default function BoostRequestsPage() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-indigo-400">+24.5%</div>
+            <div className="text-2xl font-bold text-indigo-600">+24.5%</div>
             <p className="text-[10px] text-muted-foreground mt-1">Average boost performance lift</p>
           </CardContent>
         </Card>
@@ -281,30 +281,30 @@ export default function BoostRequestsPage() {
         {/* REQUESTS QUEUE */}
         <div className="lg:col-span-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
               <Sparkles className="h-4.5 w-4.5 text-yellow-500" /> Pending Applications Queue
             </h2>
-            <Badge className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/25 font-semibold text-xs py-0.5 px-2.5">
+            <Badge className="bg-yellow-500/10 text-yellow-600 border border-yellow-500/25 font-semibold text-xs py-0.5 px-2.5">
               Review Awaited
             </Badge>
           </div>
 
           {requests.length === 0 ? (
-            <Card className="border-white/10 bg-white/5 backdrop-blur-sm p-8 text-center text-muted-foreground rounded-2xl border-dashed">
+            <Card className="border-border bg-card p-8 text-center text-muted-foreground rounded-2xl border-dashed">
               <CheckCircle className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-white">All applications reviewed</p>
+              <p className="text-sm font-semibold text-foreground">All applications reviewed</p>
               <p className="text-xs mt-1">No pending campaign boosts at the moment.</p>
             </Card>
           ) : (
             <div className="space-y-4">
               {requests.map((req) => (
-                <Card key={req.id} className="border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
-                  <CardHeader className="p-4 bg-white/5 border-b border-white/5 flex flex-row items-center justify-between pb-3">
+                <Card key={req.id} className="border-border bg-card rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+                  <CardHeader className="p-4 bg-muted/40 border-b border-border flex flex-row items-center justify-between pb-3">
                     <div className="space-y-0.5">
-                      <span className="text-[9px] uppercase font-bold tracking-wider text-indigo-400">
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-indigo-600">
                         Campaign #{req.campaignId}
                       </span>
-                      <CardTitle className="text-sm font-bold text-white line-clamp-1">{req.campaignTitle}</CardTitle>
+                      <CardTitle className="text-sm font-bold text-foreground line-clamp-1">{req.campaignTitle}</CardTitle>
                     </div>
                     <Badge className={`border-none rounded-lg text-[9px] font-bold ${
                       req.boostType === 'Premium' ? 'bg-purple-500 text-white' :
@@ -315,24 +315,24 @@ export default function BoostRequestsPage() {
                     </Badge>
                   </CardHeader>
                   <CardContent className="p-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-                      <p><strong>NGO:</strong> {req.ngoName}</p>
-                      <p><strong>Duration:</strong> {req.durationDays} Days</p>
-                      <p><strong>Price:</strong> {formatCurrency(req.price)}</p>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                      <p><strong className="text-foreground">NGO:</strong> {req.ngoName}</p>
+                      <p><strong className="text-foreground">Duration:</strong> {req.durationDays} Days</p>
+                      <p><strong className="text-foreground">Price:</strong> {formatCurrency(req.price)}</p>
                       <p className="text-muted-foreground"><strong>Submitted:</strong> {formatDate(req.requestedAt)}</p>
                     </div>
 
-                    <div className="flex gap-2 justify-end pt-1.5 border-t border-white/5">
+                    <div className="flex gap-2 justify-end pt-1.5 border-t border-border">
                       <Button 
                         onClick={() => { setSelectedReq(req); setIsRejectOpen(true); }}
                         variant="ghost" 
-                        className="text-xs text-rose-500 hover:text-rose-400 hover:bg-white/5 rounded-xl h-8 py-0"
+                        className="text-xs text-rose-500 hover:text-rose-455 hover:bg-rose-500/10 rounded-xl h-8 py-0"
                       >
                         Reject
                       </Button>
                       <Button 
                         onClick={() => { setSelectedReq(req); setIsApproveOpen(true); }}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl h-8 py-0"
+                        className="bg-emerald-650 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl h-8 py-0"
                       >
                         Approve Boost
                       </Button>
@@ -347,7 +347,7 @@ export default function BoostRequestsPage() {
         {/* ACTIVE BOOSTS */}
         <div className="lg:col-span-6 space-y-4">
           <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
               <Zap className="h-4.5 w-4.5 text-primary" /> Supervised Active Promotions
             </h2>
             <Badge className="bg-primary/10 text-primary border border-primary/25 font-semibold text-xs py-0.5 px-2.5">
@@ -356,40 +356,40 @@ export default function BoostRequestsPage() {
           </div>
 
           {activeBoosts.length === 0 ? (
-            <Card className="border-white/10 bg-white/5 backdrop-blur-sm p-8 text-center text-muted-foreground rounded-2xl border-dashed">
+            <Card className="border-border bg-card p-8 text-center text-muted-foreground rounded-2xl border-dashed">
               <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
-              <p className="text-sm font-semibold text-white">No active promotions</p>
+              <p className="text-sm font-semibold text-foreground">No active promotions</p>
               <p className="text-xs mt-1">Approve boost requests in the queue to activate discovery boosters.</p>
             </Card>
           ) : (
             <div className="space-y-4">
               {activeBoosts.map((boost) => (
-                <Card key={boost.id} className="border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all duration-300">
-                  <CardHeader className="p-4 bg-emerald-500/5 border-b border-white/5 flex flex-row items-center justify-between pb-3">
+                <Card key={boost.id} className="border-border bg-card rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all duration-300">
+                  <CardHeader className="p-4 bg-emerald-500/5 border-b border-border flex flex-row items-center justify-between pb-3">
                     <div className="space-y-0.5">
-                      <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-400">
+                      <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-650">
                         Live Boost Active
                       </span>
-                      <CardTitle className="text-sm font-bold text-white line-clamp-1">{boost.campaignTitle}</CardTitle>
+                      <CardTitle className="text-sm font-bold text-foreground line-clamp-1">{boost.campaignTitle}</CardTitle>
                     </div>
                     <Badge className="border-none rounded-lg text-[9px] font-bold bg-emerald-500 text-white animate-pulse">
                       Active
                     </Badge>
                   </CardHeader>
                   <CardContent className="p-4 space-y-3">
-                    <div className="grid grid-cols-2 gap-2 text-xs text-slate-300">
-                      <p><strong>NGO:</strong> {boost.ngoName}</p>
-                      <p><strong>Boost Class:</strong> {boost.boostType}</p>
-                      <p><strong>Starts:</strong> {formatDate(boost.startsAt)}</p>
-                      <p><strong>Ends:</strong> {formatDate(boost.endsAt)}</p>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+                      <p><strong className="text-foreground">NGO:</strong> {boost.ngoName}</p>
+                      <p><strong className="text-foreground">Boost Class:</strong> {boost.boostType}</p>
+                      <p><strong className="text-foreground">Starts:</strong> {formatDate(boost.startsAt)}</p>
+                      <p><strong className="text-foreground">Ends:</strong> {formatDate(boost.endsAt)}</p>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2.5 border-t border-white/5 text-[10px]">
+                    <div className="flex justify-between items-center pt-2.5 border-t border-border text-[10px]">
                       <span className="text-muted-foreground font-semibold">Cost: {formatCurrency(boost.price)}</span>
                       <Button 
                         onClick={() => { setSelectedReq(boost); setIsTerminateOpen(true); }}
                         variant="ghost" 
-                        className="text-xs text-rose-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl h-8 py-0 flex items-center gap-1"
+                        className="text-xs text-rose-500 hover:text-rose-455 hover:bg-rose-500/10 rounded-xl h-8 py-0 flex items-center gap-1"
                       >
                         <Trash2 className="h-3.5 w-3.5" /> Terminate Early
                       </Button>
@@ -407,7 +407,7 @@ export default function BoostRequestsPage() {
 
       {/* 1. APPROVE CONFIRMATION */}
       <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
-        <DialogContent className="max-w-sm border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl">
+        <DialogContent className="max-w-sm border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold">Approve Boost Promotion?</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -415,10 +415,10 @@ export default function BoostRequestsPage() {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 mt-4">
-            <Button variant="ghost" onClick={() => setIsApproveOpen(false)} className="rounded-xl text-xs">Cancel</Button>
+            <Button variant="ghost" onClick={() => setIsApproveOpen(false)} className="rounded-xl text-xs border border-border">Cancel</Button>
             <Button 
               onClick={handleApprove} 
-              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold px-4"
+              className="bg-emerald-650 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold px-4"
             >
               Confirm Activation
             </Button>
@@ -428,7 +428,7 @@ export default function BoostRequestsPage() {
 
       {/* 2. REJECT DIALOG */}
       <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
-        <DialogContent className="max-w-md border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl">
+        <DialogContent className="max-w-md border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-lg font-bold">Reject Promotion Request</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -442,15 +442,15 @@ export default function BoostRequestsPage() {
               placeholder="e.g. Inappropriate media content, target audience mismatch..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
-              className="rounded-xl border-white/10 bg-white/5 text-white min-h-[80px]"
+              className="rounded-xl border-border bg-muted/50 text-foreground min-h-[80px]"
             />
           </div>
 
           <DialogFooter className="gap-2 mt-4">
-            <Button variant="ghost" onClick={() => setIsRejectOpen(false)} className="rounded-xl text-xs">Cancel</Button>
+            <Button variant="ghost" onClick={() => setIsRejectOpen(false)} className="rounded-xl text-xs border border-border">Cancel</Button>
             <Button 
               onClick={handleReject} 
-              className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold px-4"
+              className="bg-rose-650 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold px-4"
             >
               Confirm Rejection
             </Button>
@@ -460,18 +460,18 @@ export default function BoostRequestsPage() {
 
       {/* 3. TERMINATE CONFIRMATION */}
       <Dialog open={isTerminateOpen} onOpenChange={setIsTerminateOpen}>
-        <DialogContent className="max-w-sm border-white/10 bg-slate-950 text-white rounded-2xl p-6 shadow-2xl">
+        <DialogContent className="max-w-sm border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-rose-500">Terminate Active Boost?</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-rose-650">Terminate Active Boost?</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
               Are you sure you want to terminate the active boost promotion for &ldquo;{selectedReq?.campaignTitle}&rdquo;? The campaign will lose its discovery booster status.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 mt-4">
-            <Button variant="ghost" onClick={() => setIsTerminateOpen(false)} className="rounded-xl text-xs">Cancel</Button>
+            <Button variant="ghost" onClick={() => setIsTerminateOpen(false)} className="rounded-xl text-xs border border-border">Cancel</Button>
             <Button 
               onClick={handleTerminate} 
-              className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold px-4"
+              className="bg-rose-650 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold px-4"
             >
               Terminate
             </Button>

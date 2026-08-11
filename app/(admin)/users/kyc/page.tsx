@@ -244,48 +244,48 @@ export default function KYCRequestsPage() {
 
       {/* Stats Widgets */}
       <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
+        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending Review</CardTitle>
-            <div className="p-2 bg-amber-500/10 text-amber-500 rounded-xl">
+            <div className="p-2 bg-amber-500/10 text-amber-650 rounded-xl">
               <Clock className="h-5 w-5" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-amber-400">{pendingCount}</div>
+            <div className="text-3xl font-bold text-amber-600">{pendingCount}</div>
             <p className="text-xs text-muted-foreground mt-1">Applications awaiting administrator audit</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
+        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Approved Verification</CardTitle>
-            <div className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl">
+            <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
               <CheckCircle2 className="h-5 w-5" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-emerald-400">{approvedCount}</div>
+            <div className="text-3xl font-bold text-emerald-600">{approvedCount}</div>
             <p className="text-xs text-muted-foreground mt-1">Successfully verified legal organizations</p>
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-300">
+        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Rejected Application</CardTitle>
-            <div className="p-2 bg-red-500/10 text-red-500 rounded-xl">
+            <div className="p-2 bg-red-500/10 text-red-650 rounded-xl">
               <XCircle className="h-5 w-5" />
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-red-400">{rejectedCount}</div>
+            <div className="text-3xl font-bold text-red-600">{rejectedCount}</div>
             <p className="text-xs text-muted-foreground mt-1">Declined requests due to validation failures</p>
           </CardContent>
         </Card>
       </div>
 
       {/* Filter Row */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-2xl shadow-md animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -295,37 +295,37 @@ export default function KYCRequestsPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-10 py-5 rounded-xl bg-white/5 border-white/10 focus:border-primary text-sm shadow-inner placeholder:text-muted-foreground/60 text-white focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="pl-10 py-5 rounded-xl bg-muted/50 border-border focus:border-primary text-sm shadow-sm placeholder:text-muted-foreground/60 text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
           />
         </div>
 
         {/* Status Tabs */}
-        <div className="flex items-center gap-1.5 bg-zinc-900 border border-white/10 p-1.5 rounded-xl">
+        <div className="flex items-center gap-1.5 bg-muted border border-border p-1.5 rounded-xl">
           <Button
             variant={statusFilter === 'ALL' ? 'default' : 'ghost'}
             onClick={() => { setStatusFilter('ALL'); setPage(1); }}
-            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === 'ALL' ? 'bg-primary text-white' : 'text-muted-foreground hover:text-white hover:bg-white/5'}`}
+            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === 'ALL' ? 'bg-primary text-white' : 'text-muted-foreground hover:text-foreground hover:bg-background'}`}
           >
             All
           </Button>
           <Button
             variant={statusFilter === KycStatus.PENDING ? 'default' : 'ghost'}
             onClick={() => { setStatusFilter(KycStatus.PENDING); setPage(1); }}
-            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === KycStatus.PENDING ? 'bg-amber-600 text-white' : 'text-muted-foreground hover:text-amber-400 hover:bg-amber-500/5'}`}
+            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === KycStatus.PENDING ? 'bg-amber-600 text-white' : 'text-muted-foreground hover:text-amber-600 hover:bg-amber-500/10'}`}
           >
             Pending
           </Button>
           <Button
             variant={statusFilter === KycStatus.APPROVED ? 'default' : 'ghost'}
             onClick={() => { setStatusFilter(KycStatus.APPROVED); setPage(1); }}
-            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === KycStatus.APPROVED ? 'bg-emerald-600 text-white' : 'text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/5'}`}
+            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === KycStatus.APPROVED ? 'bg-emerald-600 text-white' : 'text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10'}`}
           >
             Approved
           </Button>
           <Button
             variant={statusFilter === KycStatus.REJECTED ? 'default' : 'ghost'}
             onClick={() => { setStatusFilter(KycStatus.REJECTED); setPage(1); }}
-            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === KycStatus.REJECTED ? 'bg-red-600 text-white' : 'text-muted-foreground hover:text-red-400 hover:bg-red-500/5'}`}
+            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === KycStatus.REJECTED ? 'bg-red-600 text-white' : 'text-muted-foreground hover:text-red-650 hover:bg-red-500/10'}`}
           >
             Rejected
           </Button>
@@ -333,7 +333,7 @@ export default function KYCRequestsPage() {
       </div>
 
       {/* Main Table */}
-      <Card className="border border-white/10 bg-white/5 backdrop-blur-sm rounded-2xl overflow-hidden shadow-xl animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
+      <Card className="border border-border bg-card rounded-2xl overflow-hidden shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
         {loading ? (
           <div className="p-6 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -361,8 +361,8 @@ export default function KYCRequestsPage() {
         ) : (
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader className="bg-white/5 border-b border-white/10">
-                <TableRow className="border-b border-white/10 hover:bg-transparent">
+              <TableHeader className="bg-muted/50 border-b border-border">
+                <TableRow className="border-b border-border hover:bg-transparent">
                   <TableHead className="text-muted-foreground py-4">NGO Name</TableHead>
                   <TableHead className="text-muted-foreground py-4">Representative Name</TableHead>
                   <TableHead className="text-muted-foreground py-4">CNIC Identifier</TableHead>
@@ -373,10 +373,10 @@ export default function KYCRequestsPage() {
               </TableHeader>
               <TableBody>
                 {requests.map((req) => (
-                  <TableRow key={req.id} className="border-b border-white/5 hover:bg-white/[0.04] transition-all duration-200 hover:-translate-y-[1px]">
-                    <TableCell className="py-4 font-semibold text-white">
+                  <TableRow key={req.id} className="border-b border-border hover:bg-muted/30 transition-all duration-200 hover:-translate-y-[1px]">
+                    <TableCell className="py-4 font-semibold text-foreground">
                       <div className="flex items-center gap-3">
-                        <div className="h-9 w-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold">
+                        <div className="h-9 w-9 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-500 flex items-center justify-center font-bold">
                           {req.ngoName.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -387,7 +387,7 @@ export default function KYCRequestsPage() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell className="text-white">
+                    <TableCell className="text-foreground">
                       <div>
                         <span className="text-sm font-medium">{req.representativeFullName || 'N/A'}</span>
                         {req.representativeDesignation && (
@@ -399,12 +399,12 @@ export default function KYCRequestsPage() {
                     <TableCell>
                       <Badge
                         variant={statusVariants[req.status]}
-                        className={`text-[10px] px-2.5 py-1 border font-semibold uppercase tracking-wider rounded-full shadow-[0_0_8px_rgba(255,255,255,0.02)] transition-all ${
-                          req.status === KycStatus.APPROVED && 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20 shadow-[0_0_12px_rgba(16,185,129,0.15)]'
+                        className={`text-[10px] px-2.5 py-1 border font-semibold uppercase tracking-wider rounded-full transition-all ${
+                          req.status === KycStatus.APPROVED && 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                         } ${
-                          req.status === KycStatus.PENDING && 'bg-amber-500/10 text-amber-400 border-amber-500/20 shadow-[0_0_12px_rgba(245,158,11,0.15)]'
+                          req.status === KycStatus.PENDING && 'bg-amber-500/10 text-amber-600 border-amber-500/20'
                         } ${
-                          req.status === KycStatus.REJECTED && 'bg-red-500/10 text-red-400 border-red-500/20 shadow-[0_0_12px_rgba(239,68,68,0.15)]'
+                          req.status === KycStatus.REJECTED && 'bg-red-500/10 text-red-650 border-red-500/20'
                         }`}
                       >
                         {statusLabels[req.status]}
@@ -428,10 +428,10 @@ export default function KYCRequestsPage() {
 
         {/* Pagination Controls */}
         {lastPage > 1 && (
-          <div className="flex items-center justify-between px-6 py-4 border-t border-white/5 bg-white/[0.01]">
+          <div className="flex items-center justify-between px-6 py-4 border-t border-border bg-muted/20">
             <p className="text-xs text-muted-foreground">
-              Showing page <span className="font-medium text-white">{page}</span> of{' '}
-              <span className="font-medium text-white">{lastPage}</span> ({total} requests)
+              Showing page <span className="font-medium text-foreground">{page}</span> of{' '}
+              <span className="font-medium text-foreground">{lastPage}</span> ({total} requests)
             </p>
             <div className="flex gap-1.5">
               <Button
@@ -439,7 +439,7 @@ export default function KYCRequestsPage() {
                 size="icon"
                 disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="h-8 w-8 rounded-lg border-white/10 bg-transparent text-muted-foreground hover:bg-white/5 hover:text-white"
+                className="h-8 w-8 rounded-lg border-border bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -448,7 +448,7 @@ export default function KYCRequestsPage() {
                 size="icon"
                 disabled={page >= lastPage}
                 onClick={() => setPage((p) => p + 1)}
-                className="h-8 w-8 rounded-lg border-white/10 bg-transparent text-muted-foreground hover:bg-white/5 hover:text-white"
+                className="h-8 w-8 rounded-lg border-border bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground"
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -492,17 +492,17 @@ export default function KYCRequestsPage() {
             <div className="py-4 space-y-6 text-sm animate-in fade-in zoom-in-95 duration-200">
               
               {/* Header Profile */}
-              <div className="flex flex-col sm:flex-row gap-4 justify-between bg-white/5 border border-white/5 p-4 rounded-xl">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between bg-muted/50 border border-border p-4 rounded-xl">
                 <div className="flex gap-3 items-center">
                   <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-2xl font-bold">
                     {detailedRequest.ngoName.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold text-white leading-tight">{detailedRequest.ngoName}</h2>
+                    <h2 className="text-lg font-bold text-foreground leading-tight">{detailedRequest.ngoName}</h2>
                     {detailedRequest.publicName && (
                       <p className="text-xs text-muted-foreground">Public Name: {detailedRequest.publicName}</p>
                     )}
-                    <span className="text-[10px] text-indigo-400 font-mono mt-1 block">Request ID: {detailedRequest.id}</span>
+                    <span className="text-[10px] text-indigo-500 font-mono mt-1 block">Request ID: {detailedRequest.id}</span>
                   </div>
                 </div>
                 <div className="sm:text-right">
@@ -510,11 +510,11 @@ export default function KYCRequestsPage() {
                   <Badge
                     variant={statusVariants[detailedRequest.status]}
                     className={`mt-1 text-[10px] font-bold tracking-wider uppercase ${
-                      detailedRequest.status === KycStatus.APPROVED && 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+                      detailedRequest.status === KycStatus.APPROVED && 'bg-emerald-500/10 text-emerald-650 border-emerald-500/20'
                     } ${
-                      detailedRequest.status === KycStatus.PENDING && 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                      detailedRequest.status === KycStatus.PENDING && 'bg-amber-500/10 text-amber-600 border-amber-500/20'
                     } ${
-                      detailedRequest.status === KycStatus.REJECTED && 'bg-red-500/10 text-red-400 border-red-500/20'
+                      detailedRequest.status === KycStatus.REJECTED && 'bg-red-500/10 text-red-650 border-red-500/20'
                     }`}
                   >
                     {statusLabels[detailedRequest.status]}
@@ -531,31 +531,31 @@ export default function KYCRequestsPage() {
                     <Building2 className="h-4 w-4" />
                     Organization Profile
                   </h3>
-                  <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-3">
+                  <div className="bg-muted/20 border border-border p-4 rounded-xl space-y-3">
                     <div>
                       <span className="text-xs text-muted-foreground block">NGO Registration Number</span>
-                      <span className="font-medium text-white">{detailedRequest.ngoRegistrationNumber || 'N/A'}</span>
+                      <span className="font-medium text-foreground">{detailedRequest.ngoRegistrationNumber || 'N/A'}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <span className="text-xs text-muted-foreground block">Established Year</span>
-                        <span className="font-medium text-white">{detailedRequest.yearEstablished || 'N/A'}</span>
+                        <span className="font-medium text-foreground">{detailedRequest.yearEstablished || 'N/A'}</span>
                       </div>
                       <div>
                         <span className="text-xs text-muted-foreground block">Registration Type</span>
-                        <span className="font-medium text-white">{detailedRequest.registrationType || 'N/A'}</span>
+                        <span className="font-medium text-foreground">{detailedRequest.registrationType || 'N/A'}</span>
                       </div>
                     </div>
                     <div>
                       <span className="text-xs text-muted-foreground block">Registration Authority</span>
-                      <span className="font-medium text-white">{detailedRequest.registrationAuthority || 'N/A'}</span>
+                      <span className="font-medium text-foreground">{detailedRequest.registrationAuthority || 'N/A'}</span>
                     </div>
                     {detailedRequest.categories && detailedRequest.categories.length > 0 && (
                       <div>
                         <span className="text-xs text-muted-foreground block mb-1">Target Sectors / Categories</span>
                         <div className="flex flex-wrap gap-1">
                           {detailedRequest.categories.map((c: string) => (
-                            <Badge key={c} variant="outline" className="text-[10px] bg-white/5 border-white/10 text-zinc-300">
+                            <Badge key={c} variant="outline" className="text-[10px] bg-muted border-border text-foreground">
                               {c}
                             </Badge>
                           ))}
@@ -571,28 +571,28 @@ export default function KYCRequestsPage() {
                     <UserIcon className="h-4 w-4" />
                     Representative Information
                   </h3>
-                  <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-3">
+                  <div className="bg-muted/20 border border-border p-4 rounded-xl space-y-3">
                     <div>
                       <span className="text-xs text-muted-foreground block">Full Name</span>
-                      <span className="font-medium text-white">{detailedRequest.representativeFullName || 'N/A'}</span>
+                      <span className="font-medium text-foreground">{detailedRequest.representativeFullName || 'N/A'}</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <span className="text-xs text-muted-foreground block">Designation</span>
-                        <span className="font-medium text-white">{detailedRequest.representativeDesignation || 'N/A'}</span>
+                        <span className="font-medium text-foreground">{detailedRequest.representativeDesignation || 'N/A'}</span>
                       </div>
                       <div>
                         <span className="text-xs text-muted-foreground block">NGO Position</span>
-                        <span className="font-medium text-white">{detailedRequest.positionInNgo || 'N/A'}</span>
+                        <span className="font-medium text-foreground">{detailedRequest.positionInNgo || 'N/A'}</span>
                       </div>
                     </div>
                     <div>
                       <span className="text-xs text-muted-foreground block">Direct Contact (Accreditation)</span>
-                      <span className="font-medium text-white">{detailedRequest.contactForAccreditation || 'N/A'}</span>
+                      <span className="font-medium text-foreground">{detailedRequest.contactForAccreditation || 'N/A'}</span>
                     </div>
                     <div>
                       <span className="text-xs text-muted-foreground block">CNIC Identifier</span>
-                      <span className="font-medium font-mono text-white text-xs">{detailedRequest.cnicNumber || 'N/A'}</span>
+                      <span className="font-medium font-mono text-foreground text-xs">{detailedRequest.cnicNumber || 'N/A'}</span>
                     </div>
                   </div>
                 </div>
@@ -602,17 +602,17 @@ export default function KYCRequestsPage() {
               {/* Description & Mission */}
               <div className="space-y-4">
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">Mission Statement & Biography</h3>
-                <div className="bg-white/[0.02] border border-white/5 p-4 rounded-xl space-y-3 leading-relaxed text-sm">
+                <div className="bg-muted/20 border border-border p-4 rounded-xl space-y-3 leading-relaxed text-sm">
                   {detailedRequest.missionStatement && (
                     <div>
                       <span className="text-xs text-muted-foreground block mb-0.5">Mission Statement</span>
-                      <p className="text-zinc-300">{detailedRequest.missionStatement}</p>
+                      <p className="text-foreground">{detailedRequest.missionStatement}</p>
                     </div>
                   )}
                   {detailedRequest.organizationDescription && (
                     <div>
                       <span className="text-xs text-muted-foreground block mb-0.5">Organization Description</span>
-                      <p className="text-zinc-300">{detailedRequest.organizationDescription}</p>
+                      <p className="text-foreground">{detailedRequest.organizationDescription}</p>
                     </div>
                   )}
                   {!detailedRequest.missionStatement && !detailedRequest.organizationDescription && (
@@ -630,12 +630,12 @@ export default function KYCRequestsPage() {
                 <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                   
                   {detailedRequest.registrationCertificate && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
+                    <Card className="bg-muted/50 border-border hover:border-primary/50 hover:bg-muted hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-sm">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Document</span>
                         <span className="font-semibold block truncate">Registration Cert</span>
                       </div>
-                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-indigo-400 hover:text-indigo-300 hover:bg-white/5 flex items-center gap-1">
+                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-primary hover:text-primary-foreground hover:bg-primary flex items-center gap-1">
                         <a href={getFileUrl(detailedRequest.registrationCertificate)} target="_blank" rel="noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
                           View File
@@ -645,12 +645,12 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.ntnCertificate && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
+                    <Card className="bg-muted/50 border-border hover:border-primary/50 hover:bg-muted hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-sm">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Document</span>
                         <span className="font-semibold block truncate">NTN Certificate</span>
                       </div>
-                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-indigo-400 hover:text-indigo-300 hover:bg-white/5 flex items-center gap-1">
+                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-primary hover:text-primary-foreground hover:bg-primary flex items-center gap-1">
                         <a href={getFileUrl(detailedRequest.ntnCertificate)} target="_blank" rel="noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
                           View File
@@ -660,12 +660,12 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.proofOfAffiliation && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
+                    <Card className="bg-muted/50 border-border hover:border-primary/50 hover:bg-muted hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-sm">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Document</span>
                         <span className="font-semibold block truncate">Proof of Affiliation</span>
                       </div>
-                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-indigo-400 hover:text-indigo-300 hover:bg-white/5 flex items-center gap-1">
+                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-primary hover:text-primary-foreground hover:bg-primary flex items-center gap-1">
                         <a href={getFileUrl(detailedRequest.proofOfAffiliation)} target="_blank" rel="noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
                           View File
@@ -675,12 +675,12 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.cnicFrontImage && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
+                    <Card className="bg-muted/50 border-border hover:border-primary/50 hover:bg-muted hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-sm">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Scan</span>
                         <span className="font-semibold block truncate">CNIC Front Side</span>
                       </div>
-                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-indigo-400 hover:text-indigo-300 hover:bg-white/5 flex items-center gap-1">
+                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-primary hover:text-primary-foreground hover:bg-primary flex items-center gap-1">
                         <a href={getFileUrl(detailedRequest.cnicFrontImage)} target="_blank" rel="noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
                           Open Scan
@@ -690,12 +690,12 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.cnicBackImage && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
+                    <Card className="bg-muted/50 border-border hover:border-primary/50 hover:bg-muted hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-sm">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Scan</span>
                         <span className="font-semibold block truncate">CNIC Back Side</span>
                       </div>
-                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-indigo-400 hover:text-indigo-300 hover:bg-white/5 flex items-center gap-1">
+                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-primary hover:text-primary-foreground hover:bg-primary flex items-center gap-1">
                         <a href={getFileUrl(detailedRequest.cnicBackImage)} target="_blank" rel="noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
                           Open Scan
@@ -705,12 +705,12 @@ export default function KYCRequestsPage() {
                   )}
 
                   {detailedRequest.selfieImage && (
-                    <Card className="bg-white/5 border-white/10 hover:border-primary/50 hover:bg-white/[0.07] hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-md">
+                    <Card className="bg-muted/50 border-border hover:border-primary/50 hover:bg-muted hover:-translate-y-0.5 transition-all duration-200 rounded-xl p-3 flex flex-col justify-between shadow-sm">
                       <div className="text-xs">
                         <span className="text-muted-foreground block">Scan</span>
                         <span className="font-semibold block truncate">Selfie Identity Scan</span>
                       </div>
-                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-indigo-400 hover:text-indigo-300 hover:bg-white/5 flex items-center gap-1">
+                      <Button asChild size="sm" variant="ghost" className="mt-3 text-xs w-full text-primary hover:text-primary-foreground hover:bg-primary flex items-center gap-1">
                         <a href={getFileUrl(detailedRequest.selfieImage)} target="_blank" rel="noreferrer">
                           <ExternalLink className="h-3.5 w-3.5" />
                           Open Photo
@@ -742,7 +742,7 @@ export default function KYCRequestsPage() {
 
               {/* Display approval info if approved */}
               {detailedRequest.status === KycStatus.APPROVED && (
-                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 p-4 rounded-xl space-y-1">
+                <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-655 p-4 rounded-xl space-y-1">
                   <span className="text-xs font-semibold uppercase tracking-wider flex items-center gap-1.5">
                     <CheckCircle2 className="h-4 w-4" />
                     Accredited Legal Status
@@ -751,7 +751,7 @@ export default function KYCRequestsPage() {
                     This organization profile is fully verified and holds the legal rights to run fundraising campaigns.
                   </p>
                   {detailedRequest.reviewedAt && (
-                    <p className="text-xs text-zinc-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Approved: {formatDate(detailedRequest.reviewedAt)}
                     </p>
                   )}
@@ -762,7 +762,7 @@ export default function KYCRequestsPage() {
               {showRejectInput && (
                 <form onSubmit={handleReject} className="bg-red-500/5 border border-red-500/20 p-4 rounded-xl space-y-3 mt-4">
                   <div className="space-y-2">
-                    <Label htmlFor="reject-reason" className="text-sm font-semibold text-red-400 flex items-center gap-1">
+                    <Label htmlFor="reject-reason" className="text-sm font-semibold text-red-500 flex items-center gap-1">
                       <MessageSquare className="h-4 w-4" />
                       Specify Rejection Reason <span className="text-red-500">*</span>
                     </Label>
@@ -772,7 +772,7 @@ export default function KYCRequestsPage() {
                       value={rejectionReason}
                       onChange={(e) => setRejectionReason(e.target.value)}
                       rows={3}
-                      className="bg-zinc-950 border-white/10 focus:border-red-500 text-sm text-white"
+                      className="bg-muted/50 border-border focus:border-red-500 text-sm text-foreground"
                       required
                     />
                   </div>
@@ -781,14 +781,14 @@ export default function KYCRequestsPage() {
                       type="button"
                       variant="ghost"
                       onClick={() => setShowRejectInput(false)}
-                      className="rounded-xl border border-white/10 hover:bg-white/5 hover:text-white"
+                      className="rounded-xl border border-border hover:bg-muted hover:text-foreground"
                     >
                       Cancel
                     </Button>
                     <Button
                       type="submit"
                       disabled={actionLoading}
-                      className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg flex items-center gap-2"
+                      className="bg-red-650 hover:bg-red-700 text-white rounded-xl shadow-lg flex items-center gap-2"
                     >
                       {actionLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                       Confirm Decline
@@ -799,11 +799,11 @@ export default function KYCRequestsPage() {
 
               {/* Admin Actions Panel */}
               {detailedRequest.status === KycStatus.PENDING && !showRejectInput && (
-                <div className="border-t border-white/5 pt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
+                <div className="border-t border-border pt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
                   <Button
                     type="button"
                     onClick={() => setShowRejectInput(true)}
-                    className="bg-transparent hover:bg-red-500/10 text-red-400 hover:text-red-300 border border-red-500/20 rounded-xl py-6 px-5"
+                    className="bg-transparent hover:bg-red-500/10 text-red-500 hover:text-red-600 border border-red-500/20 rounded-xl py-6 px-5"
                   >
                     Decline Verification
                   </Button>
@@ -811,7 +811,7 @@ export default function KYCRequestsPage() {
                     type="button"
                     onClick={handleApprove}
                     disabled={actionLoading}
-                    className="bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/10 rounded-xl py-6 px-5 flex items-center gap-2"
+                    className="bg-emerald-650 hover:bg-emerald-700 text-white shadow-lg rounded-xl py-6 px-5 flex items-center gap-2"
                   >
                     {actionLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                     Approve Verification
@@ -822,12 +822,12 @@ export default function KYCRequestsPage() {
             </div>
           )}
 
-          <DialogFooter className="border-t border-white/5 pt-4">
+          <DialogFooter className="border-t border-border pt-4">
             <Button
               type="button"
               variant="ghost"
               onClick={() => setInspectOpen(false)}
-              className="rounded-xl border border-white/10 hover:bg-white/5 hover:text-white"
+              className="rounded-xl border border-border hover:bg-muted hover:text-foreground"
             >
               Close Inspector
             </Button>
