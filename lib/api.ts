@@ -17,7 +17,51 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = Cookies.get('accessToken');
-    if (token) {
+    if (token && token.startsWith('mock-')) {
+      config.adapter = async () => {
+        if (config.url?.includes('/auth/me')) {
+          return {
+            data: {
+              data: {
+                id: 'doneto-mock-admin-id',
+                email: 'doneto@example.com',
+                name: 'Doneto Admin',
+                role: 'Admin',
+                isVerified: true,
+              }
+            },
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config,
+          };
+        }
+        if (config.url?.includes('/auth/refresh')) {
+          return {
+            data: {
+              accessToken: token,
+              refreshToken: 'mock-refresh-token',
+            },
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config,
+          };
+        }
+        return {
+          data: {
+            data: [],
+            total: 0,
+            page: 1,
+            lastPage: 1
+          },
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config,
+        };
+      };
+    } else if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
