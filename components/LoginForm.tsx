@@ -22,8 +22,8 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('doneto@example.com');
+  const [password, setPassword] = useState('test123');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {

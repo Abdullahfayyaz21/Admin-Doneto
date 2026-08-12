@@ -23,6 +23,9 @@ function isTokenExpired(token: string): boolean {
 
 async function refreshTokens(refreshToken: string) {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3837/api';
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 2000);
+
   try {
     const res = await fetch(`${apiUrl}/auth/refresh`, {
       method: 'POST',
@@ -30,10 +33,13 @@ async function refreshTokens(refreshToken: string) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${refreshToken}`,
       },
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
     if (!res.ok) return null;
     return await res.json();
   } catch (e) {
+    clearTimeout(timeoutId);
     return null;
   }
 }
