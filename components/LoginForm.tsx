@@ -22,8 +22,8 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [email, setEmail] = useState(process.env.NEXT_PUBLIC_DEFAULT_EMAIL || '');
-  const [password, setPassword] = useState(process.env.NEXT_PUBLIC_DEFAULT_PASSWORD || '');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {

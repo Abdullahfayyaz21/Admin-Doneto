@@ -1,6 +1,12 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+const COOKIE_OPTIONS = {
+  secure: true,
+  sameSite: 'lax' as const,
+  path: '/',
+};
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3837/api',
   headers: {
@@ -85,9 +91,9 @@ api.interceptors.response.use(
         );
         const resData = response.data.data || response.data;
         const { accessToken, refreshToken: newRefreshToken } = resData;
-        Cookies.set('accessToken', accessToken);
+        Cookies.set('accessToken', accessToken, COOKIE_OPTIONS);
         if (newRefreshToken) {
-          Cookies.set('refreshToken', newRefreshToken);
+          Cookies.set('refreshToken', newRefreshToken, COOKIE_OPTIONS);
         }
 
         api.defaults.headers.common['Authorization'] = `Bearer ${accessToken}`;
@@ -109,8 +115,8 @@ api.interceptors.response.use(
 );
 
 function handleLogout() {
-  Cookies.remove('accessToken');
-  Cookies.remove('refreshToken');
+  Cookies.remove('accessToken', COOKIE_OPTIONS);
+  Cookies.remove('refreshToken', COOKIE_OPTIONS);
   if (typeof window !== 'undefined') {
     window.location.href = '/';
   }

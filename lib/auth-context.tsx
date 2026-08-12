@@ -29,12 +29,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (decoded) {
         setUser((prev) => (prev ? { ...prev, ...decoded } : decoded));
       }
-      try {
-        const response = await api.get('/auth/me');
-        setUser(response.data.data || response.data);
-      } catch (err) {
-        console.error('Failed to load user profile from api:', err);
-      }
+      // Fetch full profile in the background without blocking the initial render
+      api.get('/auth/me')
+        .then((response) => {
+          setUser(response.data.data || response.data);
+        })
+        .catch((err) => {
+          console.error('Failed to load user profile from api in background:', err);
+        });
     } else {
       setUser(null);
     }
@@ -49,16 +51,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeAuth();
   }, []);
 
+  const COOKIE_OPTIONS = {
+    secure: true,
+    sameSite: 'lax' as const,
+    path: '/',
+  };
+
   const login = async (accessToken: string, refreshToken: string) => {
-    Cookies.set('accessToken', accessToken);
-    Cookies.set('refreshToken', refreshToken);
+    Cookies.set('accessToken', accessToken, COOKIE_OPTIONS);
+    Cookies.set('refreshToken', refreshToken, COOKIE_OPTIONS);
     await loadUserFromToken();
     window.location.href = '/dashboard';
   };
 
   const logout = () => {
-    Cookies.remove('accessToken');
-    Cookies.remove('refreshToken');
+    Cookies.remove('accessToken', COOKIE_OPTIONS);
+    Cookies.remove('refreshToken', COOKIE_OPTIONS);
     setUser(null);
     window.location.href = '/';
   };
