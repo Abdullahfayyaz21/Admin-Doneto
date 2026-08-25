@@ -3,7 +3,30 @@
 @tailwind utilities;
 
 @layer base {
+  @font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
+    font-weight: 300 900;
+    font-display: swap;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: 'Satoshi';
+    src: url('/fonts/Satoshi-VariableItalic.woff2') format('woff2');
+    font-weight: 300 900;
+    font-display: swap;
+    font-style: italic;
+  }
   :root {
+    --color-primary: #185500;
+    --color-primary-dark: #0d3300;
+    --color-primary-mid: #1e6b00;
+    --color-primary-light: #2a8800;
+    --color-primary-glow: rgba(24, 85, 0, 0.3);
+    --color-ivory: #fffff0;
+    --color-ivory-dim: #f5f5e0;
+    --color-ivory-muted: rgba(255, 255, 240, 0.6);
+
     --background: 0 0% 100%;
     --foreground: 0 0% 11%;
     --card: 0 0% 100%;
@@ -33,32 +56,32 @@
     --sidebar-foreground: 0 0% 98%;
   }
   .dark {
-    --background: 0 0% 11%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 15%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 15%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 103 100% 17%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 17%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 17%;
-    --muted-foreground: 0 0% 65%;
-    --accent: 0 0% 20%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 63% 31%;
+    --background: 103 30% 6%;
+    --foreground: 103 20% 96%;
+    --card: 103 28% 9%;
+    --card-foreground: 103 20% 96%;
+    --popover: 103 28% 9%;
+    --popover-foreground: 103 20% 96%;
+    --primary: 103 75% 65%;
+    --primary-foreground: 103 50% 8%;
+    --secondary: 103 16% 14%;
+    --secondary-foreground: 103 20% 96%;
+    --muted: 103 16% 14%;
+    --muted-foreground: 103 10% 62%;
+    --accent: 103 60% 42%;
+    --accent-foreground: 103 30% 98%;
+    --destructive: 0 62% 48%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 103 100% 17%;
-    --chart-1: 103 100% 17%;
-    --chart-2: 160 60% 50%;
-    --chart-3: 30 80% 60%;
-    --chart-4: 280 65% 65%;
-    --chart-5: 340 75% 60%;
-    --sidebar: 103 20% 8%;
-    --sidebar-foreground: 0 0% 98%;
+    --border: 103 16% 18%;
+    --input: 103 16% 18%;
+    --ring: 103 50% 42%;
+    --chart-1: 103 50% 42%;
+    --chart-2: 103 60% 48%;
+    --chart-3: 173 48% 48%;
+    --chart-4: 38 80% 55%;
+    --chart-5: 12 70% 55%;
+    --sidebar: 103 30% 6%;
+    --sidebar-foreground: 103 20% 96%;
   }
 }
 
