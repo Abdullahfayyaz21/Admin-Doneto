@@ -207,7 +207,7 @@ export default function ReportedCampaignsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-650 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight">
             Reported Campaigns
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -218,7 +218,7 @@ export default function ReportedCampaignsPage() {
 
       {/* Stats Widgets */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-primary/30 transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl hover:border-primary/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Active Reports</CardTitle>
             <div className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">
@@ -231,7 +231,7 @@ export default function ReportedCampaignsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-rose-500/30 transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl hover:border-rose-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fraud Allegations</CardTitle>
             <div className="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg">
@@ -244,7 +244,7 @@ export default function ReportedCampaignsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Spam / Abuse</CardTitle>
             <div className="p-1.5 bg-yellow-500/10 text-yellow-600 rounded-lg">
@@ -259,7 +259,7 @@ export default function ReportedCampaignsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-slate-500/30 transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl hover:border-slate-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resolved this session</CardTitle>
             <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
@@ -274,7 +274,7 @@ export default function ReportedCampaignsPage() {
       </div>
 
       {/* Filter and Search Bar */}
-      <Card className="border-border bg-card shadow-sm rounded-2xl p-4">
+      <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -282,17 +282,17 @@ export default function ReportedCampaignsPage() {
               placeholder="Search by campaign title or reporter email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 rounded-xl border-border bg-muted/50 text-foreground placeholder:text-muted-foreground"
+              className="pl-10 rounded-xl bg-muted/50 border border-input text-foreground placeholder:text-muted-foreground dark:border-0 dark:bg-white/[0.05] dark:placeholder:text-muted-foreground/60 dark:focus:bg-white/[0.08] dark:focus:ring-1 dark:focus:ring-white/20"
             />
           </div>
 
           <div className="flex items-center gap-2">
             <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Reason</Label>
             <Select value={reasonFilter} onValueChange={(val) => { setReasonFilter(val); setPage(1); }}>
-              <SelectTrigger className="w-[160px] rounded-xl border-border bg-muted/50 text-foreground">
+              <SelectTrigger className="w-[160px] rounded-xl border border-input bg-muted/50 text-foreground dark:border-0 dark:bg-white/[0.05]">
                 <SelectValue placeholder="Reason Type" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
+              <SelectContent className="rounded-xl bg-popover text-popover-foreground">
                 <SelectItem value="ALL">All Reasons</SelectItem>
                 <SelectItem value="Fraud">Fraud</SelectItem>
                 <SelectItem value="Spam">Spam</SelectItem>
@@ -307,22 +307,22 @@ export default function ReportedCampaignsPage() {
 
       {/* Reports Table list */}
       {loading ? (
-        <Card className="border-border bg-card p-6 space-y-4 rounded-2xl">
+        <Card className="bg-card p-6 space-y-4 rounded-2xl">
           {[...Array(5)].map((_, i) => (
             <Skeleton key={i} className="h-12 w-full rounded-xl" />
           ))}
         </Card>
       ) : filteredReports.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-sm">
+        <div className="rounded-2xl bg-muted/20 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-sm">
           <CheckCircle className="h-10 w-10 mx-auto text-emerald-500 mb-4" />
           <h3 className="font-semibold text-lg text-foreground mb-2">No reports to review</h3>
           <p className="text-sm">Excellent! The system has no pending reports under these criteria.</p>
         </div>
       ) : (
-        <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden">
           <Table>
-            <TableHeader className="bg-muted/50 border-b border-border">
-              <TableRow className="border-b border-border hover:bg-transparent">
+            <TableHeader className="bg-muted/50">
+              <TableRow className="hover:bg-transparent">
                 <TableHead className="text-muted-foreground font-semibold">Campaign ID</TableHead>
                 <TableHead className="text-muted-foreground font-semibold">Campaign Title</TableHead>
                 <TableHead className="text-muted-foreground font-semibold">Reason</TableHead>

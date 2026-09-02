@@ -110,9 +110,9 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
 };
 
 const roleIcons: Record<string, React.ReactNode> = {
-  Admin: <Shield className="h-3.5 w-3.5 mr-1 text-purple-600 dark:text-purple-400" />,
-  Donor: <UserCheck className="h-3.5 w-3.5 mr-1 text-green-600 dark:text-green-400" />,
-  NGO: <Building2 className="h-3.5 w-3.5 mr-1 text-green-600 dark:text-green-400" />,
+  Admin: <Shield className="h-3.5 w-3.5 mr-1 text-purple-600 dark:text-white" />,
+  Donor: <UserCheck className="h-3.5 w-3.5 mr-1 text-[#185500] dark:text-white" />,
+  NGO: <Building2 className="h-3.5 w-3.5 mr-1 text-[#185500] dark:text-white" />,
 };
 
 export default function UsersPage() {
@@ -447,42 +447,42 @@ export default function UsersPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight">
             User Management
           </h1>
           <p className="text-muted-foreground">
             Manage system users, NGO profiles, donors, and roles inside Doneto.
           </p>
         </div>
-        <Button onClick={openCreateDialog} className="h-10 gap-2 self-start sm:self-auto rounded-xl bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90 text-white font-medium shadow-md shadow-primary/10">
+        <Button onClick={openCreateDialog} className="h-10 gap-2 self-start sm:self-auto rounded-xl font-medium shadow-md">
           <Plus className="h-4 w-4" />
           Add User
         </Button>
       </div>
 
       {/* Filters and Search */}
-      <Card className="border-border/50 shadow-sm">
-        <CardHeader className="p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between border-b border-border/50 bg-muted/20">
+      <Card className="rounded-2xl border border-border/60 bg-card shadow-sm dark:border-0 dark:bg-transparent dark:shadow-none overflow-hidden">
+        <CardHeader className="p-4 flex flex-col gap-4 md:flex-row md:items-center md:justify-between bg-muted/20 dark:bg-transparent dark:p-0 dark:pb-4">
           <CardTitle className="text-base font-semibold">
             All System Users ({total})
           </CardTitle>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* Search Input */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search by name, email, phone..."
                 value={search}
                 onChange={(e) => handleSearch(e.target.value)}
-                className="h-10 w-full rounded-xl border border-input bg-background pl-10 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:w-64"
+                className="h-10 w-full rounded-xl border border-input bg-background pl-10 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 sm:w-64 dark:border-0 dark:bg-white/[0.05] dark:placeholder:text-muted-foreground/60 dark:focus:bg-white/[0.08] dark:focus:ring-1 dark:focus:ring-white/20"
               />
             </div>
 
             {/* Role Filter */}
             <div className="w-full sm:w-36">
               <Select value={roleFilter} onValueChange={handleRoleFilter}>
-                <SelectTrigger className="rounded-xl h-10">
+                <SelectTrigger className="rounded-xl h-10 border border-input bg-background text-sm text-foreground dark:border-0 dark:bg-white/[0.05]">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
                 <SelectContent>
@@ -497,7 +497,7 @@ export default function UsersPage() {
             {/* Status Filter */}
             <div className="w-full sm:w-44">
               <Select value={statusFilter} onValueChange={handleStatusFilter}>
-                <SelectTrigger className="rounded-xl h-10">
+                <SelectTrigger className="rounded-xl h-10 border border-input bg-background text-sm text-foreground dark:border-0 dark:bg-white/[0.05]">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -515,7 +515,7 @@ export default function UsersPage() {
               variant="outline"
               size="icon"
               onClick={exportToCSV}
-              className="h-10 w-10 shrink-0 rounded-xl hover:bg-muted"
+              className="h-10 w-10 shrink-0 rounded-xl border border-input bg-background hover:bg-muted text-foreground dark:border-0 dark:bg-white/[0.05] dark:hover:bg-white/[0.08]"
               title="Export CSV"
             >
               <Download className="h-4 w-4" />
@@ -671,7 +671,7 @@ export default function UsersPage() {
 
           {/* Pagination */}
           {!loading && users.length > 0 && (
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-6 py-4 border-t border-border/50">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-6 py-4">
               <span className="text-sm text-muted-foreground">
                 Showing page <strong className="text-foreground">{page}</strong> of <strong className="text-foreground">{lastPage}</strong> (Total {total} users)
               </span>
@@ -704,35 +704,36 @@ export default function UsersPage() {
 
       {/* Creation Modal */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-2xl rounded-2xl">
-          <form onSubmit={handleCreateUser}>
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold">Add New User</DialogTitle>
-              <DialogDescription>
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-2xl md:max-w-3xl rounded-2xl p-6 sm:p-8">
+          <form onSubmit={handleCreateUser} className="w-full">
+            <DialogHeader className="pb-3 text-left">
+              <DialogTitle className="text-xl font-bold text-[#185500] dark:text-white">Add New User</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
                 Fill in the details to register a new user in the platform database.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto pr-2 scrollbar-thin">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-6 py-2 max-h-[70vh] overflow-y-auto no-scrollbar px-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
                 {/* General Section */}
-                <div className="space-y-1 md:col-span-2">
-                  <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
-                    <UserIcon className="h-4 w-4" /> General Information
-                  </h3>
+                <div className="space-y-1 md:col-span-2 pt-1">
+                  <div className="flex items-center gap-2 pb-2 border-b border-border/80 dark:border-white/10">
+                    <UserIcon className="h-4.5 w-4.5 text-[#185500] dark:text-white" />
+                    <span className="text-sm font-bold text-[#185500] dark:text-white tracking-tight">General Information</span>
+                  </div>
                 </div>
 
                 {/* Name */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="create-name" className="text-xs font-semibold">Full Name *</Label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="create-name" className="text-xs font-semibold text-foreground">Full Name *</Label>
+                  <div className="relative flex items-center">
+                    <UserIcon className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="create-name"
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
                       placeholder="Enter full name"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                       required
                     />
                   </div>
@@ -740,62 +741,62 @@ export default function UsersPage() {
 
                 {/* Email */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="create-email" className="text-xs font-semibold">Email Address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="create-email" className="text-xs font-semibold text-foreground">Email Address</Label>
+                  <div className="relative flex items-center">
+                    <Mail className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="create-email"
                       type="email"
                       value={formEmail}
                       onChange={(e) => setFormEmail(e.target.value)}
                       placeholder="name@example.com"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="create-phone" className="text-xs font-semibold">Phone Number</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="create-phone" className="text-xs font-semibold text-foreground">Phone Number</Label>
+                  <div className="relative flex items-center">
+                    <Phone className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="create-phone"
                       value={formPhone}
                       onChange={(e) => setFormPhone(e.target.value)}
                       placeholder="+923001234567"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Country Code */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="create-country-code" className="text-xs font-semibold">Country Code</Label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="create-country-code" className="text-xs font-semibold text-foreground">Country Code</Label>
+                  <div className="relative flex items-center">
+                    <Globe className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="create-country-code"
                       value={formCountryCode}
                       onChange={(e) => setFormCountryCode(e.target.value)}
                       placeholder="e.g. PK, US"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Password */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="create-pass" className="text-xs font-semibold">Password *</Label>
-                  <div className="relative">
-                    <Key className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="create-pass" className="text-xs font-semibold text-foreground">Password *</Label>
+                  <div className="relative flex items-center">
+                    <Key className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="create-pass"
                       type="password"
                       value={formPassword}
                       onChange={(e) => setFormPassword(e.target.value)}
                       placeholder="Password (min 6 chars)"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                       required
                       minLength={6}
                     />
@@ -804,58 +805,59 @@ export default function UsersPage() {
 
                 {/* CNIC */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="create-cnic" className="text-xs font-semibold">CNIC Number</Label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="create-cnic" className="text-xs font-semibold text-foreground">CNIC Number</Label>
+                  <div className="relative flex items-center">
+                    <FileText className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="create-cnic"
                       value={formCnic}
                       onChange={(e) => setFormCnic(e.target.value)}
                       placeholder="e.g. 35201-1234567-1"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Address */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <Label htmlFor="create-address" className="text-xs font-semibold">Residential / Business Address</Label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="create-address" className="text-xs font-semibold text-foreground">Residential / Business Address</Label>
+                  <div className="relative flex items-center">
+                    <MapPin className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="create-address"
                       value={formAddress}
                       onChange={(e) => setFormAddress(e.target.value)}
                       placeholder="Enter physical address"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Description */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <Label htmlFor="create-desc" className="text-xs font-semibold">Bio / Description</Label>
+                  <Label htmlFor="create-desc" className="text-xs font-semibold text-foreground">Bio / Description</Label>
                   <Textarea
                     id="create-desc"
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="Brief description about the user..."
-                    className="rounded-xl min-h-[80px]"
+                    className="rounded-xl min-h-[85px] text-sm p-3.5"
                   />
                 </div>
 
                 {/* Role and Account Section */}
                 <div className="space-y-1 md:col-span-2 pt-2">
-                  <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
-                    <Shield className="h-4 w-4" /> Account & Verification
-                  </h3>
+                  <div className="flex items-center gap-2 pb-1.5 border-b border-border/80 dark:border-white/10">
+                    <Shield className="h-4 w-4 text-[#185500] dark:text-white" />
+                    <span className="text-sm font-bold text-[#185500] dark:text-white">Account & Verification</span>
+                  </div>
                 </div>
 
                 {/* Role */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">System Role</Label>
+                  <Label className="text-xs font-semibold text-foreground">System Role</Label>
                   <Select value={formRole} onValueChange={(val: any) => setFormRole(val)}>
-                    <SelectTrigger className="rounded-xl h-10">
+                    <SelectTrigger className="rounded-xl h-11 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -868,9 +870,9 @@ export default function UsersPage() {
 
                 {/* Status */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Account Status</Label>
+                  <Label className="text-xs font-semibold text-foreground">Account Status</Label>
                   <Select value={formStatus} onValueChange={(val: any) => setFormStatus(val)}>
-                    <SelectTrigger className="rounded-xl h-10">
+                    <SelectTrigger className="rounded-xl h-11 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -883,11 +885,11 @@ export default function UsersPage() {
                 </div>
 
                 {/* Verification Toggles */}
-                <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 p-3 bg-muted/20 border border-border/50 rounded-xl">
+                <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 p-3.5 bg-muted/30 border border-border/60 rounded-xl">
                   <div className="flex items-center justify-between flex-1">
                     <div className="space-y-0.5">
-                      <Label htmlFor="create-email-verified" className="text-xs font-semibold cursor-pointer">Email Verified</Label>
-                      <p className="text-[10px] text-muted-foreground">Mark email as verified</p>
+                      <Label htmlFor="create-email-verified" className="text-xs font-semibold cursor-pointer text-foreground">Email Verified</Label>
+                      <p className="text-[11px] text-muted-foreground">Mark email as verified</p>
                     </div>
                     <Switch
                       id="create-email-verified"
@@ -897,8 +899,8 @@ export default function UsersPage() {
                   </div>
                   <div className="flex items-center justify-between flex-1">
                     <div className="space-y-0.5">
-                      <Label htmlFor="create-phone-verified" className="text-xs font-semibold cursor-pointer">Phone Verified</Label>
-                      <p className="text-[10px] text-muted-foreground">Mark phone number as verified</p>
+                      <Label htmlFor="create-phone-verified" className="text-xs font-semibold cursor-pointer text-foreground">Phone Verified</Label>
+                      <p className="text-[11px] text-muted-foreground">Mark phone number as verified</p>
                     </div>
                     <Switch
                       id="create-phone-verified"
@@ -912,97 +914,98 @@ export default function UsersPage() {
                 {formRole === 'NGO' && (
                   <>
                     <div className="space-y-1 md:col-span-2 pt-2">
-                      <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
-                        <Building2 className="h-4 w-4" /> NGO Accreditation Details
-                      </h3>
+                      <div className="flex items-center gap-2 pb-1.5 border-b border-border/80 dark:border-white/10">
+                        <Building2 className="h-4 w-4 text-[#185500] dark:text-white" />
+                        <span className="text-sm font-bold text-[#185500] dark:text-white">NGO Accreditation Details</span>
+                      </div>
                     </div>
 
                     {/* NGO Name */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="create-ngo-name" className="text-xs font-semibold">NGO Official Name</Label>
-                      <div className="relative">
-                        <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="create-ngo-name" className="text-xs font-semibold text-foreground">NGO Official Name</Label>
+                      <div className="relative flex items-center">
+                        <Building2 className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="create-ngo-name"
                           value={formNgoName}
                           onChange={(e) => setFormNgoName(e.target.value)}
                           placeholder="e.g. Save The Children"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* NGO Registration Number */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="create-ngo-reg" className="text-xs font-semibold">NGO Registration Number</Label>
-                      <div className="relative">
-                        <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="create-ngo-reg" className="text-xs font-semibold text-foreground">NGO Registration Number</Label>
+                      <div className="relative flex items-center">
+                        <FileText className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="create-ngo-reg"
                           value={formNgoRegistrationNumber}
                           onChange={(e) => setFormNgoRegistrationNumber(e.target.value)}
                           placeholder="e.g. REG-12345"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* Position in NGO */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="create-ngo-pos" className="text-xs font-semibold">Your Position in NGO</Label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="create-ngo-pos" className="text-xs font-semibold text-foreground">Your Position in NGO</Label>
+                      <div className="relative flex items-center">
+                        <Briefcase className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="create-ngo-pos"
                           value={formPositionInNgo}
                           onChange={(e) => setFormPositionInNgo(e.target.value)}
                           placeholder="e.g. Director, Volunteer"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* Direct Correspondent Name */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="create-ngo-corr" className="text-xs font-semibold">Direct Correspondent Name</Label>
-                      <div className="relative">
-                        <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="create-ngo-corr" className="text-xs font-semibold text-foreground">Direct Correspondent Name</Label>
+                      <div className="relative flex items-center">
+                        <UserIcon className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="create-ngo-corr"
                           value={formDirectCorrespondentName}
                           onChange={(e) => setFormDirectCorrespondentName(e.target.value)}
                           placeholder="e.g. John Doe"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* Contact for Accreditation */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="create-ngo-contact" className="text-xs font-semibold">Contact Email/Phone for Accreditation</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="create-ngo-contact" className="text-xs font-semibold text-foreground">Contact Email/Phone for Accreditation</Label>
+                      <div className="relative flex items-center">
+                        <Mail className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="create-ngo-contact"
                           value={formContactForAccreditation}
                           onChange={(e) => setFormContactForAccreditation(e.target.value)}
                           placeholder="email@ngo.org or phone"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* Proof of Affiliation */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="create-ngo-proof" className="text-xs font-semibold">Proof of Affiliation (URL / Text)</Label>
-                      <div className="relative">
-                        <Award className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="create-ngo-proof" className="text-xs font-semibold text-foreground">Proof of Affiliation (URL / Text)</Label>
+                      <div className="relative flex items-center">
+                        <Award className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="create-ngo-proof"
                           value={formProofOfAffiliation}
                           onChange={(e) => setFormProofOfAffiliation(e.target.value)}
                           placeholder="URL to registration docs / proof"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
@@ -1011,19 +1014,19 @@ export default function UsersPage() {
               </div>
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-border/50">
+            <DialogFooter className="gap-2 sm:gap-2 pt-4 border-t border-border/60 mt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsCreateOpen(false)}
-                className="rounded-xl h-10"
+                className="rounded-xl h-11 px-5"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="rounded-xl h-10 bg-primary text-white hover:bg-primary/95"
+                className="rounded-xl h-11 px-5"
               >
                 {submitLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
                 Save User
@@ -1035,34 +1038,35 @@ export default function UsersPage() {
 
       {/* Edit Modal */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-2xl rounded-2xl">
-          <form onSubmit={handleEditUser}>
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold">Edit User Profiles & Status</DialogTitle>
-              <DialogDescription>
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-2xl md:max-w-3xl rounded-2xl p-6 sm:p-8">
+          <form onSubmit={handleEditUser} className="w-full">
+            <DialogHeader className="pb-3 text-left">
+              <DialogTitle className="text-xl font-bold text-[#185500] dark:text-white">Edit User Profiles & Status</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground">
                 Modify user account details, role and manual verification status.
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto pr-2 scrollbar-thin">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-6 py-2 max-h-[70vh] overflow-y-auto no-scrollbar px-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-5 gap-y-4">
                 {/* General Section */}
-                <div className="space-y-1 md:col-span-2">
-                  <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
-                    <UserIcon className="h-4 w-4" /> General Information
-                  </h3>
+                <div className="space-y-1 md:col-span-2 pt-1">
+                  <div className="flex items-center gap-2 pb-2 border-b border-border/80 dark:border-white/10">
+                    <UserIcon className="h-4.5 w-4.5 text-[#185500] dark:text-white" />
+                    <span className="text-sm font-bold text-[#185500] dark:text-white tracking-tight">General Information</span>
+                  </div>
                 </div>
 
                 {/* Name */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-name" className="text-xs font-semibold">Full Name *</Label>
-                  <div className="relative">
-                    <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="edit-name" className="text-xs font-semibold text-foreground">Full Name *</Label>
+                  <div className="relative flex items-center">
+                    <UserIcon className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="edit-name"
                       value={formName}
                       onChange={(e) => setFormName(e.target.value)}
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                       required
                     />
                   </div>
@@ -1070,102 +1074,103 @@ export default function UsersPage() {
 
                 {/* Email */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-email" className="text-xs font-semibold">Email Address</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="edit-email" className="text-xs font-semibold text-foreground">Email Address</Label>
+                  <div className="relative flex items-center">
+                    <Mail className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="edit-email"
                       type="email"
                       value={formEmail}
                       onChange={(e) => setFormEmail(e.target.value)}
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Phone */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-phone" className="text-xs font-semibold">Phone Number</Label>
-                  <div className="relative">
-                    <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="edit-phone" className="text-xs font-semibold text-foreground">Phone Number</Label>
+                  <div className="relative flex items-center">
+                    <Phone className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="edit-phone"
                       value={formPhone}
                       onChange={(e) => setFormPhone(e.target.value)}
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Country Code */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-country-code" className="text-xs font-semibold">Country Code</Label>
-                  <div className="relative">
-                    <Globe className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="edit-country-code" className="text-xs font-semibold text-foreground">Country Code</Label>
+                  <div className="relative flex items-center">
+                    <Globe className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="edit-country-code"
                       value={formCountryCode}
                       onChange={(e) => setFormCountryCode(e.target.value)}
                       placeholder="e.g. PK, US"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* CNIC */}
                 <div className="space-y-1.5">
-                  <Label htmlFor="edit-cnic" className="text-xs font-semibold">CNIC Number</Label>
-                  <div className="relative">
-                    <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="edit-cnic" className="text-xs font-semibold text-foreground">CNIC Number</Label>
+                  <div className="relative flex items-center">
+                    <FileText className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="edit-cnic"
                       value={formCnic}
                       onChange={(e) => setFormCnic(e.target.value)}
                       placeholder="35201-XXXXXXX-X"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Address */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <Label htmlFor="edit-address" className="text-xs font-semibold">Residential / NGO Address</Label>
-                  <div className="relative">
-                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Label htmlFor="edit-address" className="text-xs font-semibold text-foreground">Residential / NGO Address</Label>
+                  <div className="relative flex items-center">
+                    <MapPin className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                     <Input
                       id="edit-address"
                       value={formAddress}
                       onChange={(e) => setFormAddress(e.target.value)}
                       placeholder="Enter physical address"
-                      className="pl-9 h-10 rounded-xl"
+                      className="pl-10 h-11 rounded-xl text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Description */}
                 <div className="space-y-1.5 md:col-span-2">
-                  <Label htmlFor="edit-desc" className="text-xs font-semibold">Bio / Description</Label>
+                  <Label htmlFor="edit-desc" className="text-xs font-semibold text-foreground">Bio / Description</Label>
                   <Textarea
                     id="edit-desc"
                     value={formDescription}
                     onChange={(e) => setFormDescription(e.target.value)}
                     placeholder="Brief description about the user..."
-                    className="rounded-xl min-h-[80px]"
+                    className="rounded-xl min-h-[85px] text-sm p-3.5"
                   />
                 </div>
 
                 {/* Role and Account Section */}
                 <div className="space-y-1 md:col-span-2 pt-2">
-                  <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
-                    <Shield className="h-4 w-4" /> Account & Verification
-                  </h3>
+                  <div className="flex items-center gap-2 pb-1.5 border-b border-border/80 dark:border-white/10">
+                    <Shield className="h-4 w-4 text-[#185500] dark:text-white" />
+                    <span className="text-sm font-bold text-[#185500] dark:text-white">Account & Verification</span>
+                  </div>
                 </div>
 
                 {/* Role */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">User Role</Label>
+                  <Label className="text-xs font-semibold text-foreground">User Role</Label>
                   <Select value={formRole} onValueChange={(val: any) => setFormRole(val)}>
-                    <SelectTrigger className="rounded-xl h-10">
+                    <SelectTrigger className="rounded-xl h-11 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1178,9 +1183,9 @@ export default function UsersPage() {
 
                 {/* Verification Status */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold">Verification Status</Label>
+                  <Label className="text-xs font-semibold text-foreground">Verification Status</Label>
                   <Select value={formStatus} onValueChange={(val: any) => setFormStatus(val)}>
-                    <SelectTrigger className="rounded-xl h-10">
+                    <SelectTrigger className="rounded-xl h-11 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -1193,11 +1198,11 @@ export default function UsersPage() {
                 </div>
 
                 {/* Verification Toggles */}
-                <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 p-3 bg-muted/20 border border-border/50 rounded-xl">
+                <div className="md:col-span-2 flex flex-col sm:flex-row gap-4 p-3.5 bg-muted/30 border border-border/60 rounded-xl">
                   <div className="flex items-center justify-between flex-1">
                     <div className="space-y-0.5">
-                      <Label htmlFor="edit-email-verified" className="text-xs font-semibold cursor-pointer">Email Verified</Label>
-                      <p className="text-[10px] text-muted-foreground">Toggle email verification status</p>
+                      <Label htmlFor="edit-email-verified" className="text-xs font-semibold cursor-pointer text-foreground">Email Verified</Label>
+                      <p className="text-[11px] text-muted-foreground">Toggle email verification status</p>
                     </div>
                     <Switch
                       id="edit-email-verified"
@@ -1207,8 +1212,8 @@ export default function UsersPage() {
                   </div>
                   <div className="flex items-center justify-between flex-1">
                     <div className="space-y-0.5">
-                      <Label htmlFor="edit-phone-verified" className="text-xs font-semibold cursor-pointer">Phone Verified</Label>
-                      <p className="text-[10px] text-muted-foreground">Toggle phone verification status</p>
+                      <Label htmlFor="edit-phone-verified" className="text-xs font-semibold cursor-pointer text-foreground">Phone Verified</Label>
+                      <p className="text-[11px] text-muted-foreground">Toggle phone verification status</p>
                     </div>
                     <Switch
                       id="edit-phone-verified"
@@ -1222,97 +1227,98 @@ export default function UsersPage() {
                 {formRole === 'NGO' && (
                   <>
                     <div className="space-y-1 md:col-span-2 pt-2">
-                      <h3 className="text-sm font-semibold text-primary flex items-center gap-1.5 border-b pb-1">
-                        <Building2 className="h-4 w-4" /> NGO Accreditation Details
-                      </h3>
+                      <div className="flex items-center gap-2 pb-1.5 border-b border-border/80 dark:border-white/10">
+                        <Building2 className="h-4 w-4 text-[#185500] dark:text-white" />
+                        <span className="text-sm font-bold text-[#185500] dark:text-white">NGO Accreditation Details</span>
+                      </div>
                     </div>
 
                     {/* NGO Name */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-ngo-name" className="text-xs font-semibold">NGO Official Name</Label>
-                      <div className="relative">
-                        <Building2 className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="edit-ngo-name" className="text-xs font-semibold text-foreground">NGO Official Name</Label>
+                      <div className="relative flex items-center">
+                        <Building2 className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="edit-ngo-name"
                           value={formNgoName}
                           onChange={(e) => setFormNgoName(e.target.value)}
                           placeholder="e.g. Save The Children"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* NGO Registration Number */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-ngo-reg" className="text-xs font-semibold">NGO Registration Number</Label>
-                      <div className="relative">
-                        <FileText className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="edit-ngo-reg" className="text-xs font-semibold text-foreground">NGO Registration Number</Label>
+                      <div className="relative flex items-center">
+                        <FileText className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="edit-ngo-reg"
                           value={formNgoRegistrationNumber}
                           onChange={(e) => setFormNgoRegistrationNumber(e.target.value)}
                           placeholder="e.g. REG-12345"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* Position in NGO */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-ngo-pos" className="text-xs font-semibold">Your Position in NGO</Label>
-                      <div className="relative">
-                        <Briefcase className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="edit-ngo-pos" className="text-xs font-semibold text-foreground">Your Position in NGO</Label>
+                      <div className="relative flex items-center">
+                        <Briefcase className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="edit-ngo-pos"
                           value={formPositionInNgo}
                           onChange={(e) => setFormPositionInNgo(e.target.value)}
                           placeholder="e.g. Director, Volunteer"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* Direct Correspondent Name */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-ngo-corr" className="text-xs font-semibold">Direct Correspondent Name</Label>
-                      <div className="relative">
-                        <UserIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="edit-ngo-corr" className="text-xs font-semibold text-foreground">Direct Correspondent Name</Label>
+                      <div className="relative flex items-center">
+                        <UserIcon className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="edit-ngo-corr"
                           value={formDirectCorrespondentName}
                           onChange={(e) => setFormDirectCorrespondentName(e.target.value)}
                           placeholder="e.g. John Doe"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* Contact for Accreditation */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-ngo-contact" className="text-xs font-semibold">Contact Email/Phone for Accreditation</Label>
-                      <div className="relative">
-                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="edit-ngo-contact" className="text-xs font-semibold text-foreground">Contact Email/Phone for Accreditation</Label>
+                      <div className="relative flex items-center">
+                        <Mail className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="edit-ngo-contact"
                           value={formContactForAccreditation}
                           onChange={(e) => setFormContactForAccreditation(e.target.value)}
                           placeholder="email@ngo.org or phone"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
 
                     {/* Proof of Affiliation */}
                     <div className="space-y-1.5">
-                      <Label htmlFor="edit-ngo-proof" className="text-xs font-semibold">Proof of Affiliation (URL / Text)</Label>
-                      <div className="relative">
-                        <Award className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Label htmlFor="edit-ngo-proof" className="text-xs font-semibold text-foreground">Proof of Affiliation (URL / Text)</Label>
+                      <div className="relative flex items-center">
+                        <Award className="absolute left-3.5 h-4 w-4 text-foreground dark:text-white pointer-events-none" />
                         <Input
                           id="edit-ngo-proof"
                           value={formProofOfAffiliation}
                           onChange={(e) => setFormProofOfAffiliation(e.target.value)}
                           placeholder="URL to registration docs / proof"
-                          className="pl-9 h-10 rounded-xl"
+                          className="pl-10 h-11 rounded-xl text-sm"
                         />
                       </div>
                     </div>
@@ -1321,19 +1327,19 @@ export default function UsersPage() {
               </div>
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-0 pt-3 border-t border-border/50">
+            <DialogFooter className="gap-2 sm:gap-2 pt-4 border-t border-border/60 mt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={() => setIsEditOpen(false)}
-                className="rounded-xl h-10"
+                className="rounded-xl h-11 px-5"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="rounded-xl h-10 bg-primary text-white hover:bg-primary/95"
+                className="rounded-xl h-11 px-5"
               >
                 {submitLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
                 Update User

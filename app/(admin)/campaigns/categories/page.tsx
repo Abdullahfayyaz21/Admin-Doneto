@@ -220,7 +220,7 @@ export default function CategoriesPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-in fade-in-50 slide-in-from-left-4 duration-300">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight">
             Campaign Categories
           </h1>
           <p className="text-muted-foreground">
@@ -229,7 +229,7 @@ export default function CategoriesPage() {
         </div>
         <Button 
           onClick={handleCreateOpen}
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 flex items-center gap-2 self-start sm:self-auto rounded-xl py-6 px-5 transition-transform duration-200 hover:scale-105 active:scale-95"
+          className="shadow-md flex items-center gap-2 self-start sm:self-auto rounded-xl py-6 px-5 transition-transform duration-200 hover:scale-105 active:scale-95"
         >
           <Plus className="h-5 w-5" />
           Create Category
@@ -238,7 +238,7 @@ export default function CategoriesPage() {
 
       {/* Stats Widgets */}
       <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Categories</CardTitle>
             <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
@@ -255,7 +255,7 @@ export default function CategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Latest Classification</CardTitle>
             <div className="p-2 bg-pink-500/10 text-pink-500 rounded-xl">
@@ -272,7 +272,7 @@ export default function CategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Status</CardTitle>
             <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
@@ -293,14 +293,14 @@ export default function CategoriesPage() {
       </div>
 
       {/* Controls Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border/60 p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100 dark:bg-transparent dark:border-0 dark:p-0 dark:shadow-none">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search categories by name..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 py-5 rounded-xl bg-muted/50 border-border focus:border-primary text-sm shadow-sm placeholder:text-muted-foreground/60 focus-visible:ring-0 focus-visible:ring-offset-0 text-foreground"
+            className="pl-10 py-5 rounded-xl bg-muted/50 border border-input text-sm shadow-sm placeholder:text-muted-foreground focus-visible:ring-0 text-foreground dark:border-0 dark:bg-white/[0.05] dark:placeholder:text-muted-foreground/60 dark:focus-visible:ring-1 dark:focus-visible:ring-white/20"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -308,7 +308,7 @@ export default function CategoriesPage() {
             variant="outline"
             size="icon"
             onClick={() => setViewMode('grid')}
-            className={`rounded-xl border-border p-2.5 ${viewMode === 'grid' ? 'bg-primary text-white border-primary shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+            className={`rounded-xl p-2.5 ${viewMode === 'grid' ? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           >
             <Grid className="h-4 w-4" />
           </Button>
@@ -316,7 +316,7 @@ export default function CategoriesPage() {
             variant="outline"
             size="icon"
             onClick={() => setViewMode('table')}
-            className={`rounded-xl border-border p-2.5 ${viewMode === 'table' ? 'bg-primary text-white border-primary shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+            className={`rounded-xl p-2.5 ${viewMode === 'table' ? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -327,7 +327,7 @@ export default function CategoriesPage() {
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="border-border bg-card p-6 rounded-2xl space-y-4">
+            <Card key={i} className="bg-card p-6 rounded-2xl space-y-4">
               <div className="flex items-center gap-3">
                 <Skeleton className="h-12 w-12 rounded-xl" />
                 <Skeleton className="h-6 w-28" />
@@ -342,7 +342,7 @@ export default function CategoriesPage() {
           ))}
         </div>
       ) : filteredCategories.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-border rounded-2xl bg-muted/20 text-center">
+        <div className="flex flex-col items-center justify-center p-16 rounded-2xl bg-muted/20 text-center">
           <div className="p-4 bg-muted/20 text-muted-foreground rounded-full mb-4">
             <FolderOpen className="h-10 w-10 text-muted-foreground" />
           </div>
@@ -356,7 +356,7 @@ export default function CategoriesPage() {
           {!searchQuery && (
             <Button 
               onClick={handleCreateOpen}
-              className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg"
+              className="rounded-xl shadow-lg"
             >
               Create Your First Category
             </Button>
@@ -369,7 +369,7 @@ export default function CategoriesPage() {
             return (
               <Card 
                 key={category.id} 
-                className="group border border-border bg-card hover:border-primary/40 hover:shadow-md hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between animate-in fade-in-50 slide-in-from-bottom-4 duration-300"
+                className="group bg-card hover:shadow-md hover:-translate-y-1 transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between animate-in fade-in-50 slide-in-from-bottom-4 duration-300"
               >
                 <div className="p-6 space-y-4">
                   {/* Card Header Info */}
@@ -382,7 +382,7 @@ export default function CategoriesPage() {
                         <h3 className="font-semibold text-foreground text-base">
                           {category.name}
                         </h3>
-                        <Badge variant="outline" className="text-[10px] text-muted-foreground bg-muted border-border px-2 py-0.5 mt-1">
+                        <Badge variant="outline" className="text-[10px] text-muted-foreground bg-muted border-0 px-2 py-0.5 mt-1">
                           ID: #{category.id}
                         </Badge>
                       </div>
@@ -394,7 +394,7 @@ export default function CategoriesPage() {
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-36 bg-popover border-border text-popover-foreground">
+                      <DropdownMenuContent align="end" className="w-36 bg-popover border text-popover-foreground">
                         <DropdownMenuItem onClick={() => handleEditOpen(category)} className="flex items-center gap-2 hover:bg-muted cursor-pointer text-sm py-2">
                           <Pencil className="h-4 w-4 text-primary" />
                           Edit
@@ -409,7 +409,7 @@ export default function CategoriesPage() {
                 </div>
 
                 {/* Card Footer */}
-                <div className="px-6 py-4 bg-muted/20 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                <div className="px-6 py-4 bg-muted/20 flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
                     <span>Created: {formatDate(category.createdAt)}</span>
@@ -421,10 +421,10 @@ export default function CategoriesPage() {
         </div>
       ) : (
         /* Table View */
-        <Card className="border border-border bg-card rounded-2xl overflow-hidden shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
+        <Card className="bg-card rounded-2xl overflow-hidden shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
           <Table>
-            <TableHeader className="bg-muted/50 border-b border-border">
-              <TableRow className="border-b border-border hover:bg-transparent">
+            <TableHeader className="bg-muted/50">
+              <TableRow className="hover:bg-transparent">
                 <TableHead className="w-16 text-muted-foreground py-4">Icon</TableHead>
                 <TableHead className="w-16 text-muted-foreground py-4">ID</TableHead>
                 <TableHead className="font-semibold text-muted-foreground py-4">Category Name</TableHead>
@@ -475,11 +475,11 @@ export default function CategoriesPage() {
 
       {/* CREATE DIALOG */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl p-6 no-scrollbar">
           <form onSubmit={handleCreate}>
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                <Plus className="h-5 w-5 text-primary" />
+              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-[#185500] dark:text-white">
+                <Plus className="h-5 w-5 text-[#185500] dark:text-white" />
                 Create Campaign Category
               </DialogTitle>
               <DialogDescription className="text-muted-foreground mt-1 text-sm">
@@ -502,19 +502,19 @@ export default function CategoriesPage() {
                 />
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4">
+            <DialogFooter className="gap-2 sm:gap-2 border-t border-border pt-4">
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={() => setIsCreateOpen(false)}
-                className="rounded-xl border border-border hover:bg-muted hover:text-foreground"
+                className="rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
+                className="rounded-xl flex items-center gap-2"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Create Category
@@ -526,11 +526,11 @@ export default function CategoriesPage() {
 
       {/* EDIT DIALOG */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl p-6 no-scrollbar">
           <form onSubmit={handleEdit}>
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                <Pencil className="h-5 w-5 text-primary" />
+              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-[#185500] dark:text-white">
+                <Pencil className="h-5 w-5 text-[#185500] dark:text-white" />
                 Edit Category
               </DialogTitle>
               <DialogDescription className="text-muted-foreground mt-1 text-sm">
@@ -552,19 +552,19 @@ export default function CategoriesPage() {
                 />
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4">
+            <DialogFooter className="gap-2 sm:gap-2 border-t border-border pt-4">
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={() => setIsEditOpen(false)}
-                className="rounded-xl border border-border hover:bg-muted hover:text-foreground"
+                className="rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
+                className="rounded-xl flex items-center gap-2"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Save Changes

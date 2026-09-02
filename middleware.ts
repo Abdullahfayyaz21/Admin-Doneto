@@ -45,6 +45,18 @@ async function refreshTokens(refreshToken: string) {
 }
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Never intercept or redirect static assets, JS/CSS chunks, or Next.js internals
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.startsWith('/api') ||
+    pathname.startsWith('/fonts') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
   // Bypass redirects for Next.js prefetch requests to prevent ReadableStream crash
   if (request.headers.get('x-middleware-prefetch') || request.headers.get('purpose') === 'prefetch') {
     return NextResponse.next();
@@ -52,12 +64,11 @@ export async function middleware(request: NextRequest) {
 
   let token = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
-  const { pathname } = request.nextUrl;
 
   const isLoginPage = pathname === '/';
   
   // Protect exact paths and their subpaths
-  const protectedPaths = ['/dashboard', '/users', '/settings'];
+  const protectedPaths = ['/dashboard', '/users', '/settings', '/campaigns', '/financials', '/media', '/notifications'];
   const isProtectedPath = protectedPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
 
   let didRefresh = false;
@@ -122,9 +133,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/',
-    '/dashboard/:path*',
-    '/users/:path*',
-    '/settings/:path*',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2|woff|ttf)$).*)',
   ],
 };

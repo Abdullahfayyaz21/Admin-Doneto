@@ -28,19 +28,19 @@
     --color-ivory-muted: rgba(255, 255, 240, 0.6);
 
     --background: 0 0% 100%;
-    --foreground: 0 0% 11%;
+    --foreground: 0 0% 0%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 11%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 11%;
+    --popover-foreground: 0 0% 0%;
     --primary: 103 100% 17%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 11%;
+    --secondary: 103 100% 17%;
+    --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 47%;
+    --muted-foreground: 0 0% 30%;
     --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 11%;
+    --accent-foreground: 0 0% 0%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 91%;
@@ -56,32 +56,32 @@
     --sidebar-foreground: 0 0% 98%;
   }
   .dark {
-    --background: 103 30% 6%;
-    --foreground: 103 20% 96%;
-    --card: 103 28% 9%;
-    --card-foreground: 103 20% 96%;
-    --popover: 103 28% 9%;
-    --popover-foreground: 103 20% 96%;
-    --primary: 103 75% 65%;
-    --primary-foreground: 103 50% 8%;
-    --secondary: 103 16% 14%;
-    --secondary-foreground: 103 20% 96%;
-    --muted: 103 16% 14%;
-    --muted-foreground: 103 10% 62%;
-    --accent: 103 60% 42%;
-    --accent-foreground: 103 30% 98%;
+    --background: 105 91% 4.3%;
+    --foreground: 0 0% 100%;
+    --card: 105 91% 4.3%;
+    --card-foreground: 0 0% 100%;
+    --popover: 105 91% 4.3%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 0 0% 100%;
+    --secondary-foreground: 0 0% 0%;
+    --muted: 105 50% 7%;
+    --muted-foreground: 0 0% 90%;
+    --accent: 105 50% 8%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62% 48%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 103 16% 18%;
-    --input: 103 16% 18%;
-    --ring: 103 50% 42%;
-    --chart-1: 103 50% 42%;
-    --chart-2: 103 60% 48%;
-    --chart-3: 173 48% 48%;
-    --chart-4: 38 80% 55%;
-    --chart-5: 12 70% 55%;
-    --sidebar: 103 30% 6%;
-    --sidebar-foreground: 103 20% 96%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100% / 0;
+    --input: 0 0% 100% / 0.06;
+    --ring: 0 0% 100%;
+    --chart-1: 0 0% 100%;
+    --chart-2: 0 0% 90%;
+    --chart-3: 0 0% 80%;
+    --chart-4: 0 0% 70%;
+    --chart-5: 0 0% 60%;
+    --sidebar: 105 91% 4.3%;
+    --sidebar-foreground: 0 0% 100%;
   }
 }
 
@@ -90,31 +90,52 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    color: #185500;
+    font-weight: 700;
+  }
+  .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    color: #ffffff !important;
+  }
+  .dark p, .dark span, .dark label, .dark div {
+    color: inherit;
+  }
+  .dark .text-muted-foreground {
+    color: rgba(255, 255, 255, 0.7) !important;
+  }
+  .dark input, .dark textarea, .dark select {
+    color: #ffffff !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+  .dark input::placeholder, .dark textarea::placeholder {
+    color: rgba(255, 255, 255, 0.65) !important;
   }
 }
 
 @layer utilities {
-  .scrollbar-thin {
-    scrollbar-width: thin;
+  /* Hide scrollbar completely across all browsers */
+  *::-webkit-scrollbar {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
   }
-  .scrollbar-thin::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-  }
-  .scrollbar-thin::-webkit-scrollbar-thumb {
-    background: hsl(var(--muted-foreground) / 0.3);
-    border-radius: 9999px;
-  }
-  .scrollbar-thin::-webkit-scrollbar-track {
-    background: transparent;
+  * {
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
   .no-scrollbar::-webkit-scrollbar {
-    display: none;
+    display: none !important;
   }
   .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    -ms-overflow-style: none !important;
+    scrollbar-width: none !important;
   }
 }
+
+

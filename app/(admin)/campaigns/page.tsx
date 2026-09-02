@@ -524,7 +524,7 @@ export default function CampaignsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight">
             All Campaigns
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -537,7 +537,7 @@ export default function CampaignsPage() {
       {loading ? (
         <div className="grid gap-4 md:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Card key={i} className="border-border bg-card shadow-sm rounded-2xl p-6">
+            <Card key={i} className="bg-card shadow-sm rounded-2xl p-6">
               <Skeleton className="h-4 w-24 mb-2" />
               <Skeleton className="h-8 w-36" />
             </Card>
@@ -546,7 +546,7 @@ export default function CampaignsPage() {
       ) : (
         <div className="grid gap-4 md:grid-cols-4">
           {/* Card 1 */}
-          <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+          <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Campaigns</CardTitle>
               <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
@@ -560,7 +560,7 @@ export default function CampaignsPage() {
           </Card>
 
           {/* Card 2 */}
-          <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-emerald-500/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+          <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Active Campaigns</CardTitle>
               <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
@@ -574,7 +574,7 @@ export default function CampaignsPage() {
           </Card>
 
           {/* Card 3 */}
-          <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-yellow-500/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+          <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Awaiting Review</CardTitle>
               <div className="p-2 bg-yellow-500/10 text-yellow-600 rounded-xl">
@@ -588,7 +588,7 @@ export default function CampaignsPage() {
           </Card>
 
           {/* Card 4 */}
-          <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+          <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Funds Raised</CardTitle>
               <div className="p-2 bg-primary/10 text-primary rounded-xl">
@@ -604,7 +604,7 @@ export default function CampaignsPage() {
       )}
 
       {/* Filters and Searching Toolbar */}
-      <Card className="border-border bg-card shadow-sm rounded-2xl p-4">
+      <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           {/* Search bar */}
           <div className="relative flex-1 max-w-md">
@@ -613,7 +613,7 @@ export default function CampaignsPage() {
               placeholder="Search campaigns by title or category..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 rounded-xl border-border bg-muted/50 hover:bg-muted focus:bg-muted text-foreground placeholder:text-muted-foreground"
+              className="pl-10 rounded-xl border border-input bg-muted/50 hover:bg-muted focus:bg-background text-foreground placeholder:text-muted-foreground dark:border-0 dark:bg-white/[0.05] dark:placeholder:text-muted-foreground/60 dark:focus:bg-white/[0.08]"
             />
           </div>
 
@@ -622,10 +622,10 @@ export default function CampaignsPage() {
             <div className="flex items-center gap-2">
               <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Approval</Label>
               <Select value={approvalFilter} onValueChange={setApprovalFilter}>
-                <SelectTrigger className="w-[140px] rounded-xl border-border bg-muted/50 text-foreground">
+                <SelectTrigger className="w-[140px] rounded-xl border border-input bg-muted/50 text-foreground dark:border-0 dark:bg-white/[0.05]">
                   <SelectValue placeholder="Approval Status" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
+                <SelectContent className="rounded-xl border border-border bg-popover text-popover-foreground dark:border-0">
                   <SelectItem value="ALL">All Statuses</SelectItem>
                   <SelectItem value="Pending">Pending</SelectItem>
                   <SelectItem value="Approved">Approved</SelectItem>
@@ -637,10 +637,10 @@ export default function CampaignsPage() {
             <div className="flex items-center gap-2">
               <Label className="text-xs text-muted-foreground uppercase font-bold tracking-wider">Status</Label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[140px] rounded-xl border-border bg-muted/50 text-foreground">
+                <SelectTrigger className="w-[140px] rounded-xl border border-input bg-muted/50 text-foreground dark:border-0 dark:bg-white/[0.05]">
                   <SelectValue placeholder="Campaign Status" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl border-border bg-popover text-popover-foreground">
+                <SelectContent className="rounded-xl border border-border bg-popover text-popover-foreground dark:border-0">
                   <SelectItem value="ALL">All States</SelectItem>
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Paused">Paused</SelectItem>
@@ -651,12 +651,12 @@ export default function CampaignsPage() {
             </div>
 
             {/* Layout view buttons */}
-            <div className="flex items-center border border-border rounded-xl overflow-hidden p-1 bg-muted/50">
+            <div className="flex items-center border border-border/60 rounded-xl overflow-hidden p-1 bg-muted/50 dark:border-0 dark:bg-white/[0.05]">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={() => setViewMode('grid')}
-                className={`h-8 w-8 rounded-lg ${viewMode === 'grid' ? 'bg-primary text-white hover:bg-primary/90' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                className={`h-8 w-8 rounded-lg ${viewMode === 'grid' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
               >
                 <Grid className="h-4 w-4" />
               </Button>
@@ -664,7 +664,7 @@ export default function CampaignsPage() {
                 variant="ghost"
                 size="icon"
                 onClick={() => setViewMode('table')}
-                className={`h-8 w-8 rounded-lg ${viewMode === 'table' ? 'bg-primary text-white' : 'text-muted-foreground'}`}
+                className={`h-8 w-8 rounded-lg ${viewMode === 'table' ? 'bg-primary text-primary-foreground hover:bg-primary/90' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
               >
                 <List className="h-4 w-4" />
               </Button>
@@ -677,7 +677,7 @@ export default function CampaignsPage() {
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
-            <Card key={i} className="border-border bg-card p-4 space-y-4">
+            <Card key={i} className="bg-card p-4 space-y-4">
               <Skeleton className="h-40 rounded-xl w-full" />
               <Skeleton className="h-6 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
@@ -690,7 +690,7 @@ export default function CampaignsPage() {
           ))}
         </div>
       ) : filteredCampaigns.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-muted/20 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-sm">
+        <div className="rounded-2xl bg-muted/20 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-sm">
           <AlertCircle className="h-10 w-10 mx-auto text-primary mb-4" />
           <h3 className="font-semibold text-lg text-foreground mb-2">No campaigns found</h3>
           <p className="text-sm">Try broadening your search criteria or review the filters settings.</p>
@@ -703,7 +703,7 @@ export default function CampaignsPage() {
             return (
               <Card 
                 key={camp.id} 
-                className="group relative overflow-hidden border-border bg-card hover:border-primary/40 shadow-sm rounded-2xl flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300"
+                className="group relative overflow-hidden bg-card shadow-sm rounded-2xl flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300"
               >
                 {/* Cover Image */}
                 <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -852,7 +852,7 @@ export default function CampaignsPage() {
         </div>
       ) : (
         /* TABLE VIEW */
-        <Card className="border-border bg-card shadow-sm rounded-2xl overflow-hidden">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden">
           <Table>
             <TableHeader className="bg-muted/50 border-b border-border">
               <TableRow className="border-b border-border hover:bg-transparent">

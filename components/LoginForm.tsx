@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { LogoLoader } from '@/components/brand/logo-loader';
 
 export function LoginForm() {
   const router = useRouter();
@@ -142,7 +143,10 @@ export function LoginForm() {
         className="h-12 w-full rounded-xl text-base font-semibold"
       >
         {loading ? (
-          <Loader2 className="h-5 w-5 animate-spin" />
+          <span className="flex items-center justify-center gap-2">
+            <LogoLoader size="sm" heartOnly variant="white" />
+            <span>Signing In...</span>
+          </span>
         ) : (
           'Sign In'
         )}

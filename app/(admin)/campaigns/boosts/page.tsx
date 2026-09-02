@@ -211,7 +211,7 @@ export default function BoostRequestsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-650 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight">
             Boost Requests
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -222,7 +222,7 @@ export default function BoostRequestsPage() {
 
       {/* Stats Widgets */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-primary/30 transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl hover:border-primary/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Active Boosts</CardTitle>
             <div className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">
@@ -235,7 +235,7 @@ export default function BoostRequestsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Pending Applications</CardTitle>
             <div className="p-1.5 bg-yellow-500/10 text-yellow-600 rounded-lg">
@@ -248,7 +248,7 @@ export default function BoostRequestsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-emerald-500/30 transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl hover:border-emerald-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Simulated Revenue</CardTitle>
             <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
@@ -261,7 +261,7 @@ export default function BoostRequestsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-border bg-card shadow-sm rounded-2xl hover:border-indigo-500/30 transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl hover:border-indigo-500/30 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Discovery Conversion</CardTitle>
             <div className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">
@@ -290,7 +290,7 @@ export default function BoostRequestsPage() {
           </div>
 
           {requests.length === 0 ? (
-            <Card className="border-border bg-card p-8 text-center text-muted-foreground rounded-2xl border-dashed">
+            <Card className="bg-card p-8 text-center text-muted-foreground rounded-2xl">
               <CheckCircle className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
               <p className="text-sm font-semibold text-foreground">All applications reviewed</p>
               <p className="text-xs mt-1">No pending campaign boosts at the moment.</p>
@@ -298,8 +298,8 @@ export default function BoostRequestsPage() {
           ) : (
             <div className="space-y-4">
               {requests.map((req) => (
-                <Card key={req.id} className="border-border bg-card rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
-                  <CardHeader className="p-4 bg-muted/40 border-b border-border flex flex-row items-center justify-between pb-3">
+                <Card key={req.id} className="bg-card rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300">
+                  <CardHeader className="p-4 bg-muted/40 flex flex-row items-center justify-between pb-3">
                     <div className="space-y-0.5">
                       <span className="text-[9px] uppercase font-bold tracking-wider text-indigo-600">
                         Campaign #{req.campaignId}
@@ -322,7 +322,7 @@ export default function BoostRequestsPage() {
                       <p className="text-muted-foreground"><strong>Submitted:</strong> {formatDate(req.requestedAt)}</p>
                     </div>
 
-                    <div className="flex gap-2 justify-end pt-1.5 border-t border-border">
+                    <div className="flex gap-2 justify-end pt-1.5">
                       <Button 
                         onClick={() => { setSelectedReq(req); setIsRejectOpen(true); }}
                         variant="ghost" 
@@ -356,7 +356,7 @@ export default function BoostRequestsPage() {
           </div>
 
           {activeBoosts.length === 0 ? (
-            <Card className="border-border bg-card p-8 text-center text-muted-foreground rounded-2xl border-dashed">
+            <Card className="bg-card p-8 text-center text-muted-foreground rounded-2xl">
               <AlertCircle className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
               <p className="text-sm font-semibold text-foreground">No active promotions</p>
               <p className="text-xs mt-1">Approve boost requests in the queue to activate discovery boosters.</p>
@@ -364,8 +364,8 @@ export default function BoostRequestsPage() {
           ) : (
             <div className="space-y-4">
               {activeBoosts.map((boost) => (
-                <Card key={boost.id} className="border-border bg-card rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all duration-300">
-                  <CardHeader className="p-4 bg-emerald-500/5 border-b border-border flex flex-row items-center justify-between pb-3">
+                <Card key={boost.id} className="bg-card rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all duration-300">
+                  <CardHeader className="p-4 bg-emerald-500/5 flex flex-row items-center justify-between pb-3">
                     <div className="space-y-0.5">
                       <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-650">
                         Live Boost Active
@@ -384,7 +384,7 @@ export default function BoostRequestsPage() {
                       <p><strong className="text-foreground">Ends:</strong> {formatDate(boost.endsAt)}</p>
                     </div>
 
-                    <div className="flex justify-between items-center pt-2.5 border-t border-border text-[10px]">
+                    <div className="flex justify-between items-center pt-2.5 text-[10px]">
                       <span className="text-muted-foreground font-semibold">Cost: {formatCurrency(boost.price)}</span>
                       <Button 
                         onClick={() => { setSelectedReq(boost); setIsTerminateOpen(true); }}

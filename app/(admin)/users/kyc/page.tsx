@@ -234,7 +234,7 @@ export default function KYCRequestsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="animate-in fade-in-50 slide-in-from-left-4 duration-300">
-        <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-bold tracking-tight">
           KYC Requests Queue
         </h1>
         <p className="text-muted-foreground">
@@ -244,7 +244,7 @@ export default function KYCRequestsPage() {
 
       {/* Stats Widgets */}
       <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Pending Review</CardTitle>
             <div className="p-2 bg-amber-500/10 text-amber-650 rounded-xl">
@@ -257,7 +257,7 @@ export default function KYCRequestsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Approved Verification</CardTitle>
             <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
@@ -270,7 +270,7 @@ export default function KYCRequestsPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Rejected Application</CardTitle>
             <div className="p-2 bg-red-500/10 text-red-650 rounded-xl">
@@ -285,7 +285,7 @@ export default function KYCRequestsPage() {
       </div>
 
       {/* Filter Row */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border/60 p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100 dark:bg-transparent dark:border-0 dark:p-0 dark:shadow-none">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -295,16 +295,16 @@ export default function KYCRequestsPage() {
               setSearch(e.target.value);
               setPage(1);
             }}
-            className="pl-10 py-5 rounded-xl bg-muted/50 border-border focus:border-primary text-sm shadow-sm placeholder:text-muted-foreground/60 text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="pl-10 py-5 rounded-xl bg-muted/50 border border-input text-sm shadow-sm placeholder:text-muted-foreground text-foreground focus-visible:ring-0 dark:border-0 dark:bg-white/[0.05] dark:placeholder:text-muted-foreground/60 dark:focus-visible:ring-1 dark:focus-visible:ring-white/20"
           />
         </div>
 
         {/* Status Tabs */}
-        <div className="flex items-center gap-1.5 bg-muted border border-border p-1.5 rounded-xl">
+        <div className="flex items-center gap-1.5 bg-muted p-1.5 rounded-xl dark:bg-white/[0.05]">
           <Button
             variant={statusFilter === 'ALL' ? 'default' : 'ghost'}
             onClick={() => { setStatusFilter('ALL'); setPage(1); }}
-            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === 'ALL' ? 'bg-primary text-white' : 'text-muted-foreground hover:text-foreground hover:bg-background'}`}
+            className={`rounded-lg py-1 px-3.5 h-8 text-xs font-semibold ${statusFilter === 'ALL' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-background'}`}
           >
             All
           </Button>
@@ -333,7 +333,7 @@ export default function KYCRequestsPage() {
       </div>
 
       {/* Main Table */}
-      <Card className="border border-border bg-card rounded-2xl overflow-hidden shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
+      <Card className="bg-card rounded-2xl overflow-hidden shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
         {loading ? (
           <div className="p-6 space-y-4">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -414,7 +414,7 @@ export default function KYCRequestsPage() {
                     <TableCell className="text-right py-4 pr-6">
                       <Button
                         onClick={() => handleInspect(req.id)}
-                        className="bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 text-xs font-semibold py-1.5 px-3 rounded-lg transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-md hover:shadow-primary/10"
+                        className="text-xs font-semibold py-1.5 px-3 rounded-lg shadow-sm"
                       >
                         Review
                       </Button>
@@ -459,10 +459,10 @@ export default function KYCRequestsPage() {
 
       {/* INSPECT DETAIL DIALOG */}
       <Dialog open={inspectOpen} onOpenChange={setInspectOpen}>
-        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto bg-zinc-950 border-white/10 text-white rounded-2xl shadow-2xl">
-          <DialogHeader className="border-b border-white/5 pb-4">
-            <DialogTitle className="text-xl font-bold flex items-center gap-2">
-              <Shield className="h-5.5 w-5.5 text-primary" />
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto no-scrollbar bg-background border-border text-foreground rounded-2xl shadow-2xl p-6">
+          <DialogHeader className="border-b border-border/60 pb-4">
+            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-[#185500] dark:text-white">
+              <Shield className="h-5.5 w-5.5 text-[#185500] dark:text-white" />
               Review KYC Verification Request
             </DialogTitle>
             <DialogDescription className="text-muted-foreground mt-1 text-xs">
@@ -478,9 +478,9 @@ export default function KYCRequestsPage() {
               </div>
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
-              <div className="grid grid-cols-2 gap-4 pt-4">
-                <Skeleton className="h-12 w-full" />
-                <Skeleton className="h-12 w-full" />
+              <div className="grid grid-cols-2 gap-4">
+                <Skeleton className="h-32 rounded-xl" />
+                <Skeleton className="h-32 rounded-xl" />
               </div>
             </div>
           ) : !detailedRequest ? (
@@ -527,7 +527,7 @@ export default function KYCRequestsPage() {
                 
                 {/* Organization Details */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold text-[#185500] dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                     <Building2 className="h-4 w-4" />
                     Organization Profile
                   </h3>
@@ -567,7 +567,7 @@ export default function KYCRequestsPage() {
 
                 {/* Representative details */}
                 <div className="space-y-4">
-                  <h3 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                  <h3 className="text-xs font-semibold text-[#185500] dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                     <UserIcon className="h-4 w-4" />
                     Representative Information
                   </h3>
@@ -601,7 +601,7 @@ export default function KYCRequestsPage() {
 
               {/* Description & Mission */}
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">Mission Statement & Biography</h3>
+                <h3 className="text-xs font-semibold text-[#185500] dark:text-white uppercase tracking-wider">Mission Statement & Biography</h3>
                 <div className="bg-muted/20 border border-border p-4 rounded-xl space-y-3 leading-relaxed text-sm">
                   {detailedRequest.missionStatement && (
                     <div>
@@ -623,7 +623,7 @@ export default function KYCRequestsPage() {
 
               {/* Scans and Uploaded Files */}
               <div className="space-y-4">
-                <h3 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center gap-1.5">
+                <h3 className="text-xs font-semibold text-[#185500] dark:text-white uppercase tracking-wider flex items-center gap-1.5">
                   <FileText className="h-4 w-4" />
                   Official Documents & Verification Scans
                 </h3>

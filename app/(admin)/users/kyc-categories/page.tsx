@@ -259,7 +259,7 @@ export default function KycCategoriesPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-in fade-in-50 slide-in-from-left-4 duration-300">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-primary to-indigo-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight">
             KYC / NGO Categories
           </h1>
           <p className="text-muted-foreground">
@@ -268,7 +268,7 @@ export default function KycCategoriesPage() {
         </div>
         <Button 
           onClick={handleCreateOpen}
-          className="bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 flex items-center gap-2 self-start sm:self-auto rounded-xl py-6 px-5 transition-transform duration-200 hover:scale-105 active:scale-95"
+          className="shadow-md flex items-center gap-2 self-start sm:self-auto rounded-xl py-6 px-5 transition-transform duration-200 hover:scale-105 active:scale-95"
         >
           <Plus className="h-5 w-5" />
           Add Category
@@ -277,7 +277,7 @@ export default function KycCategoriesPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total NGO Classifications</CardTitle>
             <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
@@ -294,7 +294,7 @@ export default function KycCategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Active Categories</CardTitle>
             <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
@@ -311,7 +311,7 @@ export default function KycCategoriesPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-border bg-card shadow-sm rounded-2xl overflow-hidden hover:border-primary/30 hover:-translate-y-1 hover:shadow-md transition-all duration-300">
+        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
             <CardTitle className="text-sm font-medium text-muted-foreground">Hidden Categories</CardTitle>
             <div className="p-2 bg-red-500/10 text-red-650 rounded-xl">
@@ -330,14 +330,14 @@ export default function KycCategoriesPage() {
       </div>
 
       {/* Filter Row */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border/60 p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100 dark:bg-transparent dark:border-0 dark:p-0 dark:shadow-none">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search categories..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10 py-5 rounded-xl bg-muted/50 border-border focus:border-primary text-sm shadow-sm placeholder:text-muted-foreground/60 text-foreground focus-visible:ring-0 focus-visible:ring-offset-0"
+            className="pl-10 py-5 rounded-xl bg-muted/50 border border-input text-sm shadow-sm placeholder:text-muted-foreground text-foreground focus-visible:ring-0 dark:border-0 dark:bg-white/[0.05] dark:placeholder:text-muted-foreground/60 dark:focus-visible:ring-1 dark:focus-visible:ring-white/20"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -345,7 +345,7 @@ export default function KycCategoriesPage() {
             variant="outline"
             size="icon"
             onClick={() => setViewMode('grid')}
-            className={`rounded-xl border-border p-2.5 ${viewMode === 'grid' ? 'bg-primary text-white border-primary shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+            className={`rounded-xl p-2.5 ${viewMode === 'grid' ? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           >
             <Grid className="h-4 w-4" />
           </Button>
@@ -353,7 +353,7 @@ export default function KycCategoriesPage() {
             variant="outline"
             size="icon"
             onClick={() => setViewMode('table')}
-            className={`rounded-xl border-border p-2.5 ${viewMode === 'table' ? 'bg-primary text-white border-primary shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+            className={`rounded-xl p-2.5 ${viewMode === 'table' ? 'bg-primary text-primary-foreground shadow-md hover:bg-primary/95' : 'bg-transparent text-muted-foreground hover:bg-muted hover:text-foreground'}`}
           >
             <List className="h-4 w-4" />
           </Button>
@@ -364,7 +364,7 @@ export default function KycCategoriesPage() {
       {loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <Card key={i} className="border-border bg-card p-6 rounded-2xl space-y-4">
+            <Card key={i} className="bg-card p-6 rounded-2xl space-y-4">
               <div className="flex items-center gap-3">
                 <Skeleton className="h-12 w-12 rounded-xl" />
                 <Skeleton className="h-6 w-28" />
@@ -372,14 +372,14 @@ export default function KycCategoriesPage() {
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-2/3" />
               <div className="flex justify-between items-center pt-2">
-                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-24" />
                 <Skeleton className="h-8 w-8 rounded-lg" />
               </div>
             </Card>
           ))}
         </div>
       ) : filteredCategories.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-16 border border-dashed border-border rounded-2xl bg-muted/20 text-center">
+        <div className="flex flex-col items-center justify-center p-16 rounded-2xl bg-muted/20 text-center">
           <div className="p-4 bg-muted/20 text-muted-foreground rounded-full mb-4">
             <FolderOpen className="h-10 w-10 text-muted-foreground" />
           </div>
@@ -393,7 +393,7 @@ export default function KycCategoriesPage() {
           {!searchQuery && (
             <Button 
               onClick={handleCreateOpen}
-              className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg"
+              className="rounded-xl shadow-lg"
             >
               Add First Category
             </Button>
@@ -406,8 +406,8 @@ export default function KycCategoriesPage() {
             return (
               <Card 
                 key={category.id} 
-                className={`group border bg-card hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between animate-in fade-in-50 slide-in-from-bottom-4 duration-300 ${
-                  category.isActive ? 'border-border hover:border-primary/40 hover:-translate-y-1' : 'border-red-500/20 bg-red-500/5 opacity-80 hover:opacity-100 hover:border-red-500/40 hover:-translate-y-1'
+                className={`group bg-card hover:shadow-md transition-all duration-300 rounded-2xl overflow-hidden flex flex-col justify-between animate-in fade-in-50 slide-in-from-bottom-4 duration-300 ${
+                  category.isActive ? 'hover:-translate-y-1' : 'bg-red-500/5 opacity-80 hover:opacity-100 hover:-translate-y-1'
                 }`}
               >
                 <div className="p-6 space-y-4">
@@ -469,7 +469,7 @@ export default function KycCategoriesPage() {
                 </div>
 
                 {/* Card Footer */}
-                <div className="px-6 py-4 bg-muted/20 border-t border-border flex items-center justify-between text-xs text-muted-foreground">
+                <div className="px-6 py-4 bg-muted/20 flex items-center justify-between text-xs text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="h-3.5 w-3.5 text-muted-foreground/60" />
                     <span>Created: {formatDate(category.createdAt)}</span>
@@ -489,7 +489,7 @@ export default function KycCategoriesPage() {
         </div>
       ) : (
         /* Table View */
-        <Card className="border border-border bg-card rounded-2xl overflow-hidden shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
+        <Card className="bg-card rounded-2xl overflow-hidden shadow-sm animate-in fade-in-50 slide-in-from-bottom-4 duration-300 delay-150">
           <Table>
             <TableHeader className="bg-muted/50 border-b border-border">
               <TableRow className="border-b border-border hover:bg-transparent">
@@ -536,9 +536,9 @@ export default function KycCategoriesPage() {
                           variant="ghost"
                           size="icon"
                           onClick={() => handleEditOpen(category)}
-                          className="h-8 w-8 text-primary hover:text-primary-foreground hover:bg-primary rounded-lg"
+                          className="h-8 w-8 text-[#185500] dark:text-white hover:bg-muted rounded-lg"
                         >
-                          <Pencil className="h-4 w-4 text-primary" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button
                           variant="ghost"
@@ -560,11 +560,11 @@ export default function KycCategoriesPage() {
 
       {/* CREATE DIALOG */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl p-6 no-scrollbar">
           <form onSubmit={handleCreate}>
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                <Plus className="h-5 w-5 text-primary" />
+              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-[#185500] dark:text-white">
+                <Plus className="h-5 w-5 text-[#185500] dark:text-white" />
                 Create NGO Category
               </DialogTitle>
               <DialogDescription className="text-muted-foreground mt-1 text-sm">
@@ -611,19 +611,19 @@ export default function KycCategoriesPage() {
                 />
               </div>
             </div>
-            <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4">
+            <DialogFooter className="gap-2 sm:gap-2 border-t border-border pt-4">
               <Button
                 type="button"
-                variant="ghost"
+                variant="outline"
                 onClick={() => setIsCreateOpen(false)}
-                className="rounded-xl border border-border hover:bg-muted hover:text-foreground"
+                className="rounded-xl"
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
                 disabled={submitLoading}
-                className="bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/10 flex items-center gap-2 transition-transform duration-100 hover:scale-105 active:scale-95"
+                className="rounded-xl flex items-center gap-2"
               >
                 {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                 Create Category
@@ -635,11 +635,11 @@ export default function KycCategoriesPage() {
 
       {/* EDIT DIALOG */}
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[500px] bg-background border-border text-foreground rounded-2xl shadow-2xl p-6 no-scrollbar">
           <form onSubmit={handleEdit}>
             <DialogHeader>
-              <DialogTitle className="text-xl font-bold flex items-center gap-2">
-                <Pencil className="h-5 w-5 text-primary" />
+              <DialogTitle className="text-xl font-bold flex items-center gap-2 text-[#185500] dark:text-white">
+                <Pencil className="h-5 w-5 text-[#185500] dark:text-white" />
                 Edit Category
               </DialogTitle>
               <DialogDescription className="text-muted-foreground mt-1 text-sm">

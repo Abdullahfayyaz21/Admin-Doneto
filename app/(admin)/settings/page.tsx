@@ -316,8 +316,8 @@ export default function SettingsPage() {
 
       {/* NGO KYC Verification Status Card */}
       {isNGO && (
-        <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
-          <CardHeader className="border-b border-white/5 bg-white/5 pb-4">
+        <Card className="bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
+          <CardHeader className="bg-white/5 pb-4">
             <CardTitle className="text-lg flex items-center gap-2 text-white">
               <ShieldCheck className="h-5 w-5 text-indigo-400" />
               NGO KYC Verification
@@ -328,78 +328,73 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="pt-6">
             {kycLoading ? (
-              <div className="space-y-3">
-                <Skeleton className="h-10 w-full rounded-xl" />
-                <Skeleton className="h-4 w-1/3 rounded-xl" />
+              <div className="space-y-4">
+                <Skeleton className="h-10 w-full rounded-xl bg-white/5" />
+                <Skeleton className="h-20 w-full rounded-xl bg-white/5" />
               </div>
             ) : kycStatus?.accountStatus === 'Verified' ? (
               /* Verified Banner */
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-emerald-500/10 border border-emerald-500/25 p-5 rounded-2xl">
-                <div className="flex items-start gap-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-emerald-500/10 p-5 rounded-2xl">
+                <div className="flex items-center gap-4">
                   <div className="h-12 w-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="h-7 w-7" />
+                    <ShieldCheck className="h-6 w-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-base">Verification Approved</h3>
-                    <p className="text-xs text-slate-300 mt-1">
-                      Your organization, <strong>{kycStatus.ngoName}</strong>, is fully verified! You can now launch active campaigns and request fund withdrawals.
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-white text-base">Verified NGO Account</h3>
+                      <Badge className="bg-emerald-500 text-white font-semibold text-[10px] px-2 py-0.5">Verified</Badge>
+                    </div>
+                    <p className="text-xs text-emerald-300/80 mt-1">
+                      Organization: <strong className="text-white">{kycStatus.ngoName || user?.ngoName}</strong> • CNIC: <strong className="text-white">{kycStatus.cnicNumber || user?.cnicNumber || 'Registered'}</strong>
                     </p>
                   </div>
                 </div>
-                <Badge className="bg-emerald-500 text-white font-semibold rounded-lg px-3 py-1 self-start sm:self-auto">
-                  VERIFIED
-                </Badge>
               </div>
             ) : kycStatus?.accountStatus === 'Pending' ? (
-              /* Pending Review Banner */
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-amber-500/10 border border-amber-500/25 p-5 rounded-2xl">
-                <div className="flex items-start gap-4">
-                  <div className="h-12 w-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0 animate-pulse">
-                    <Clock className="h-7 w-7" />
+              /* Pending Banner */
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-amber-500/10 p-5 rounded-2xl">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                    <Clock className="h-6 w-6 animate-pulse" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white text-base">Under Review</h3>
-                    <p className="text-xs text-slate-300 mt-1">
-                      Your verification request is currently pending. An administrator is auditing your legal documentation files.
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-white text-base">Verification Under Review</h3>
+                      <Badge className="bg-amber-500 text-black font-semibold text-[10px] px-2 py-0.5">Pending Audit</Badge>
+                    </div>
+                    <p className="text-xs text-amber-300/80 mt-1">
+                      Your legal accreditation documents were submitted and are currently in the audit queue.
                     </p>
                   </div>
                 </div>
-                <Badge className="bg-amber-500 text-white font-semibold rounded-lg px-3 py-1 self-start sm:self-auto animate-pulse">
-                  PENDING REVIEW
-                </Badge>
               </div>
             ) : kycStatus?.accountStatus === 'Rejected' ? (
               /* Rejected Banner */
-              <div className="space-y-4">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-rose-500/10 border border-rose-500/25 p-5 rounded-2xl">
-                  <div className="flex items-start gap-4">
-                    <div className="h-12 w-12 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
-                      <ShieldAlert className="h-7 w-7" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-white text-base">Verification Rejected</h3>
-                      <p className="text-xs text-rose-400 mt-1 font-semibold">
-                        Reason: {kycStatus.rejectionReason || 'Documents verification failed.'}
-                      </p>
-                      <p className="text-xs text-slate-300 mt-1">
-                        Please review the feedback above, update your verification details and resubmit.
-                      </p>
-                    </div>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-rose-500/10 p-5 rounded-2xl">
+                <div className="flex items-start gap-4">
+                  <div className="h-12 w-12 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center shrink-0">
+                    <ShieldAlert className="h-6 w-6" />
                   </div>
-                  <Badge className="bg-rose-500 text-white font-semibold rounded-lg px-3 py-1 self-start sm:self-auto">
-                    REJECTED
-                  </Badge>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-bold text-white text-base">Verification Declined</h3>
+                      <Badge className="bg-rose-500 text-white font-semibold text-[10px] px-2 py-0.5">Action Needed</Badge>
+                    </div>
+                    <p className="text-xs text-rose-300/80 mt-1">
+                      Reason: <span className="font-semibold text-white">{kycStatus.rejectionReason || 'Documentation did not meet criteria.'}</span>
+                    </p>
+                  </div>
                 </div>
                 <Button 
                   onClick={handleOpenKycWizard}
-                  className="bg-primary hover:bg-primary/95 text-white font-semibold shadow-lg shadow-primary/20 rounded-xl px-5 h-11"
+                  className="bg-rose-600 hover:bg-rose-500 text-white font-semibold rounded-xl px-5 h-11 self-start sm:self-auto"
                 >
-                  Resubmit KYC Documents
+                  Resubmit Application
                 </Button>
               </div>
             ) : (
               /* Not Submitted Banner */
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-slate-900 border border-white/10 p-5 rounded-2xl">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-slate-900 p-5 rounded-2xl">
                 <div className="flex items-start gap-4">
                   <div className="h-12 w-12 rounded-xl bg-indigo-500/10 text-indigo-400 flex items-center justify-center shrink-0">
                     <FileText className="h-6 w-6" />
@@ -424,8 +419,8 @@ export default function SettingsPage() {
       )}
 
       {/* Account Settings Profile */}
-      <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
-        <CardHeader className="border-b border-white/5 bg-white/5 pb-4">
+      <Card className="bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
+        <CardHeader className="bg-white/5 pb-4">
           <CardTitle className="text-lg text-white">Profile</CardTitle>
           <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Update your personal account information.
@@ -465,15 +460,15 @@ export default function SettingsPage() {
       </Card>
 
       {/* Appearance */}
-      <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
-        <CardHeader className="border-b border-white/5 bg-white/5 pb-4">
+      <Card className="bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
+        <CardHeader className="bg-white/5 pb-4">
           <CardTitle className="text-lg text-white">Appearance</CardTitle>
           <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Customize how DONETO looks on your device.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="flex items-center justify-between rounded-2xl border border-white/10 p-4 bg-white/5">
+          <div className="flex items-center justify-between rounded-2xl p-4 bg-white/5">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
                 {theme === 'dark' ? (
@@ -500,15 +495,15 @@ export default function SettingsPage() {
       </Card>
 
       {/* Preferences */}
-      <Card className="border-white/10 bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
-        <CardHeader className="border-b border-white/5 bg-white/5 pb-4">
+      <Card className="bg-white/5 backdrop-blur-sm shadow-xl rounded-2xl overflow-hidden">
+        <CardHeader className="bg-white/5 pb-4">
           <CardTitle className="text-lg text-white">Preferences</CardTitle>
           <CardDescription className="text-xs text-muted-foreground mt-0.5">
             Configure your language and notification settings.
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-4">
-          <div className="flex items-center justify-between rounded-2xl border border-white/10 p-4 bg-white/5">
+          <div className="flex items-center justify-between rounded-2xl p-4 bg-white/5">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
                 <Globe className="h-5 w-5" />
@@ -531,7 +526,7 @@ export default function SettingsPage() {
             </Select>
           </div>
 
-          <div className="flex items-center justify-between rounded-2xl border border-white/10 p-4 bg-white/5">
+          <div className="flex items-center justify-between rounded-2xl p-4 bg-white/5">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-400">
                 <Save className="h-5 w-5" />
@@ -556,7 +551,7 @@ export default function SettingsPage() {
         <Button
           onClick={handleSave}
           disabled={saving}
-          className="h-11 gap-2 px-8 bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl shadow-lg shadow-primary/20"
+          className="h-11 gap-2 px-8 font-semibold rounded-xl shadow-md"
         >
           {saving ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -569,11 +564,11 @@ export default function SettingsPage() {
 
       {/* --------------------- KYC WIZARD DIALOG (NGO ONLY) --------------------- */}
       <Dialog open={isKycModalOpen} onOpenChange={setIsKycModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-slate-950 border-white/10 text-white rounded-2xl shadow-2xl p-0 flex flex-col no-scrollbar">
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-background border-border text-foreground rounded-2xl shadow-2xl p-0 flex flex-col no-scrollbar">
           
-          <DialogHeader className="p-6 bg-gradient-to-br from-indigo-950 to-slate-900 border-b border-white/10 shrink-0">
-            <DialogTitle className="text-xl font-bold flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-indigo-400 animate-pulse" />
+          <DialogHeader className="p-6 bg-muted/40 border-b border-border shrink-0">
+            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-[#185500] dark:text-white">
+              <Sparkles className="h-5 w-5 text-[#185500] dark:text-white animate-pulse" />
               NGO KYC Registration
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -914,16 +909,16 @@ export default function SettingsPage() {
                     }
                     setKycStep(kycStep + 1);
                   }}
-                  className="bg-primary hover:bg-primary/95 text-white font-semibold rounded-xl flex items-center gap-1.5 h-10 px-4"
+                  className="font-semibold rounded-xl flex items-center gap-1.5 h-10 px-4"
                 >
                   Next <ChevronRight className="h-4 w-4" />
                 </Button>
               ) : (
                 <Button 
-                  type="button"
+                  type="button" 
                   onClick={handleKycSubmit}
                   disabled={saving}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl px-5 h-10 shadow-lg shadow-emerald-500/20"
+                  className="font-semibold rounded-xl px-5 h-10 shadow-md"
                 >
                   {saving ? 'Uploading...' : 'Submit Verification'}
                 </Button>

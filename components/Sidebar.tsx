@@ -1,82 +1,89 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
+  CheckSquare,
+  ShieldCheck,
+  AlertTriangle,
+  Flag,
+  Heart,
   Users,
+  Building2,
+  UserCheck,
+  Sparkles,
+  Image as ImageIcon,
+  DollarSign,
+  Wallet,
+  Tag,
+  Layers,
   Settings,
   LogOut,
-  ShieldCheck,
   PanelLeftClose,
   PanelLeft,
-  ChevronDown,
-  ChevronRight,
-  Heart,
-  DollarSign,
-  Flag,
-  Sparkles,
-  UserCheck,
-  Building2,
-  FileCheck,
-  Filter,
-  Layers,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 import Cookies from 'js-cookie';
 import { useTheme } from 'next-themes';
-import { useEffect } from 'react';
-
-interface SubNavItem {
-  label: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
+import api from '@/lib/api';
 
 interface NavItem {
   label: string;
+  href: string;
   icon: React.ComponentType<{ className?: string }>;
-  href?: string;
-  subItems?: SubNavItem[];
+  badgeKey?: string;
 }
 
-const navItems: NavItem[] = [
-  { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const navSections: NavSection[] = [
   {
-    label: 'User Management',
-    icon: Users,
-    subItems: [
+    title: 'Overview',
+    items: [
+      { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+    ],
+  },
+  {
+    title: 'Moderation & Approvals',
+    items: [
+      { label: 'Approvals Queue', href: '/campaigns/approvals', icon: CheckSquare, badgeKey: 'pendingCampaigns' },
+      { label: 'KYC Verifications', href: '/users/kyc', icon: ShieldCheck, badgeKey: 'pendingKyc' },
+      { label: 'Deletion Requests', href: '/campaigns/delete-requests', icon: AlertTriangle, badgeKey: 'deleteRequests' },
+      { label: 'Reported Campaigns', href: '/campaigns/reports', icon: Flag, badgeKey: 'reports' },
+    ],
+  },
+  {
+    title: 'Platform Management',
+    items: [
+      { label: 'Campaigns', href: '/campaigns', icon: Heart },
       { label: 'All Users', href: '/users', icon: Users },
       { label: 'NGOs', href: '/users/ngos', icon: Building2 },
       { label: 'Donors', href: '/users/donors', icon: UserCheck },
-      { label: 'KYC Requests', href: '/users/kyc', icon: FileCheck },
-      { label: 'KYC Categories', href: '/users/kyc-categories', icon: Layers },
-    ],
-  },
-  {
-    label: 'Campaigns',
-    icon: Heart,
-    subItems: [
-      { label: 'All Campaigns', href: '/campaigns', icon: Heart },
-      { label: 'Categories', href: '/campaigns/categories', icon: Filter },
-      { label: 'Reported Campaigns', href: '/campaigns/reports', icon: Flag },
       { label: 'Boost Requests', href: '/campaigns/boosts', icon: Sparkles },
+      { label: 'Media Assets', href: '/media', icon: ImageIcon },
     ],
   },
   {
-    label: 'Financials',
-    icon: DollarSign,
-    subItems: [
+    title: 'Finances & Payouts',
+    items: [
       { label: 'Donations', href: '/financials/donations', icon: DollarSign },
-      { label: 'Withdrawal Requests', href: '/financials/withdrawals', icon: ShieldCheck },
+      { label: 'Withdrawals', href: '/financials/withdrawals', icon: Wallet, badgeKey: 'pendingWithdrawals' },
     ],
   },
-];
-
-const bottomItems = [
-  { label: 'Settings', href: '/settings', icon: Settings },
+  {
+    title: 'Configuration',
+    items: [
+      { label: 'Campaign Categories', href: '/campaigns/categories', icon: Tag },
+      { label: 'NGO Categories', href: '/users/kyc-categories', icon: Layers },
+      { label: 'Settings', href: '/settings', icon: Settings },
+    ],
+  },
 ];
 
 interface SidebarProps {
@@ -85,46 +92,61 @@ interface SidebarProps {
 
 export function Sidebar({ initialCollapsed = false }: SidebarProps) {
   const pathname = usePathname();
-  const router = useRouter();
   const { logout } = useAuth();
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [badgeCounts, setBadgeCounts] = useState<{ [key: string]: number }>({});
 
   useEffect(() => {
     setMounted(true);
-  }, []);
 
-  // Submenu toggle states
-  const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({
-    'User Management': true, // Open by default
-    'Campaigns': false,
-    'Financials': false,
-  });
+    // Fetch badges/counts in background
+    const fetchCounters = async () => {
+      try {
+        const [pendingRes, delReqRes] = await Promise.allSettled([
+          api.get('/fundraising-campaigns/admin/pending'),
+          api.get('/fundraising-campaigns/admin/delete-requests'),
+        ]);
 
-  const toggleMenu = (label: string) => {
-    if (collapsed) {
-      setCollapsed(false); // Auto expand sidebar if collapsed
-      Cookies.set('sidebar_collapsed', 'false', { expires: 365 });
-    }
-    setOpenMenus((prev) => ({
-      ...prev,
-      [label]: !prev[label],
-    }));
-  };
+        const counts: { [key: string]: number } = {};
+
+        if (pendingRes.status === 'fulfilled') {
+          const list = pendingRes.value.data?.data || pendingRes.value.data || [];
+          counts.pendingCampaigns = Array.isArray(list) ? list.length : 0;
+        }
+        if (delReqRes.status === 'fulfilled') {
+          const list = delReqRes.value.data?.data || delReqRes.value.data || [];
+          counts.deleteRequests = Array.isArray(list) ? list.length : 0;
+        }
+
+        setBadgeCounts(counts);
+      } catch (err) {
+        // silent fail
+      }
+    };
+
+    fetchCounters();
+  }, [pathname]);
 
   return (
     <aside
       className={cn(
-        'flex h-screen flex-col text-white transition-all duration-300',
-        collapsed ? 'w-44 bg-transparent shadow-none' : 'w-64 bg-[hsl(var(--sidebar))]'
+        'flex h-screen flex-col text-white transition-all duration-300 select-none shrink-0 z-30 antialiased',
+        collapsed
+          ? 'w-44 bg-transparent shadow-none'
+          : 'w-64 bg-[#061501] border-r border-white/[0.08] dark:bg-background dark:border-none'
       )}
     >
-      {/* Logo */}
-      <div className={cn(
-        'relative flex h-16 items-center px-4 transition-all duration-300',
-        collapsed ? 'border-none justify-center' : 'border-b border-white/10 justify-between'
-      )}>
+      {/* Logo & Hover Toggle Button */}
+      <div
+        className={cn(
+          'relative flex h-16 items-center px-4 transition-all duration-300',
+          collapsed
+            ? 'justify-center border-none'
+            : 'justify-between border-b border-white/[0.08] dark:border-none'
+        )}
+      >
         <div className="relative w-[115px] h-10 flex items-center justify-center group/logo">
           <Link
             href="/dashboard"
@@ -133,7 +155,7 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
             <img
               src={collapsed && mounted && resolvedTheme === 'light' ? '/logo-green.svg' : '/logo.svg'}
               alt="DONETO"
-              className="h-7 w-auto shrink-0"
+              className="h-7 w-auto shrink-0 select-none"
             />
           </Link>
           <button
@@ -150,6 +172,7 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
                   : 'text-white hover:bg-white/10'
                 : 'text-white hover:bg-white/10'
             )}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
           >
             {collapsed ? (
               <PanelLeft className="h-5 w-5" />
@@ -160,123 +183,91 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
         </div>
       </div>
 
-      {/* Nav */}
+      {/* Navigation List - Hidden when collapsed */}
       {!collapsed && (
-        <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-4 no-scrollbar">
-          {!collapsed && (
-            <p className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-white/40">
-              Menu
-            </p>
-          )}
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            
-            // If no subItems, render simple Link
-            if (!item.subItems) {
-              const active = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href!}
-                  className={cn(
-                    'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:translate-x-1',
-                    active
-                      ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-[1.02]'
-                      : 'text-white/70 hover:bg-white/10 hover:text-white hover:shadow-md'
-                  )}
-                >
-                  <Icon className="h-5 w-5 shrink-0" />
-                  {!collapsed && <span>{item.label}</span>}
-                </Link>
-              );
-            }
+        <nav className="flex-1 space-y-4 overflow-y-auto px-3 py-4 no-scrollbar">
+          {navSections.map((section, sIdx) => (
+            <div key={section.title || sIdx} className="space-y-1">
+              <p className="px-3 pb-1.5 text-[11px] font-bold uppercase tracking-wider text-white/45 select-none">
+                {section.title}
+              </p>
+              <div className="space-y-1">
+                {section.items.map((item) => {
+                  const Icon = item.icon;
+                  const allNavHrefs = navSections.flatMap((s) => s.items.map((i) => i.href));
+                  const isExact = pathname === item.href;
+                  const isPrefix = item.href !== '/dashboard' && pathname.startsWith(item.href + '/');
+                  const hasMoreSpecificMatch = allNavHrefs.some(
+                    (otherHref) =>
+                      otherHref !== item.href &&
+                      (pathname === otherHref ||
+                        (otherHref.length > item.href.length && pathname.startsWith(otherHref + '/')))
+                  );
+                  const active = isExact || (isPrefix && !hasMoreSpecificMatch);
+                  const badge = item.badgeKey ? badgeCounts[item.badgeKey] : 0;
 
-            // Expandable Submenu Group
-            const hasActiveSub = item.subItems.some((sub) => pathname === sub.href);
-            const isOpen = openMenus[item.label];
-
-            return (
-              <div key={item.label} className="space-y-1">
-                <button
-                  onClick={() => toggleMenu(item.label)}
-                  className={cn(
-                    'flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:translate-x-0.5',
-                    hasActiveSub
-                      ? 'bg-white/5 text-white'
-                      : 'text-white/70 hover:bg-white/10 hover:text-white'
-                  )}
-                >
-                  <div className="flex items-center gap-3">
-                    <Icon className={cn('h-5 w-5 shrink-0 transition-colors', hasActiveSub && 'text-primary')} />
-                    {!collapsed && <span>{item.label}</span>}
-                  </div>
-                  {!collapsed && (
-                    isOpen ? (
-                      <ChevronDown className="h-4 w-4 text-white/40" />
-                    ) : (
-                      <ChevronRight className="h-4 w-4 text-white/40" />
-                    )
-                  )}
-                </button>
-                
-                {/* Sub-items */}
-                {!collapsed && isOpen && (
-                  <div className="pl-4 pr-1 py-1 space-y-1 border-l border-white/10 ml-5 transition-all animate-in fade-in-50 slide-in-from-top-1 duration-150 ease-out">
-                    {item.subItems.map((sub) => {
-                      const SubIcon = sub.icon;
-                      const subActive = pathname === sub.href;
-                      return (
-                        <Link
-                          key={sub.href}
-                          href={sub.href}
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        'group flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-all duration-150 antialiased shadow-none',
+                        active
+                          ? 'bg-[#185500] text-white dark:bg-white dark:text-black font-semibold'
+                          : 'text-white/75 hover:bg-white/10 hover:text-white font-medium'
+                      )}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Icon
                           className={cn(
-                            'flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-xs font-medium transition-all duration-200 hover:translate-x-1',
-                            subActive
-                              ? 'bg-primary text-white shadow-md scale-[1.02]'
-                              : 'text-white/60 hover:bg-white/5 hover:text-white'
+                            'h-[19px] w-[19px] shrink-0 transition-transform duration-150 group-hover:scale-105',
+                            active
+                              ? 'text-white dark:text-black stroke-[2]'
+                              : 'text-white/75 group-hover:text-white stroke-[1.75]'
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            'truncate text-xs tracking-normal',
+                            active
+                              ? 'text-white dark:text-black font-bold'
+                              : 'text-white/80 group-hover:text-white font-medium'
                           )}
                         >
-                          <SubIcon className="h-4 w-4 shrink-0" />
-                          <span>{sub.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-                )}
+                          {item.label}
+                        </span>
+                      </div>
+
+                      {badge && badge > 0 ? (
+                        <span
+                          className={cn(
+                            'flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-bold shadow-none',
+                            active
+                              ? 'bg-white text-[#185500] dark:bg-black dark:text-white'
+                              : 'bg-white/20 text-white'
+                          )}
+                        >
+                          {badge > 99 ? '99+' : badge}
+                        </span>
+                      ) : null}
+                    </Link>
+                  );
+                })}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </nav>
       )}
 
-      {/* Bottom */}
+      {/* Bottom Logout - Hidden when collapsed */}
       {!collapsed && (
-        <div className="space-y-1 px-3 py-4 border-t border-white/10">
-          {bottomItems.map((item) => {
-            const Icon = item.icon;
-            const active = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  'flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:translate-x-1',
-                  active
-                    ? 'bg-primary text-white shadow-lg shadow-primary/30 scale-[1.02]'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white'
-                )}
-              >
-                <Icon className="h-5 w-5 shrink-0" />
-                {!collapsed && <span>{item.label}</span>}
-              </Link>
-            );
-          })}
+        <div className="space-y-1 px-3 py-3 border-t border-white/[0.08] dark:border-none">
           <button
             onClick={logout}
-            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-white/70 transition-all hover:bg-red-500/20 hover:text-red-400"
+            className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/75 transition-all hover:bg-red-500/20 hover:text-red-400"
           >
-            <LogOut className="h-5 w-5 shrink-0" />
-            {!collapsed && <span>Logout</span>}
+            <LogOut className="h-[19px] w-[19px] shrink-0 stroke-[1.75]" />
+            <span className="text-xs font-medium">Logout</span>
           </button>
         </div>
       )}

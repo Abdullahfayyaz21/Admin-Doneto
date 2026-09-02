@@ -11,11 +11,11 @@ export default function AdminLayout({
   const sidebarCollapsed = cookieStore.get('sidebar_collapsed')?.value === 'true';
 
   return (
-    <div className="flex h-screen overflow-hidden bg-muted/30">
+    <div className="flex h-screen overflow-hidden bg-muted/30 dark:bg-background">
       <Sidebar initialCollapsed={sidebarCollapsed} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-6 scrollbar-thin">
+        <main className="flex-1 overflow-y-auto p-6 no-scrollbar">
           {children}
         </main>
       </div>
