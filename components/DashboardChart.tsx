@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import {
   AreaChart,
   Area,
@@ -9,35 +10,83 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import api from '@/lib/api';
 
-const data = [
-  { month: 'Jan', users: 2400, revenue: 2400 },
-  { month: 'Feb', users: 1398, revenue: 2210 },
-  { month: 'Mar', users: 3800, revenue: 2290 },
-  { month: 'Apr', users: 3908, revenue: 2000 },
-  { month: 'May', users: 4800, revenue: 2181 },
-  { month: 'Jun', users: 3800, revenue: 2500 },
-  { month: 'Jul', users: 4300, revenue: 2100 },
-  { month: 'Aug', users: 5100, revenue: 2800 },
-  { month: 'Sep', users: 4600, revenue: 2600 },
-  { month: 'Oct', users: 5400, revenue: 3100 },
-  { month: 'Nov', users: 6200, revenue: 3400 },
-  { month: 'Dec', users: 7100, revenue: 3900 },
-];
+interface ChartPoint {
+  month: string;
+  users: number;
+  campaigns: number;
+}
+
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 export default function DashboardChart() {
+  const [data, setData] = useState<ChartPoint[]>([]);
+
+  useEffect(() => {
+    const buildChartData = async () => {
+      try {
+        const [usersRes, campsRes] = await Promise.allSettled([
+          api.get('/users?limit=100'),
+          api.get('/fundraising-campaigns'),
+        ]);
+
+        const usersList: any[] = usersRes.status === 'fulfilled' ? (usersRes.value.data?.data?.data || usersRes.value.data?.data || usersRes.value.data || []) : [];
+        const campsList: any[] = campsRes.status === 'fulfilled' ? (campsRes.value.data?.data?.data || campsRes.value.data?.data || campsRes.value.data || []) : [];
+
+        const currentYear = new Date().getFullYear();
+        const monthlyUsers: number[] = new Array(12).fill(0);
+        const monthlyCamps: number[] = new Array(12).fill(0);
+
+        if (Array.isArray(usersList)) {
+          usersList.forEach((u) => {
+            if (u.createdAt) {
+              const d = new Date(u.createdAt);
+              if (d.getFullYear() === currentYear) {
+                monthlyUsers[d.getMonth()]++;
+              }
+            }
+          });
+        }
+
+        if (Array.isArray(campsList)) {
+          campsList.forEach((c) => {
+            if (c.createdAt) {
+              const d = new Date(c.createdAt);
+              if (d.getFullYear() === currentYear) {
+                monthlyCamps[d.getMonth()]++;
+              }
+            }
+          });
+        }
+
+        const chartPoints: ChartPoint[] = months.map((month, idx) => ({
+          month,
+          users: monthlyUsers[idx],
+          campaigns: monthlyCamps[idx],
+        }));
+
+        setData(chartPoints);
+      } catch (e) {
+        setData(months.map((m) => ({ month: m, users: 0, campaigns: 0 })));
+      }
+    };
+
+    buildChartData();
+  }, []);
+
   return (
-    <div className="h-[350px] w-full">
+    <div className="h-[320px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0} />
+              <stop offset="5%" stopColor="#185500" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#185500" stopOpacity={0} />
             </linearGradient>
-            <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.3} />
-              <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0} />
+            <linearGradient id="colorCampaigns" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3} />
+              <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
             </linearGradient>
           </defs>
           <CartesianGrid
@@ -57,6 +106,7 @@ export default function DashboardChart() {
             fontSize={12}
             tickLine={false}
             axisLine={false}
+            allowDecimals={false}
           />
           <Tooltip
             contentStyle={{
@@ -70,18 +120,18 @@ export default function DashboardChart() {
           <Area
             type="monotone"
             dataKey="users"
-            stroke="hsl(var(--chart-1))"
+            stroke="#185500"
             strokeWidth={2}
             fill="url(#colorUsers)"
-            name="Users"
+            name="New Users"
           />
           <Area
             type="monotone"
-            dataKey="revenue"
-            stroke="hsl(var(--chart-2))"
+            dataKey="campaigns"
+            stroke="#6366f1"
             strokeWidth={2}
-            fill="url(#colorRevenue)"
-            name="Revenue"
+            fill="url(#colorCampaigns)"
+            name="Campaigns"
           />
         </AreaChart>
       </ResponsiveContainer>

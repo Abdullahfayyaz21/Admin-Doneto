@@ -180,53 +180,7 @@ export default function MediaAssetsPage() {
         </Button>
       </div>
 
-      {/* Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Assets
-            </CardTitle>
-            <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-              <ImageIcon className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{mediaList.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Uploaded platform files</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Storage Usage
-            </CardTitle>
-            <div className="rounded-xl bg-teal-500/10 p-2.5 text-teal-500">
-              <HardDrive className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{formatBytes(totalBytes)}</div>
-            <p className="text-xs text-muted-foreground mt-1">Total disk footprint</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Storage Provider
-            </CardTitle>
-            <div className="rounded-xl bg-blue-500/10 p-2.5 text-blue-500">
-              <Layers className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">Cloudflare R2 / Local</div>
-            <p className="text-xs text-muted-foreground mt-1">Presigned SSL protected URLs</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main Container */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none overflow-hidden">

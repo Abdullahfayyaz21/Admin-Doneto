@@ -189,55 +189,7 @@ export default function NotificationsPage() {
         </div>
       </div>
 
-      {/* Metrics */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Unread Alerts
-            </CardTitle>
-            <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-              <Bell className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{unreadCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Requires your review or acknowledgment</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Notifications
-            </CardTitle>
-            <div className="rounded-xl bg-blue-500/10 p-2.5 text-blue-500">
-              <Layers className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{totalCount || notifications.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Total recorded system events</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Status
-            </CardTitle>
-            <div className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-500">
-              <CheckCircle2 className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              {unreadCount === 0 ? 'All Caught Up' : 'Active Updates'}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Live webhook & dispatch active</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main List */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none overflow-hidden">

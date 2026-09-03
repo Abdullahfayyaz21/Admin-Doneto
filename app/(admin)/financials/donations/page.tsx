@@ -178,72 +178,7 @@ export default function DonationsPage() {
         </div>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Raised
-            </CardTitle>
-            <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-              <DollarSign className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              PKR {totalDonationsAmount.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Platform-wide contribution volume</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Transactions
-            </CardTitle>
-            <div className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-500">
-              <Gift className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{donations.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Successfully recorded donations</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Average Gift
-            </CardTitle>
-            <div className="rounded-xl bg-blue-500/10 p-2.5 text-blue-500">
-              <TrendingUp className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              PKR {avgDonation.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Average contribution amount</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Anonymous Donors
-            </CardTitle>
-            <div className="rounded-xl bg-purple-500/10 p-2.5 text-purple-500">
-              <Shield className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{anonymousCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Privacy protected contributions</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main Table */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none overflow-hidden">

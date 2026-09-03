@@ -104,9 +104,10 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
     // Fetch badges/counts in background
     const fetchCounters = async () => {
       try {
-        const [pendingRes, delReqRes] = await Promise.allSettled([
+        const [pendingRes, delReqRes, kycRes] = await Promise.allSettled([
           api.get('/fundraising-campaigns/admin/pending'),
           api.get('/fundraising-campaigns/admin/delete-requests'),
+          api.get('/kyc/admin/requests', { params: { status: 'PENDING', limit: 1 } }),
         ]);
 
         const counts: { [key: string]: number } = {};
@@ -118,6 +119,17 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
         if (delReqRes.status === 'fulfilled') {
           const list = delReqRes.value.data?.data || delReqRes.value.data || [];
           counts.deleteRequests = Array.isArray(list) ? list.length : 0;
+        }
+        if (kycRes.status === 'fulfilled') {
+          const resData = kycRes.value.data;
+          const total = typeof resData?.total === 'number' 
+            ? resData.total 
+            : Array.isArray(resData?.data) 
+              ? resData.data.length 
+              : Array.isArray(resData) 
+                ? resData.length 
+                : 0;
+          counts.pendingKyc = total;
         }
 
         setBadgeCounts(counts);
@@ -135,7 +147,7 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
         'flex h-screen flex-col text-white transition-all duration-300 select-none shrink-0 z-30 antialiased',
         collapsed
           ? 'w-44 bg-transparent shadow-none'
-          : 'w-64 bg-[#061501] border-r border-white/[0.08] dark:bg-background dark:border-none'
+          : 'w-64 bg-[#061501] border-none dark:bg-background dark:border-none'
       )}
     >
       {/* Logo & Hover Toggle Button */}
@@ -144,7 +156,7 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
           'relative flex h-16 items-center px-4 transition-all duration-300',
           collapsed
             ? 'justify-center border-none'
-            : 'justify-between border-b border-white/[0.08] dark:border-none'
+            : 'justify-between border-none'
         )}
       >
         <div className="relative w-[115px] h-10 flex items-center justify-center group/logo">
@@ -156,6 +168,7 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
               src={collapsed && mounted && resolvedTheme === 'light' ? '/logo-green.svg' : '/logo.svg'}
               alt="DONETO"
               className="h-7 w-auto shrink-0 select-none"
+              style={{ imageRendering: '-webkit-optimize-contrast' }}
             />
           </Link>
           <button
@@ -261,7 +274,7 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
 
       {/* Bottom Logout - Hidden when collapsed */}
       {!collapsed && (
-        <div className="space-y-1 px-3 py-3 border-t border-white/[0.08] dark:border-none">
+        <div className="space-y-1 px-3 py-3 border-none">
           <button
             onClick={logout}
             className="flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium text-white/75 transition-all hover:bg-red-500/20 hover:text-red-400"

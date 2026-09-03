@@ -28,19 +28,19 @@
     --color-ivory-muted: rgba(255, 255, 240, 0.6);
 
     --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --foreground: 0 0% 10%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 0 0% 10%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 0 0% 10%;
     --primary: 103 100% 17%;
     --primary-foreground: 0 0% 100%;
     --secondary: 103 100% 17%;
     --secondary-foreground: 0 0% 100%;
     --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 30%;
+    --muted-foreground: 0 0% 40%;
     --accent: 0 0% 96%;
-    --accent-foreground: 0 0% 0%;
+    --accent-foreground: 0 0% 10%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
     --border: 0 0% 91%;
@@ -88,8 +88,11 @@
 @layer base {
   * {
     @apply border-border;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
-  body {
+  html, body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
@@ -99,15 +102,10 @@
   h1, h2, h3, h4, h5, h6 {
     color: #185500;
     font-weight: 700;
+    letter-spacing: -0.015em;
   }
   .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
     color: #ffffff !important;
-  }
-  .dark p, .dark span, .dark label, .dark div {
-    color: inherit;
-  }
-  .dark .text-muted-foreground {
-    color: rgba(255, 255, 255, 0.7) !important;
   }
   .dark input, .dark textarea, .dark select {
     color: #ffffff !important;

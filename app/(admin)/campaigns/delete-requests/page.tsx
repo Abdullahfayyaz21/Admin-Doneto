@@ -163,58 +163,7 @@ export default function DeleteRequestsPage() {
         </Button>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Deletions
-            </CardTitle>
-            <div className="rounded-xl bg-red-500/10 p-2.5 text-red-500">
-              <AlertTriangle className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{requests.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Campaigns requested for removal</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Collected Funds Impact
-            </CardTitle>
-            <div className="rounded-xl bg-amber-500/10 p-2.5 text-amber-500">
-              <DollarSign className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              PKR{' '}
-              {requests
-                .reduce((acc, c) => acc + (Number(c.collectedAmount) || 0), 0)
-                .toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Total donations in requested campaigns</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Safety Guard
-            </CardTitle>
-            <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-              <AlertOctagon className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">Admin Protected</div>
-            <p className="text-xs text-muted-foreground mt-1">Deletion requires admin authorization</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main Table */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none overflow-hidden">

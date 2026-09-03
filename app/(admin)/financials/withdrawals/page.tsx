@@ -192,72 +192,7 @@ export default function WithdrawalRequestsPage() {
         </Button>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Payouts
-            </CardTitle>
-            <div className="rounded-xl bg-amber-500/10 p-2.5 text-amber-500">
-              <Clock className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{pendingCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Awaiting admin clearance</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Amount
-            </CardTitle>
-            <div className="rounded-xl bg-amber-500/10 p-2.5 text-amber-500">
-              <Receipt className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              PKR {totalPendingAmount.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Total pending payout funds</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Disbursed
-            </CardTitle>
-            <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-              <DollarSign className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              PKR {totalDisbursed.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Successfully transferred to NGOs</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Requests
-            </CardTitle>
-            <div className="rounded-xl bg-teal-500/10 p-2.5 text-teal-500">
-              <Wallet className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{requests.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Lifetime withdrawal volume</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main Table */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none overflow-hidden">

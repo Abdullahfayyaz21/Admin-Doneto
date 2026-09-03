@@ -25,6 +25,8 @@ import {
   FileSignature,
   Briefcase,
   Award,
+  CheckCircle2,
+  Check,
 } from 'lucide-react';
 import {
   Card,
@@ -297,52 +299,90 @@ export default function UsersPage() {
     setIsEditOpen(true);
   };
 
+  const handleQuickVerify = async (user: User) => {
+    try {
+      const payload: Record<string, any> = {
+        isVerified: true,
+        accountStatus: 'Verified',
+        emailVerified: true,
+        phoneVerified: true,
+      };
+
+      if (user.role === 'NGO') {
+        payload.isVerifiedRecipient = true;
+      }
+
+      await api.patch(`/users/${user.id}`, payload);
+      
+      // Also approve KYC request if one exists for this user/NGO
+      try {
+        await api.patch(`/kyc/admin/requests/${user.id}/review`, { status: 'APPROVED' });
+      } catch {
+        // silent if no separate KYC request record
+      }
+
+      toast.success(`User "${user.name}" verified on platform & web app!`);
+      fetchUsers();
+    } catch (err: any) {
+      console.error(err);
+      try {
+        await api.patch(`/kyc/admin/requests/${user.id}/review`, { status: 'APPROVED' });
+        toast.success(`User "${user.name}" verified on platform & web app!`);
+        fetchUsers();
+      } catch {
+        toast.error(err.response?.data?.message || 'Failed to verify user.');
+      }
+    }
+  };
+
+  const handleQuickReject = async (user: User) => {
+    try {
+      const payload: Record<string, any> = {
+        isVerified: false,
+        accountStatus: 'Rejected',
+      };
+      if (user.role === 'NGO') {
+        payload.isVerifiedRecipient = false;
+      }
+      await api.patch(`/users/${user.id}`, payload);
+      toast.success(`User "${user.name}" marked as rejected/unverified.`);
+      fetchUsers();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to update user status.');
+    }
+  };
+
   const handleEditUser = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedUser) return;
 
     try {
       setSubmitLoading(true);
+      const isNowVerified = formStatus === 'Verified';
       const payload: Record<string, any> = {
-        name: formName.trim(),
+        name: formName.trim() || selectedUser.name,
         role: formRole,
         accountStatus: formStatus,
-        isVerified: formStatus === 'Verified',
-        emailVerified: formStatus === 'Verified' ? true : formEmailVerified,
-        phoneVerified: formStatus === 'Verified' ? true : formPhoneVerified,
-        countryCode: formCountryCode.trim() || null,
-        cnicNumber: formCnic.trim() || null,
-        address: formAddress.trim() || null,
-        description: formDescription.trim() || null,
+        isVerified: isNowVerified,
+        emailVerified: isNowVerified ? true : formEmailVerified,
+        phoneVerified: isNowVerified ? true : formPhoneVerified,
       };
 
-      if (formEmail.trim()) {
-        payload.email = formEmail.trim();
-      } else {
-        payload.email = null;
-      }
-
-      if (formPhone.trim()) {
-        payload.phoneNumber = formPhone.trim();
-      } else {
-        payload.phoneNumber = null;
-      }
+      if (formEmail.trim()) payload.email = formEmail.trim();
+      if (formPhone.trim()) payload.phoneNumber = formPhone.trim();
+      if (formCountryCode.trim()) payload.countryCode = formCountryCode.trim();
+      if (formCnic.trim()) payload.cnicNumber = formCnic.trim();
+      if (formAddress.trim()) payload.address = formAddress.trim();
+      if (formDescription.trim()) payload.description = formDescription.trim();
 
       if (formRole === 'NGO') {
-        payload.ngoName = formNgoName.trim() || null;
-        payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim() || null;
-        payload.positionInNgo = formPositionInNgo.trim() || null;
-        payload.directCorrespondentName = formDirectCorrespondentName.trim() || null;
-        payload.contactForAccreditation = formContactForAccreditation.trim() || null;
-        payload.proofOfAffiliation = formProofOfAffiliation.trim() || null;
-      } else {
-        // Clear NGO fields if role is changed to Donor or Admin
-        payload.ngoName = null;
-        payload.ngoRegistrationNumber = null;
-        payload.positionInNgo = null;
-        payload.directCorrespondentName = null;
-        payload.contactForAccreditation = null;
-        payload.proofOfAffiliation = null;
+        if (formNgoName.trim()) payload.ngoName = formNgoName.trim();
+        if (formNgoRegistrationNumber.trim()) payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim();
+        if (formPositionInNgo.trim()) payload.positionInNgo = formPositionInNgo.trim();
+        if (formDirectCorrespondentName.trim()) payload.directCorrespondentName = formDirectCorrespondentName.trim();
+        if (formContactForAccreditation.trim()) payload.contactForAccreditation = formContactForAccreditation.trim();
+        if (formProofOfAffiliation.trim()) payload.proofOfAffiliation = formProofOfAffiliation.trim();
       }
 
       await api.patch(`/users/${selectedUser.id}`, payload);
@@ -635,32 +675,56 @@ export default function UsersPage() {
                         {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
                       </TableCell>
                       <TableCell className="text-right pr-6 py-4">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
+                        <div className="flex items-center justify-end gap-1.5">
+                          {user.accountStatus !== 'Verified' && !user.isVerified && (
                             <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 hover:bg-muted rounded-full"
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleQuickVerify(user)}
+                              className="h-8 rounded-xl px-2.5 text-xs font-semibold text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-700 dark:text-emerald-400 dark:border-emerald-500/30"
                             >
-                              <MoreHorizontal className="h-4 w-4" />
+                              <CheckCircle2 className="h-3.5 w-3.5 mr-1 text-emerald-600 dark:text-emerald-400" />
+                              Verify
                             </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="rounded-xl shadow-lg border-border">
-                            <DropdownMenuItem onClick={() => openEditDialog(user)} className="cursor-pointer gap-2">
-                              <Pencil className="h-4 w-4 text-muted-foreground" />
-                              Edit / Verify
-                            </DropdownMenuItem>
-                            {user.role !== 'Admin' && (
-                              <DropdownMenuItem
-                                onClick={() => openDeleteDialog(user)}
-                                className="cursor-pointer text-red-600 focus:text-red-600 gap-2 focus:bg-red-50 dark:focus:bg-red-950/30"
+                          )}
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 hover:bg-muted rounded-full"
                               >
-                                <Trash2 className="h-4 w-4" />
-                                Delete
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="rounded-xl shadow-lg border-border">
+                              {user.accountStatus !== 'Verified' && !user.isVerified ? (
+                                <DropdownMenuItem onClick={() => handleQuickVerify(user)} className="cursor-pointer gap-2 text-emerald-600 font-medium dark:text-emerald-400">
+                                  <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                  Verify User
+                                </DropdownMenuItem>
+                              ) : (
+                                <DropdownMenuItem onClick={() => handleQuickReject(user)} className="cursor-pointer gap-2 text-amber-600 font-medium">
+                                  <Shield className="h-4 w-4 text-amber-600" />
+                                  Unverify Account
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem onClick={() => openEditDialog(user)} className="cursor-pointer gap-2">
+                                <Pencil className="h-4 w-4 text-muted-foreground" />
+                                Edit Profile
                               </DropdownMenuItem>
-                            )}
-                          </DropdownMenuContent>
-                        </DropdownMenu>
+                              {user.role !== 'Admin' && (
+                                <DropdownMenuItem
+                                  onClick={() => openDeleteDialog(user)}
+                                  className="cursor-pointer text-red-600 focus:text-red-600 gap-2 focus:bg-red-50 dark:focus:bg-red-950/30"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                  Delete
+                                </DropdownMenuItem>
+                              )}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

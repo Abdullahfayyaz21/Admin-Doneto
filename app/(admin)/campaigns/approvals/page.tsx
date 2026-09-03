@@ -19,7 +19,8 @@ import {
   Tag,
   FileText,
   User,
-  HeartHandshake
+  HeartHandshake,
+  ShieldCheck,
 } from 'lucide-react';
 import {
   Card,
@@ -181,59 +182,7 @@ export default function ApprovalsQueuePage() {
         </Button>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Reviews
-            </CardTitle>
-            <div className="rounded-xl bg-amber-500/10 p-2.5 text-amber-500">
-              <CheckSquare className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{campaigns.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Campaigns awaiting verification</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Requested Goal
-            </CardTitle>
-            <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-              <DollarSign className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              PKR {totalPendingAmount.toLocaleString()}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">Sum of all pending target funds</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Review Status
-            </CardTitle>
-            <div className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-500">
-              <HeartHandshake className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">
-              {campaigns.length === 0 ? 'All Clear' : 'Action Required'}
-            </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {campaigns.length === 0 ? 'Zero backlogs in queue' : 'Campaigns need moderation'}
-            </p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main Content Area */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none overflow-hidden">
@@ -311,9 +260,14 @@ export default function ApprovalsQueuePage() {
                       <div className="flex items-center gap-2">
                         <Building2 className="h-4 w-4 text-muted-foreground shrink-0" />
                         <div>
-                          <p className="text-xs font-medium text-foreground truncate max-w-[150px]">
-                            {campaign.createdBy?.ngoName || campaign.createdBy?.name || 'NGO Owner'}
-                          </p>
+                          <div className="flex items-center gap-1.5 flex-wrap">
+                            <p className="text-xs font-medium text-foreground truncate max-w-[140px]">
+                              {campaign.createdBy?.ngoName || campaign.createdBy?.name || 'NGO Owner'}
+                            </p>
+                            <span title="Verified Organizer" className="inline-flex items-center">
+                              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500 shrink-0" />
+                            </span>
+                          </div>
                           <p className="text-[11px] text-muted-foreground truncate max-w-[150px]">
                             {campaign.createdBy?.email}
                           </p>
@@ -464,9 +418,14 @@ export default function ApprovalsQueuePage() {
                 </div>
 
                 <div className="p-3 rounded-xl border border-border bg-muted/30">
-                  <p className="text-xs text-muted-foreground mb-1 font-semibold uppercase tracking-wider">
-                    NGO / Organization Details
-                  </p>
+                  <div className="flex items-center justify-between mb-1">
+                    <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wider">
+                      NGO / Organization Details
+                    </p>
+                    <Badge className="bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 text-[10px] font-semibold">
+                      <ShieldCheck className="h-3 w-3 mr-1" /> Verified Organizer
+                    </Badge>
+                  </div>
                   <p className="text-sm font-semibold text-foreground">
                     {selectedCampaign.createdBy?.ngoName || selectedCampaign.createdBy?.name}
                   </p>

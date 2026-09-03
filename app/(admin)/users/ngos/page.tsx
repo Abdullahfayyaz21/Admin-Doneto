@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
 import {
   Building2,
   Search,
@@ -99,6 +100,29 @@ export default function NGOsPage() {
     }
   }, []);
 
+  const handleVerifyNgo = async (ngo: NgoUser) => {
+    try {
+      await api.patch(`/users/${ngo.id}`, {
+        isVerified: true,
+        isVerifiedRecipient: true,
+        accountStatus: 'Verified',
+        emailVerified: true,
+        phoneVerified: true,
+      });
+      try {
+        await api.patch(`/kyc/admin/requests/${ngo.id}/review`, { status: 'APPROVED' });
+      } catch {
+        // silent
+      }
+      toast.success(`NGO "${ngo.ngoName || ngo.name}" verified on platform & web app!`);
+      fetchNgos();
+      if (isDetailOpen) setIsDetailOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to verify NGO.');
+    }
+  };
+
   useEffect(() => {
     fetchNgos();
   }, [fetchNgos]);
@@ -147,53 +171,7 @@ export default function NGOsPage() {
         </Button>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Registered NGOs
-            </CardTitle>
-            <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-              <Building2 className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{ngos.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Partner organizations on Doneto</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Verified Recipients
-            </CardTitle>
-            <div className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-500">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{verifiedCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Completed full KYC verification</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Pending Accreditation
-            </CardTitle>
-            <div className="rounded-xl bg-amber-500/10 p-2.5 text-amber-500">
-              <Clock className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{ngos.length - verifiedCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Awaiting KYC clearance</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main Table */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none overflow-hidden">
@@ -296,7 +274,7 @@ export default function NGOsPage() {
                       </span>
                     </TableCell>
                     <TableCell>
-                      {ngo.isVerifiedRecipient ? (
+                      {ngo.isVerifiedRecipient || ngo.isVerified || ngo.accountStatus === 'Verified' ? (
                         <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs font-medium rounded-lg">
                           <ShieldCheck className="h-3 w-3 mr-1" /> Verified
                         </Badge>
@@ -310,18 +288,31 @@ export default function NGOsPage() {
                       {new Date(ngo.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setSelectedNgo(ngo);
-                          setIsDetailOpen(true);
-                        }}
-                        className="h-8 rounded-lg px-2.5 text-xs"
-                      >
-                        <Eye className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                        Details
-                      </Button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        {!ngo.isVerifiedRecipient && !ngo.isVerified && ngo.accountStatus !== 'Verified' && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleVerifyNgo(ngo)}
+                            className="h-8 rounded-lg px-2 text-xs font-semibold text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10"
+                          >
+                            <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+                            Verify
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setSelectedNgo(ngo);
+                            setIsDetailOpen(true);
+                          }}
+                          className="h-8 rounded-lg px-2.5 text-xs"
+                        >
+                          <Eye className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                          Details
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -369,12 +360,14 @@ export default function NGOsPage() {
                 <div className="flex items-center justify-between">
                   <Badge
                     className={
-                      selectedNgo.isVerifiedRecipient
+                      selectedNgo.isVerifiedRecipient || selectedNgo.isVerified || selectedNgo.accountStatus === 'Verified'
                         ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                         : 'bg-amber-500/10 text-amber-600 border-amber-500/20'
                     }
                   >
-                    {selectedNgo.isVerifiedRecipient ? 'Verified Recipient' : 'Unverified'}
+                    {selectedNgo.isVerifiedRecipient || selectedNgo.isVerified || selectedNgo.accountStatus === 'Verified'
+                      ? 'Verified Recipient'
+                      : 'Pending KYC Verification'}
                   </Badge>
                   <span className="text-xs text-muted-foreground">
                     Joined {new Date(selectedNgo.createdAt).toLocaleDateString()}
@@ -430,11 +423,26 @@ export default function NGOsPage() {
                 </div>
               </div>
 
-              <DialogFooter className="flex gap-2">
+              <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                {!selectedNgo.isVerifiedRecipient && !selectedNgo.isVerified && selectedNgo.accountStatus !== 'Verified' && (
+                  <Button
+                    onClick={() => handleVerifyNgo(selectedNgo)}
+                    className="bg-[#185500] hover:bg-[#1e6b00] text-white dark:bg-white dark:text-black rounded-xl flex-1 text-xs font-semibold"
+                  >
+                    <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+                    Verify NGO (Web App)
+                  </Button>
+                )}
+                <Button asChild variant="outline" className="rounded-xl flex-1 text-xs">
+                  <Link href={`/users/kyc?search=${encodeURIComponent(selectedNgo.ngoName || selectedNgo.name || '')}`}>
+                    <ShieldCheck className="h-3.5 w-3.5 mr-1" />
+                    Audit KYC Docs
+                  </Link>
+                </Button>
                 <Button
                   variant="outline"
                   onClick={() => setIsDetailOpen(false)}
-                  className="rounded-xl w-full"
+                  className="rounded-xl"
                 >
                   Close
                 </Button>

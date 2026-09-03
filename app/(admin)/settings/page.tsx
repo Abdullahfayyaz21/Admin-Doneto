@@ -402,7 +402,7 @@ export default function SettingsPage() {
                   <div>
                     <h3 className="font-bold text-white text-base">Verification Required</h3>
                     <p className="text-xs text-slate-300 mt-1">
-                      You have not submitted your organization's KYC details. Please submit details to build verification credentials.
+                      You have not submitted your organization&apos;s KYC details. Please submit details to build verification credentials.
                     </p>
                   </div>
                 </div>

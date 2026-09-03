@@ -182,14 +182,14 @@ export function Navbar() {
   );
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-border bg-background px-6 select-none dark:border-b-0 dark:bg-background">
+    <header className="flex h-16 items-center justify-between border-none bg-background px-6 select-none dark:bg-background">
       {/* Search Input */}
       <div className="relative max-w-md flex-1">
         <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
         <input
           type="text"
           placeholder="Search campaigns, users, transactions..."
-          className="h-10 w-full rounded-xl border border-input bg-muted/50 pl-10 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground text-foreground focus:border-primary focus:bg-background focus:ring-2 focus:ring-primary/20 dark:border-0 dark:bg-white/[0.05] dark:placeholder:text-muted-foreground/60 dark:focus:bg-white/[0.08] dark:focus:ring-1 dark:focus:ring-white/20"
+          className="h-10 w-full rounded-xl border-0 bg-muted/60 pl-10 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground/70 text-foreground focus:bg-muted/90 focus:ring-2 focus:ring-primary/20 dark:bg-white/[0.05] dark:placeholder:text-muted-foreground/60 dark:focus:bg-white/[0.08] dark:focus:ring-1 dark:focus:ring-white/20"
         />
       </div>
 
@@ -240,7 +240,7 @@ export function Navbar() {
               <div className="flex items-center gap-2">
                 <h3 className="text-sm font-bold text-foreground">Notifications</h3>
                 {unreadCount > 0 && (
-                  <Badge className="bg-primary text-white text-[10px] h-5 px-1.5 rounded-full font-semibold">
+                  <Badge className="bg-[#185500] text-white dark:bg-white dark:text-black text-[10px] h-5 px-1.5 rounded-full font-semibold">
                     {unreadCount} new
                   </Badge>
                 )}
@@ -358,7 +358,7 @@ export function Navbar() {
         </Popover>
 
         {/* User Profile Avatar & Name */}
-        <div className="flex items-center gap-3 border-l border-border pl-4">
+        <div className="flex items-center gap-3 pl-2">
           <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-green-600 to-emerald-700 text-sm font-bold text-white shadow-sm">
             {getInitials(name)}
           </div>

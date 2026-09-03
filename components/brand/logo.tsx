@@ -47,6 +47,7 @@ export function Logo({
         height: `${config.height}px`,
         aspectRatio: '8838 / 2155',
         objectFit: 'contain',
+        imageRendering: '-webkit-optimize-contrast',
       }}
       className={cn(config.className, 'select-none pointer-events-none', className)}
     />

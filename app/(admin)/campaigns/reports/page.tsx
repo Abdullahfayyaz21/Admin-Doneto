@@ -216,62 +216,7 @@ export default function ReportedCampaignsPage() {
         </div>
       </div>
 
-      {/* Stats Widgets */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-card shadow-sm rounded-2xl hover:border-primary/30 transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Total Active Reports</CardTitle>
-            <div className="p-1.5 bg-indigo-500/10 text-indigo-500 rounded-lg">
-              <Flag className="h-4.5 w-4.5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{totalCount}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Requires audit resolution</p>
-          </CardContent>
-        </Card>
 
-        <Card className="bg-card shadow-sm rounded-2xl hover:border-rose-500/30 transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fraud Allegations</CardTitle>
-            <div className="p-1.5 bg-rose-500/10 text-rose-500 rounded-lg">
-              <ShieldAlert className="h-4.5 w-4.5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-rose-650">{reports.filter(r => r.reason === 'Fraud').length}</div>
-            <p className="text-[10px] text-muted-foreground mt-1">High priority audits</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card shadow-sm rounded-2xl hover:border-yellow-500/30 transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Spam / Abuse</CardTitle>
-            <div className="p-1.5 bg-yellow-500/10 text-yellow-600 rounded-lg">
-              <AlertTriangle className="h-4.5 w-4.5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">
-              {reports.filter(r => r.reason === 'Spam' || r.reason === 'Abusive').length}
-            </div>
-            <p className="text-[10px] text-muted-foreground mt-1">Guideline compliance issues</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card shadow-sm rounded-2xl hover:border-slate-500/30 transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Resolved this session</CardTitle>
-            <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
-              <CheckCircle className="h-4.5 w-4.5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-650">0</div>
-            <p className="text-[10px] text-muted-foreground mt-1">Reports resolved in current view</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Filter and Search Bar */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none">
@@ -420,7 +365,7 @@ export default function ReportedCampaignsPage() {
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className="max-w-md border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl space-y-4">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-rose-650">
+            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-rose-600">
               <Flag className="h-5 w-5" /> Detailed Violation Report
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
@@ -467,13 +412,13 @@ export default function ReportedCampaignsPage() {
             <Button 
               variant="outline"
               onClick={() => handleOpenBlock(selectedReport!)} 
-              className="bg-rose-500/10 hover:bg-rose-500 hover:text-white border-rose-500/20 text-rose-650 rounded-xl text-xs h-10 px-4"
+              className="bg-rose-500/10 hover:bg-rose-500 hover:text-white border-rose-500/20 text-rose-600 rounded-xl text-xs h-10 px-4"
             >
               Block/Pause Campaign
             </Button>
             <Button 
               onClick={() => handleOpenResolve(selectedReport!)}
-              className="bg-emerald-650 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold h-10 px-4"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold h-10 px-4"
             >
               Resolve / Dismiss
             </Button>
@@ -495,7 +440,7 @@ export default function ReportedCampaignsPage() {
             <Button 
               onClick={handleResolveReport} 
               disabled={submitLoading}
-              className="bg-emerald-650 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold px-4"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold px-4"
             >
               {submitLoading ? 'Resolving...' : 'Confirm Dismissal'}
             </Button>
@@ -507,7 +452,7 @@ export default function ReportedCampaignsPage() {
       <Dialog open={isBlockOpen} onOpenChange={setIsBlockOpen}>
         <DialogContent className="max-w-sm border-border bg-background text-foreground rounded-2xl p-6 shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-rose-650">Pause Campaign & Resolve Report?</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-rose-600">Pause Campaign & Resolve Report?</DialogTitle>
             <DialogDescription className="text-muted-foreground text-xs mt-1">
               This will immediately transition the campaign status to <strong>Paused</strong> (stopping public donations) and resolve the report.
             </DialogDescription>
@@ -517,7 +462,7 @@ export default function ReportedCampaignsPage() {
             <Button 
               onClick={handleBlockCampaign} 
               disabled={submitLoading}
-              className="bg-rose-650 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold px-4"
+              className="bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-semibold px-4"
             >
               {submitLoading ? 'Auditing...' : 'Confirm Block'}
             </Button>

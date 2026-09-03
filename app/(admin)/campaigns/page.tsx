@@ -30,8 +30,15 @@ import {
   Ban,
   Clock,
   Sparkles,
-  ArrowUpRight
+  ArrowUpRight,
+  ShieldCheck,
+  ShieldAlert,
+  HeartHandshake,
 } from 'lucide-react';
+import { useVerification } from '@/hooks/useVerification';
+import { VerificationGateModal } from '@/components/campaigns/VerificationGateModal';
+import { VerificationBanner } from '@/components/campaigns/VerificationBanner';
+import { CreateCampaignModal } from '@/components/campaigns/CreateCampaignModal';
 import {
   Card,
   CardContent,
@@ -146,6 +153,25 @@ export default function CampaignsPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === 'Admin';
   const isNGO = user?.role === 'NGO';
+
+  // Verification status & security gate
+  const {
+    isVerified,
+    canCreateCampaign,
+    status: verificationStatus,
+    rejectionReason: kycRejectionReason,
+    statusLabel,
+  } = useVerification();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isGateOpen, setIsGateOpen] = useState(false);
+
+  const handleCreateCampaignClick = () => {
+    if (canCreateCampaign) {
+      setIsCreateOpen(true);
+    } else {
+      setIsGateOpen(true);
+    }
+  };
 
   // Core campaigns lists and stats
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -531,77 +557,43 @@ export default function CampaignsPage() {
             {isAdmin ? 'Audit, approve, and manage fundraising campaigns system-wide.' : 'Create, monitor, and manage your fundraising campaigns.'}
           </p>
         </div>
+
+        {/* Action Button: Create Campaign with Verification Guard */}
+        <div className="flex items-center gap-2">
+          {canCreateCampaign ? (
+            <Button
+              onClick={handleCreateCampaignClick}
+              className="gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 text-white text-xs font-semibold shadow-md shadow-emerald-900/20 h-10 px-4 transition-all hover:scale-[1.02]"
+            >
+              <Plus className="h-4 w-4" />
+              Create Campaign
+            </Button>
+          ) : (
+            <Button
+              onClick={handleCreateCampaignClick}
+              variant="outline"
+              className="gap-2 rounded-xl border-amber-500/40 bg-amber-500/10 hover:bg-amber-500/20 text-foreground text-xs font-semibold h-10 px-4 transition-all shadow-xs"
+            >
+              <ShieldAlert className="h-4 w-4 text-amber-500" />
+              Create Campaign
+              <Badge className="bg-amber-500/20 text-amber-600 dark:text-amber-400 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0 h-4 ml-1">
+                Verify
+              </Badge>
+            </Button>
+          )}
+        </div>
       </div>
 
-      {/* Stats Widgets */}
-      {loading ? (
-        <div className="grid gap-4 md:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <Card key={i} className="bg-card shadow-sm rounded-2xl p-6">
-              <Skeleton className="h-4 w-24 mb-2" />
-              <Skeleton className="h-8 w-36" />
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-4">
-          {/* Card 1 */}
-          <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Campaigns</CardTitle>
-              <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
-                <FolderHeart className="h-5 w-5" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stats?.totalCampaigns || 0}</div>
-              <p className="text-xs text-muted-foreground mt-1">Submitted in total</p>
-            </CardContent>
-          </Card>
-
-          {/* Card 2 */}
-          <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Active Campaigns</CardTitle>
-              <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
-                <TrendingUp className="h-5 w-5" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-emerald-650">{activeCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">Currently raising funds</p>
-            </CardContent>
-          </Card>
-
-          {/* Card 3 */}
-          <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Awaiting Review</CardTitle>
-              <div className="p-2 bg-yellow-500/10 text-yellow-600 rounded-xl">
-                <Clock className="h-5 w-5" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{pendingCount}</div>
-              <p className="text-xs text-muted-foreground mt-1">Requires approval audit</p>
-            </CardContent>
-          </Card>
-
-          {/* Card 4 */}
-          <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Total Funds Raised</CardTitle>
-              <div className="p-2 bg-primary/10 text-primary rounded-xl">
-                <DollarSign className="h-5 w-5" />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-primary">{formatCurrency(stats?.totalCollectedAmount || '0')}</div>
-              <p className="text-xs text-muted-foreground mt-1">Goal: {formatCurrency(stats?.totalGoalAmount || '0')}</p>
-            </CardContent>
-          </Card>
-        </div>
+      {/* Verification Alert Banner for Unverified / Pending / Rejected Users */}
+      {!isAdmin && (
+        <VerificationBanner
+          status={verificationStatus}
+          rejectionReason={kycRejectionReason}
+          onOpenGateModal={() => setIsGateOpen(true)}
+        />
       )}
+
+
 
       {/* Filters and Searching Toolbar */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none">
@@ -690,10 +682,34 @@ export default function CampaignsPage() {
           ))}
         </div>
       ) : filteredCampaigns.length === 0 ? (
-        <div className="rounded-2xl bg-muted/20 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-sm">
-          <AlertCircle className="h-10 w-10 mx-auto text-primary mb-4" />
-          <h3 className="font-semibold text-lg text-foreground mb-2">No campaigns found</h3>
-          <p className="text-sm">Try broadening your search criteria or review the filters settings.</p>
+        <div className="rounded-2xl bg-muted/20 p-12 text-center text-muted-foreground max-w-xl mx-auto shadow-sm space-y-4">
+          <AlertCircle className="h-10 w-10 mx-auto text-primary" />
+          <div>
+            <h3 className="font-semibold text-lg text-foreground mb-1">No campaigns found</h3>
+            <p className="text-sm">
+              {searchQuery || statusFilter !== 'ALL' || approvalFilter !== 'ALL'
+                ? 'Try broadening your search criteria or review the filters settings.'
+                : 'No fundraising campaigns have been created yet.'}
+            </p>
+          </div>
+          {canCreateCampaign ? (
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              className="rounded-xl bg-gradient-to-r from-emerald-600 to-green-700 hover:from-emerald-700 hover:to-green-800 text-white font-semibold text-xs gap-1.5 shadow-sm h-9 px-4"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Create First Campaign
+            </Button>
+          ) : (
+            <Button
+              onClick={() => setIsGateOpen(true)}
+              variant="outline"
+              className="rounded-xl border-emerald-500/30 hover:bg-emerald-500/10 text-xs font-semibold gap-1.5 h-9 px-4"
+            >
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-500" />
+              Verify Account to Create Campaigns
+            </Button>
+          )}
         </div>
       ) : viewMode === 'grid' ? (
         /* GRID VIEW */
@@ -893,7 +909,7 @@ export default function CampaignsPage() {
                     <Badge 
                       className={`border-none rounded-lg font-semibold py-0.5 px-2 ${
                         camp.campaignStatus === 'Active' ? 'bg-emerald-500/25 text-emerald-600' :
-                        camp.campaignStatus === 'Paused' ? 'bg-amber-500/25 text-amber-655' :
+                        camp.campaignStatus === 'Paused' ? 'bg-amber-500/25 text-amber-600' :
                         camp.campaignStatus === 'Completed' ? 'bg-blue-500/25 text-blue-600' :
                         'bg-rose-500/25 text-rose-600'
                       }`}
@@ -953,7 +969,7 @@ export default function CampaignsPage() {
               {/* Header Title with image/gradient background */}
               <div className="relative p-6 bg-gradient-to-br from-indigo-50 to-slate-100 dark:from-indigo-950 dark:to-slate-900 flex justify-between items-start border-b border-border">
                 <div className="space-y-1 max-w-[80%]">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-650 bg-indigo-500/10 dark:text-indigo-400 py-1 px-2.5 rounded-lg border border-indigo-500/25">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-600 bg-indigo-500/10 dark:text-indigo-400 py-1 px-2.5 rounded-lg border border-indigo-500/25">
                     {selectedCampaign.categoryName}
                   </span>
                   <DialogTitle className="text-2xl font-bold tracking-tight line-clamp-1">{selectedCampaign.title}</DialogTitle>
@@ -1032,7 +1048,7 @@ export default function CampaignsPage() {
                       <div className="bg-muted/40 border border-border rounded-xl p-4 grid grid-cols-2 gap-4">
                         <div>
                           <Label className="text-xs text-muted-foreground">Collected Amount</Label>
-                          <div className="text-lg font-bold text-emerald-650 mt-0.5">{formatCurrency(selectedCampaign.collectedAmount)}</div>
+                          <div className="text-lg font-bold text-emerald-600 mt-0.5">{formatCurrency(selectedCampaign.collectedAmount)}</div>
                         </div>
                         <div>
                           <Label className="text-xs text-muted-foreground">Goal Target</Label>
@@ -1138,7 +1154,7 @@ export default function CampaignsPage() {
                           {selectedCampaign.supportingDocuments?.map((doc, idx) => (
                             <div key={idx} className="flex items-center justify-between bg-muted/40 border border-border rounded-xl p-3">
                               <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-500/10 text-indigo-650 rounded-lg">
+                                <div className="p-2 bg-indigo-500/10 text-indigo-600 rounded-lg">
                                   <FileText className="h-4 w-4" />
                                 </div>
                                 <div className="space-y-0.5 text-xs">
@@ -1638,7 +1654,7 @@ export default function CampaignsPage() {
 
             {/* Beneficiary details */}
             <div className="bg-muted/40 border border-border rounded-xl p-4 space-y-4">
-              <span className="font-bold text-indigo-650 dark:text-indigo-400 uppercase tracking-wider block">Beneficiary Settings</span>
+              <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">Beneficiary Settings</span>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label className="text-muted-foreground font-semibold">Beneficiary Type</Label>
@@ -1695,7 +1711,7 @@ export default function CampaignsPage() {
 
             {/* POC information */}
             <div className="bg-muted/40 border border-border rounded-xl p-4 space-y-3">
-              <span className="font-bold text-indigo-650 dark:text-indigo-400 uppercase tracking-wider block">Point of Contact Details</span>
+              <span className="font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider block">Point of Contact Details</span>
               <div className="space-y-2">
                 <div className="grid grid-cols-3 gap-3">
                   <div className="space-y-1.5 col-span-1">
@@ -1760,6 +1776,23 @@ export default function CampaignsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Create Campaign Modal (Verified Only) */}
+      <CreateCampaignModal
+        open={isCreateOpen}
+        onOpenChange={setIsCreateOpen}
+        categories={categories}
+        onSuccess={fetchCampaignsAndStats}
+      />
+
+      {/* Verification Gate Modal (Unverified / Pending / Rejected) */}
+      <VerificationGateModal
+        open={isGateOpen}
+        onOpenChange={setIsGateOpen}
+        status={verificationStatus}
+        rejectionReason={kycRejectionReason}
+        ngoName={user?.ngoName}
+      />
     </div>
   );
 }

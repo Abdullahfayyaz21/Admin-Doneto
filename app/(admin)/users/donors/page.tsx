@@ -92,6 +92,23 @@ export default function DonorsPage() {
     }
   }, []);
 
+  const handleVerifyDonor = async (donor: DonorUser) => {
+    try {
+      await api.patch(`/users/${donor.id}`, {
+        isVerified: true,
+        accountStatus: 'Verified',
+        emailVerified: true,
+        phoneVerified: true,
+      });
+      toast.success(`Donor "${donor.name}" verified for web app & platform!`);
+      fetchDonors();
+      if (isDetailOpen) setIsDetailOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to verify donor.');
+    }
+  };
+
   useEffect(() => {
     fetchDonors();
   }, [fetchDonors]);
@@ -139,53 +156,7 @@ export default function DonorsPage() {
         </Button>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Donors
-            </CardTitle>
-            <div className="rounded-xl bg-primary/10 p-2.5 text-primary">
-              <UserCheck className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{donors.length}</div>
-            <p className="text-xs text-muted-foreground mt-1">Registered patron community</p>
-          </CardContent>
-        </Card>
 
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Verified Donors
-            </CardTitle>
-            <div className="rounded-xl bg-emerald-500/10 p-2.5 text-emerald-500">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">{verifiedCount}</div>
-            <p className="text-xs text-muted-foreground mt-1">Email or phone verified</p>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl bg-card shadow-sm">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Community Health
-            </CardTitle>
-            <div className="rounded-xl bg-blue-500/10 p-2.5 text-blue-500">
-              <Heart className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-foreground">Active</div>
-            <p className="text-xs text-muted-foreground mt-1">Patrons engaging regularly</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Main Table */}
       <Card className="rounded-2xl border border-border/60 bg-card p-4 shadow-sm dark:border-0 dark:bg-transparent dark:p-0 dark:shadow-none overflow-hidden">
@@ -291,18 +262,31 @@ export default function DonorsPage() {
                       {new Date(donor.createdAt).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => {
-                          setSelectedDonor(donor);
-                          setIsDetailOpen(true);
-                        }}
-                        className="h-8 rounded-lg px-2.5 text-xs"
-                      >
-                        <Eye className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
-                        Details
-                      </Button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        {!donor.isVerified && !donor.emailVerified && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleVerifyDonor(donor)}
+                            className="h-8 rounded-lg px-2 text-xs font-semibold text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10"
+                          >
+                            <UserCheck className="h-3.5 w-3.5 mr-1" />
+                            Verify
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            setSelectedDonor(donor);
+                            setIsDetailOpen(true);
+                          }}
+                          className="h-8 rounded-lg px-2.5 text-xs"
+                        >
+                          <Eye className="h-3.5 w-3.5 mr-1 text-muted-foreground" />
+                          Details
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -389,11 +373,20 @@ export default function DonorsPage() {
                 </div>
               </div>
 
-              <DialogFooter>
+              <DialogFooter className="flex flex-col sm:flex-row gap-2">
+                {!selectedDonor.isVerified && !selectedDonor.emailVerified && (
+                  <Button
+                    onClick={() => handleVerifyDonor(selectedDonor)}
+                    className="bg-[#185500] hover:bg-[#1e6b00] text-white dark:bg-white dark:text-black rounded-xl flex-1 text-xs font-semibold"
+                  >
+                    <UserCheck className="h-3.5 w-3.5 mr-1" />
+                    Verify Donor (Web App)
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   onClick={() => setIsDetailOpen(false)}
-                  className="rounded-xl w-full"
+                  className="rounded-xl flex-1"
                 >
                   Close
                 </Button>

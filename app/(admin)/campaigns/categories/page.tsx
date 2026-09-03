@@ -236,61 +236,7 @@ export default function CategoriesPage() {
         </Button>
       </div>
 
-      {/* Stats Widgets */}
-      <div className="grid gap-4 md:grid-cols-3 animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-75">
-        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Categories</CardTitle>
-            <div className="p-2 bg-indigo-500/10 text-indigo-500 rounded-xl">
-              <Layers className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-9 w-20" />
-            ) : (
-              <div className="text-3xl font-bold">{totalCategoriesCount}</div>
-            )}
-            <p className="text-xs text-muted-foreground mt-1">Available for new fundraising campaigns</p>
-          </CardContent>
-        </Card>
 
-        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Latest Classification</CardTitle>
-            <div className="p-2 bg-pink-500/10 text-pink-500 rounded-xl">
-              <Clock className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <Skeleton className="h-9 w-32" />
-            ) : (
-              <div className="text-2xl font-bold truncate max-w-full">{latestCategoryName}</div>
-            )}
-            <p className="text-xs text-muted-foreground mt-2">Most recently added classification</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-card shadow-sm rounded-2xl overflow-hidden hover:-translate-y-1 hover:shadow-md transition-all duration-300">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Status</CardTitle>
-            <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl">
-              <FolderHeart className="h-5 w-5" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-emerald-600 flex items-center gap-1.5">
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-450 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-600"></span>
-              </span>
-              Active
-            </div>
-            <p className="text-xs text-muted-foreground mt-2">Operational and synced with database</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* Controls Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-card border border-border/60 p-4 rounded-2xl shadow-sm animate-in fade-in-50 slide-in-from-bottom-3 duration-300 delay-100 dark:bg-transparent dark:border-0 dark:p-0 dark:shadow-none">
@@ -583,7 +529,7 @@ export default function CategoriesPage() {
               Delete Campaign Category?
             </DialogTitle>
             <DialogDescription className="text-muted-foreground mt-2 text-sm leading-relaxed">
-              Are you sure you want to delete category <span className="text-foreground font-semibold">"{selectedCategory?.name}"</span>?
+              Are you sure you want to delete category <span className="text-foreground font-semibold">&quot;{selectedCategory?.name}&quot;</span>?
               This action is permanent and cannot be undone.
             </DialogDescription>
           </DialogHeader>
@@ -603,7 +549,7 @@ export default function CategoriesPage() {
               type="button"
               onClick={handleDelete}
               disabled={submitLoading}
-              className="bg-red-650 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-600/10 flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg shadow-red-600/10 flex items-center gap-2"
             >
               {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
               Delete Category
