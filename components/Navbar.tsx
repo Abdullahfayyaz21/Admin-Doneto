@@ -83,8 +83,17 @@ export function Navbar() {
   useEffect(() => {
     setMounted(true);
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 30000);
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchUnreadCount, 15000);
+
+    const handleKycUpdated = () => {
+      fetchUnreadCount();
+    };
+    window.addEventListener('doneto_kyc_updated', handleKycUpdated);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('doneto_kyc_updated', handleKycUpdated);
+    };
   }, [fetchUnreadCount]);
 
   const handlePopoverOpenChange = (open: boolean) => {

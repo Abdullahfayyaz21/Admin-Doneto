@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import {
   Search,
   Filter,
@@ -13,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Shield,
+  ShieldCheck,
   UserCheck,
   Building2,
   Mail,
@@ -27,6 +29,7 @@ import {
   Award,
   CheckCircle2,
   Check,
+  HelpCircle,
 } from 'lucide-react';
 import {
   Card,
@@ -80,7 +83,7 @@ interface User {
   phoneNumber: string | null;
   countryCode: string | null;
   role: 'Admin' | 'NGO' | 'Donor';
-  accountStatus: 'Not Verified' | 'Pending' | 'Verified' | 'Rejected';
+  accountStatus: 'Not Verified' | 'Pending' | 'Verified' | 'Rejected' | 'On Hold' | string;
   cnicNumber: string | null;
   address: string | null;
   description: string | null;
@@ -108,6 +111,7 @@ const statusVariant: Record<string, 'default' | 'secondary' | 'destructive' | 'o
   'Verified': 'default',
   'Not Verified': 'secondary',
   'Pending': 'outline',
+  'On Hold': 'outline',
   'Rejected': 'destructive',
 };
 
@@ -144,7 +148,7 @@ export default function UsersPage() {
   const [formCountryCode, setFormCountryCode] = useState('');
   const [formPassword, setFormPassword] = useState('');
   const [formRole, setFormRole] = useState<'Admin' | 'NGO' | 'Donor'>('Donor');
-  const [formStatus, setFormStatus] = useState<'Not Verified' | 'Pending' | 'Verified' | 'Rejected'>('Verified');
+  const [formStatus, setFormStatus] = useState<string>('Verified');
   const [formCnic, setFormCnic] = useState('');
   const [formAddress, setFormAddress] = useState('');
   const [formDescription, setFormDescription] = useState('');
@@ -194,6 +198,15 @@ export default function UsersPage() {
 
     return () => clearTimeout(delayDebounceFn);
   }, [search, roleFilter, statusFilter, page]);
+
+  // Real-time synchronization listener
+  useEffect(() => {
+    const handleKycUpdated = () => {
+      fetchUsers();
+    };
+    window.addEventListener('doneto_kyc_updated', handleKycUpdated);
+    return () => window.removeEventListener('doneto_kyc_updated', handleKycUpdated);
+  }, []);
 
   // Reset page when filter changes
   const handleSearch = (val: string) => {
@@ -350,6 +363,22 @@ export default function UsersPage() {
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.message || 'Failed to update user status.');
+    }
+  };
+
+  const handleQuickHold = async (user: User) => {
+    try {
+      const payload: Record<string, any> = {
+        isVerified: false,
+        accountStatus: 'Pending',
+        description: `[ON HOLD] Application placed on hold for administrative audit.`,
+      };
+      await api.patch(`/users/${user.id}`, payload);
+      toast.info(`User "${user.name}" placed on hold.`);
+      fetchUsers();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to put user on hold.');
     }
   };
 
@@ -544,6 +573,7 @@ export default function UsersPage() {
                   <SelectItem value="ALL">All Statuses</SelectItem>
                   <SelectItem value="Verified">Verified</SelectItem>
                   <SelectItem value="Pending">Pending</SelectItem>
+                  <SelectItem value="On Hold">On Hold</SelectItem>
                   <SelectItem value="Rejected">Rejected</SelectItem>
                   <SelectItem value="Not Verified">Not Verified</SelectItem>
                 </SelectContent>
@@ -697,18 +727,38 @@ export default function UsersPage() {
                                 <MoreHorizontal className="h-4 w-4" />
                               </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="rounded-xl shadow-lg border-border">
+                            <DropdownMenuContent align="end" className="rounded-xl shadow-lg border-border w-52">
                               {user.accountStatus !== 'Verified' && !user.isVerified ? (
-                                <DropdownMenuItem onClick={() => handleQuickVerify(user)} className="cursor-pointer gap-2 text-emerald-600 font-medium dark:text-emerald-400">
-                                  <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                                  Verify User
-                                </DropdownMenuItem>
+                                <>
+                                  <DropdownMenuItem onClick={() => handleQuickVerify(user)} className="cursor-pointer gap-2 text-emerald-600 font-medium dark:text-emerald-400">
+                                    <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                                    Verify User
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleQuickHold(user)} className="cursor-pointer gap-2 text-orange-600 font-medium">
+                                    <HelpCircle className="h-4 w-4 text-orange-600" />
+                                    Put on Hold
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem onClick={() => handleQuickReject(user)} className="cursor-pointer gap-2 text-red-600 font-medium">
+                                    <Shield className="h-4 w-4 text-red-600" />
+                                    Reject Application
+                                  </DropdownMenuItem>
+                                </>
                               ) : (
                                 <DropdownMenuItem onClick={() => handleQuickReject(user)} className="cursor-pointer gap-2 text-amber-600 font-medium">
                                   <Shield className="h-4 w-4 text-amber-600" />
                                   Unverify Account
                                 </DropdownMenuItem>
                               )}
+
+                              {user.role === 'NGO' && (
+                                <DropdownMenuItem asChild className="cursor-pointer gap-2 text-primary font-medium">
+                                  <Link href={`/users/kyc?search=${encodeURIComponent(user.ngoName || user.name)}`}>
+                                    <ShieldCheck className="h-4 w-4" />
+                                    Audit KYC Dossier
+                                  </Link>
+                                </DropdownMenuItem>
+                              )}
+
                               <DropdownMenuItem onClick={() => openEditDialog(user)} className="cursor-pointer gap-2">
                                 <Pencil className="h-4 w-4 text-muted-foreground" />
                                 Edit Profile

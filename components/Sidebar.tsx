@@ -139,6 +139,17 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
     };
 
     fetchCounters();
+    const interval = setInterval(fetchCounters, 20000);
+
+    const handleKycUpdated = () => {
+      fetchCounters();
+    };
+    window.addEventListener('doneto_kyc_updated', handleKycUpdated);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('doneto_kyc_updated', handleKycUpdated);
+    };
   }, [pathname]);
 
   return (

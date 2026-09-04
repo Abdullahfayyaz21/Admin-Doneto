@@ -4,6 +4,8 @@ export enum KycStatus {
   PENDING = 'PENDING',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
+  HOLD = 'HOLD',
+  UNDER_REVIEW = 'UNDER_REVIEW',
 }
 
 export interface KycUser {
@@ -41,8 +43,10 @@ export interface KycRequest {
   missionStatement?: string | null;
   organizationDescription?: string | null;
   categories?: string[];
-  status: KycStatus;
+  status: KycStatus | string;
   rejectionReason?: string | null;
+  adminNotes?: string | null;
+  holdReason?: string | null;
   reviewedBy?: string | null;
   reviewedAt?: string | null;
   createdAt: string;
@@ -61,15 +65,17 @@ export interface MyKycStatusResponse {
 }
 
 export interface KycQueryDto {
-  status?: KycStatus;
+  status?: KycStatus | string;
   search?: string;
   page?: number;
   limit?: number;
 }
 
 export interface ReviewKycDto {
-  status: KycStatus.APPROVED | KycStatus.REJECTED;
+  status: KycStatus | 'APPROVED' | 'REJECTED' | 'HOLD' | 'UNDER_REVIEW' | 'PENDING';
   rejectionReason?: string;
+  adminNotes?: string;
+  holdReason?: string;
 }
 
 export interface KycPaginatedResponse {
@@ -151,13 +157,93 @@ export async function getAdminKycRequestByIdApi(id: string): Promise<KycRequest>
 }
 
 /**
- * Admin: Accept or Reject a KYC request (PATCH /api/kyc/admin/requests/{id}/review)
+ * Admin: Accept, Reject, Hold, or Re-evaluate a KYC request
  */
 export async function reviewKycRequestApi(
   requestId: string,
   data: ReviewKycDto,
+  userId?: string
 ): Promise<KycRequest> {
-  const response = await api.patch(`/kyc/admin/requests/${requestId}/review`, data);
-  return response.data?.data || response.data;
+  try {
+    const response = await api.patch(`/kyc/admin/requests/${requestId}/review`, data);
+    
+    // Also synchronize user profile status
+    if (userId) {
+      if (data.status === 'APPROVED') {
+        await api.patch(`/users/${userId}`, {
+          isVerified: true,
+          accountStatus: 'Verified',
+          isVerifiedRecipient: true,
+        }).catch(() => {});
+      } else if (data.status === 'REJECTED') {
+        await api.patch(`/users/${userId}`, {
+          isVerified: false,
+          accountStatus: 'Rejected',
+          isVerifiedRecipient: false,
+        }).catch(() => {});
+      } else if (data.status === 'HOLD' || data.status === 'UNDER_REVIEW') {
+        await api.patch(`/users/${userId}`, {
+          accountStatus: 'Pending',
+          isVerified: false,
+        }).catch(() => {});
+      }
+    }
+
+    return response.data?.data || response.data;
+  } catch (err: any) {
+    // If backend rejects custom HOLD status on review endpoint, handle via user status & metadata note
+    if (data.status === 'HOLD' || data.status === 'UNDER_REVIEW') {
+      const holdNote = `[ON HOLD] ${data.holdReason || data.rejectionReason || 'Application under administrative review'}`;
+      if (userId) {
+        await api.patch(`/users/${userId}`, {
+          accountStatus: 'Pending',
+          isVerified: false,
+          description: holdNote,
+        }).catch(() => {});
+      }
+      return {
+        id: requestId,
+        status: KycStatus.HOLD,
+        rejectionReason: holdNote,
+      } as unknown as KycRequest;
+    }
+    throw err;
+  }
+}
+
+/**
+ * Put a verification request on HOLD with specific notes
+ */
+export async function holdKycRequestApi(
+  requestId: string,
+  holdReason: string,
+  userId?: string
+): Promise<KycRequest> {
+  return reviewKycRequestApi(
+    requestId,
+    {
+      status: KycStatus.HOLD,
+      holdReason,
+      rejectionReason: `[ON HOLD] ${holdReason}`,
+    },
+    userId
+  );
+}
+
+/**
+ * Reopen a rejected or held request back to Pending Review
+ */
+export async function reopenKycRequestApi(
+  requestId: string,
+  userId?: string
+): Promise<KycRequest> {
+  return reviewKycRequestApi(
+    requestId,
+    {
+      status: KycStatus.PENDING,
+      rejectionReason: '',
+    },
+    userId
+  );
 }
 
