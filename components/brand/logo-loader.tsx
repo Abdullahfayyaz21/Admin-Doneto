@@ -66,29 +66,6 @@ export function LogoLoader({
       )}
       {...props}
     >
-      <style jsx>{`
-        @keyframes doneto-heartbeat {
-          0%, 100% {
-            transform: scale(1);
-          }
-          14% {
-            transform: scale(1.18);
-          }
-          28% {
-            transform: scale(1);
-          }
-          42% {
-            transform: scale(1.12);
-          }
-          70% {
-            transform: scale(1);
-          }
-        }
-        .doneto-heart-beat {
-          transform-origin: center;
-          animation: doneto-heartbeat 1.3s ease-in-out infinite;
-        }
-      `}</style>
 
       {heartOnly ? (
         /* Heart Mark Only Loader */

@@ -52,7 +52,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const COOKIE_OPTIONS = {
-    secure: true,
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax' as const,
     path: '/',
   };
@@ -67,8 +67,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = () => {
     Cookies.remove('accessToken', COOKIE_OPTIONS);
     Cookies.remove('refreshToken', COOKIE_OPTIONS);
+    Cookies.remove('accessToken', { path: '/' });
+    Cookies.remove('refreshToken', { path: '/' });
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
     setUser(null);
-    window.location.href = '/';
+    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
+      window.location.href = '/';
+    }
   };
 
   const refreshUser = async () => {

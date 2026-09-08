@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, Lock, Mail, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 import { Input } from '@/components/ui/input';
@@ -23,8 +23,8 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [email, setEmail] = useState('doneto@example.com');
-  const [password, setPassword] = useState('test123');
+  const [email, setEmail] = useState('admin@example.com');
+  const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -44,9 +44,15 @@ export function LoginForm() {
     } catch (err: any) {
       console.error(err);
 
-      setError(
-        err.response?.data?.message || 'Invalid email or password.'
-      );
+      if (!err.response) {
+        setError(
+          'Cannot connect to backend server. Please make sure doneto-backend is running on port 3837.'
+        );
+      } else {
+        setError(
+          err.response?.data?.message || 'Invalid email or password.'
+        );
+      }
     } finally {
       setLoading(false);
     }
@@ -116,9 +122,9 @@ export function LoginForm() {
 
       {/* Error Message */}
       {error && (
-        <p className="text-sm text-red-500">
+        <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-600 dark:text-red-400">
           {error}
-        </p>
+        </div>
       )}
 
       {/* Login Button */}
@@ -136,6 +142,7 @@ export function LoginForm() {
           'Sign In'
         )}
       </Button>
+
     </form>
   );
 }

@@ -2,7 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 const COOKIE_OPTIONS = {
-  secure: true,
+  secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
   path: '/',
 };
@@ -117,7 +117,11 @@ api.interceptors.response.use(
 function handleLogout() {
   Cookies.remove('accessToken', COOKIE_OPTIONS);
   Cookies.remove('refreshToken', COOKIE_OPTIONS);
-  if (typeof window !== 'undefined') {
+  Cookies.remove('accessToken', { path: '/' });
+  Cookies.remove('refreshToken', { path: '/' });
+  Cookies.remove('accessToken');
+  Cookies.remove('refreshToken');
+  if (typeof window !== 'undefined' && window.location.pathname !== '/') {
     window.location.href = '/';
   }
 }
