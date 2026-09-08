@@ -101,9 +101,11 @@ api.interceptors.response.use(
 
         processQueue(null, accessToken);
         return api(originalRequest);
-      } catch (refreshError) {
+      } catch (refreshError: any) {
         processQueue(refreshError, null);
-        handleLogout();
+        if (refreshError?.response?.status === 401) {
+          handleLogout();
+        }
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
