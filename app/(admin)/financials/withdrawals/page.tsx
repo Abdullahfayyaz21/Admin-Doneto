@@ -49,6 +49,7 @@ import api from '@/lib/api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { TableSkeleton } from '@/components/brand/states';
+import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface WithdrawalItem {
   id: number;
@@ -104,6 +105,19 @@ export default function WithdrawalRequestsPage() {
 
   useEffect(() => {
     fetchWithdrawals();
+
+    const interval = setInterval(() => {
+      fetchWithdrawals();
+    }, 15000);
+
+    const unsubscribe = subscribeToModerationUpdates(() => {
+      fetchWithdrawals();
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, [fetchWithdrawals]);
 
   const handleReview = async () => {
@@ -130,6 +144,7 @@ export default function WithdrawalRequestsPage() {
       setIsDetailOpen(false);
       setSelectedReq(null);
       setRejectionReason('');
+      broadcastModerationUpdate('withdrawals');
       fetchWithdrawals();
     } catch (error: any) {
       console.error('Review withdrawal error:', error);

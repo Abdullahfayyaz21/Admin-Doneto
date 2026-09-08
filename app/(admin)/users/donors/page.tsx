@@ -48,6 +48,7 @@ import api from '@/lib/api';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { TableSkeleton } from '@/components/brand/states';
+import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface DonorUser {
   id: string;
@@ -101,6 +102,7 @@ export default function DonorsPage() {
         phoneVerified: true,
       });
       toast.success(`Donor "${donor.name}" verified for web app & platform!`);
+      broadcastModerationUpdate('kyc');
       fetchDonors();
       if (isDetailOpen) setIsDetailOpen(false);
     } catch (err: any) {
@@ -111,6 +113,19 @@ export default function DonorsPage() {
 
   useEffect(() => {
     fetchDonors();
+
+    const interval = setInterval(() => {
+      fetchDonors();
+    }, 15000);
+
+    const unsubscribe = subscribeToModerationUpdates(() => {
+      fetchDonors();
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, [fetchDonors]);
 
   const filtered = donors.filter((d) => {

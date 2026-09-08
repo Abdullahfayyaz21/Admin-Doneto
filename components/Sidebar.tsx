@@ -29,6 +29,7 @@ import { useAuth } from '@/lib/auth-context';
 import Cookies from 'js-cookie';
 import { useTheme } from 'next-themes';
 import api from '@/lib/api';
+import { subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface NavItem {
   label: string;
@@ -104,10 +105,12 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
     // Fetch badges/counts in background
     const fetchCounters = async () => {
       try {
-        const [pendingRes, delReqRes, kycRes] = await Promise.allSettled([
+        const [pendingRes, delReqRes, kycRes, reportsRes, withdrawRes] = await Promise.allSettled([
           api.get('/fundraising-campaigns/admin/pending'),
           api.get('/fundraising-campaigns/admin/delete-requests'),
           api.get('/kyc/admin/requests', { params: { status: 'PENDING', limit: 1 } }),
+          api.get('/fundraising-campaigns/admin/reports', { params: { limit: 1 } }),
+          api.get('/fundraising-campaigns/admin/withdraw-requests'),
         ]);
 
         const counts: { [key: string]: number } = {};
@@ -131,6 +134,21 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
                 : 0;
           counts.pendingKyc = total;
         }
+        if (reportsRes.status === 'fulfilled') {
+          const resData = reportsRes.value.data?.data || reportsRes.value.data || [];
+          const total = typeof reportsRes.value.data?.total === 'number'
+            ? reportsRes.value.data.total
+            : Array.isArray(resData)
+              ? resData.length
+              : 0;
+          counts.reports = total;
+        }
+        if (withdrawRes.status === 'fulfilled') {
+          const raw = withdrawRes.value.data?.data || withdrawRes.value.data || [];
+          const list = Array.isArray(raw) ? raw : [];
+          const pendingW = list.filter((w: any) => w.status === 'Pending' || w.status === 'PENDING').length;
+          counts.pendingWithdrawals = pendingW;
+        }
 
         setBadgeCounts(counts);
       } catch (err) {
@@ -139,16 +157,15 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
     };
 
     fetchCounters();
-    const interval = setInterval(fetchCounters, 20000);
+    const interval = setInterval(fetchCounters, 15000);
 
-    const handleKycUpdated = () => {
+    const unsubscribe = subscribeToModerationUpdates(() => {
       fetchCounters();
-    };
-    window.addEventListener('doneto_kyc_updated', handleKycUpdated);
+    });
 
     return () => {
       clearInterval(interval);
-      window.removeEventListener('doneto_kyc_updated', handleKycUpdated);
+      unsubscribe();
     };
   }, [pathname]);
 

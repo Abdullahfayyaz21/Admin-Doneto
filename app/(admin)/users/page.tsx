@@ -75,6 +75,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import api from '@/lib/api';
+import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface User {
   id: string;
@@ -201,12 +202,19 @@ export default function UsersPage() {
 
   // Real-time synchronization listener
   useEffect(() => {
-    const handleKycUpdated = () => {
+    const interval = setInterval(() => {
       fetchUsers();
+    }, 15000);
+
+    const unsubscribe = subscribeToModerationUpdates(() => {
+      fetchUsers();
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
     };
-    window.addEventListener('doneto_kyc_updated', handleKycUpdated);
-    return () => window.removeEventListener('doneto_kyc_updated', handleKycUpdated);
-  }, []);
+  }, [page, roleFilter, statusFilter]);
 
   // Reset page when filter changes
   const handleSearch = (val: string) => {

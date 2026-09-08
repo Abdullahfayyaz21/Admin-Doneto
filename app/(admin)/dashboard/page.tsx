@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Users,
   UserCheck,
@@ -21,6 +21,7 @@ import {
   CardTitle,
   CardContent,
 } from '@/components/ui/card';
+import { subscribeToModerationUpdates } from '@/lib/realtime';
 
 const DashboardChart = dynamic(
   () => import('@/components/DashboardChart'),
@@ -42,81 +43,117 @@ export default function DashboardPage() {
   const [totalFunds, setTotalFunds] = useState('PKR 0');
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchDashboardOverview = async () => {
-      try {
-        setLoading(true);
-        const [usersRes, campsRes, kycRes] = await Promise.allSettled([
-          api.get('/users?limit=100'),
-          api.get('/fundraising-campaigns'),
-          api.get('/kyc/admin/requests', { params: { limit: 100 } }),
-        ]);
+  const fetchDashboardOverview = useCallback(async (isBackground = false) => {
+    try {
+      if (!isBackground) setLoading(true);
 
-        if (usersRes.status === 'fulfilled') {
-          const raw = usersRes.value.data;
-          const userList = Array.isArray(raw?.data?.data)
-            ? raw.data.data
-            : Array.isArray(raw?.data)
-            ? raw.data
-            : Array.isArray(raw)
-            ? raw
-            : [];
-          setTotalUsers(typeof raw?.total === 'number' ? raw.total : userList.length);
-          const verified = userList.filter((u: any) => u.isVerified || u.accountStatus === 'Verified').length;
-          setVerifiedUsers(verified);
-        }
+      const [usersRes, campsRes, donationsRes] = await Promise.allSettled([
+        api.get('/users?limit=100'),
+        api.get('/fundraising-campaigns'),
+        api.get('/donations/admin'),
+      ]);
 
-        if (campsRes.status === 'fulfilled') {
-          const raw = campsRes.value.data;
-          const campList = Array.isArray(raw?.data?.data)
-            ? raw.data.data
-            : Array.isArray(raw?.data)
-            ? raw.data
-            : Array.isArray(raw)
-            ? raw
-            : [];
-          setTotalCampaigns(typeof raw?.total === 'number' ? raw.total : campList.length);
-
-          const sumRaised = campList.reduce((acc: number, c: any) => acc + (Number(c.collectedAmount) || 0), 0);
-          setTotalFunds(`PKR ${sumRaised.toLocaleString()}`);
-        }
-      } catch (err) {
-        // silent fail
-      } finally {
-        setLoading(false);
+      if (usersRes.status === 'fulfilled') {
+        const raw = usersRes.value.data;
+        const userList: any[] = Array.isArray(raw?.data?.data)
+          ? raw.data.data
+          : Array.isArray(raw?.data)
+          ? raw.data
+          : Array.isArray(raw)
+          ? raw
+          : [];
+        setTotalUsers(typeof raw?.total === 'number' ? raw.total : userList.length);
+        const verified = userList.filter((u: any) => u.isVerified || u.accountStatus === 'Verified').length;
+        setVerifiedUsers(verified);
       }
-    };
 
-    fetchDashboardOverview();
+      if (campsRes.status === 'fulfilled') {
+        const raw = campsRes.value.data;
+        const campList: any[] = Array.isArray(raw?.data?.data)
+          ? raw.data.data
+          : Array.isArray(raw?.data)
+          ? raw.data
+          : Array.isArray(raw)
+          ? raw
+          : [];
+        setTotalCampaigns(typeof raw?.total === 'number' ? raw.total : campList.length);
+
+        const sumRaised = campList.reduce((acc: number, c: any) => acc + (Number(c.collectedAmount) || 0), 0);
+        setTotalFunds(`PKR ${sumRaised.toLocaleString()}`);
+      }
+
+      if (donationsRes.status === 'fulfilled') {
+        const raw = donationsRes.value.data;
+        const donList: any[] = Array.isArray(raw?.data?.data)
+          ? raw.data.data
+          : Array.isArray(raw?.data)
+          ? raw.data
+          : Array.isArray(raw)
+          ? raw
+          : [];
+        if (donList.length > 0) {
+          const sumDon = donList.reduce((sum: number, d: any) => sum + (Number(d.amount) || 0), 0);
+          if (sumDon > 0) {
+            setTotalFunds(`PKR ${sumDon.toLocaleString()}`);
+          }
+        }
+      }
+    } catch {
+      // silent fail
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchDashboardOverview();
+
+    // Auto-poll every 15s in background
+    const interval = setInterval(() => {
+      fetchDashboardOverview(true);
+    }, 15000);
+
+    // Real-time listener for any platform/moderation updates
+    const unsubscribe = subscribeToModerationUpdates(() => {
+      fetchDashboardOverview(true);
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, [fetchDashboardOverview]);
 
   const liveStats = [
     {
       title: 'Total Users',
-      value: loading ? '...' : totalUsers.toString(),
+      value: loading ? '...' : totalUsers.toLocaleString(),
       change: 'Realtime',
       trend: 'up' as const,
       icon: Users,
       iconColor: 'text-[#185500] dark:text-emerald-400',
       iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
+      href: '/users',
     },
     {
       title: 'Verified Members',
-      value: loading ? '...' : verifiedUsers.toString(),
+      value: loading ? '...' : verifiedUsers.toLocaleString(),
       change: 'Active',
       trend: 'up' as const,
       icon: UserCheck,
       iconColor: 'text-emerald-600 dark:text-emerald-400',
       iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
+      href: '/users/kyc',
     },
     {
       title: 'Campaigns',
-      value: loading ? '...' : totalCampaigns.toString(),
+      value: loading ? '...' : totalCampaigns.toLocaleString(),
       change: 'Platform',
       trend: 'up' as const,
       icon: Heart,
       iconColor: 'text-indigo-600 dark:text-indigo-400',
       iconBg: 'bg-indigo-50 dark:bg-indigo-500/10',
+      href: '/campaigns',
     },
     {
       title: 'Total Raised',
@@ -126,6 +163,7 @@ export default function DashboardPage() {
       icon: DollarSign,
       iconColor: 'text-[#185500] dark:text-emerald-400',
       iconBg: 'bg-emerald-50 dark:bg-emerald-500/10',
+      href: '/financials/donations',
     },
   ];
 

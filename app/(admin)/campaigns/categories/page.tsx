@@ -103,6 +103,12 @@ export default function CategoriesPage() {
 
   useEffect(() => {
     fetchCategories();
+
+    const interval = setInterval(() => {
+      fetchCategories();
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleCreateOpen = () => {

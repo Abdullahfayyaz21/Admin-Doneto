@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   AreaChart,
   Area,
@@ -11,6 +11,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import api from '@/lib/api';
+import { subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface ChartPoint {
   month: string;
@@ -23,57 +24,76 @@ const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 export default function DashboardChart() {
   const [data, setData] = useState<ChartPoint[]>([]);
 
-  useEffect(() => {
-    const buildChartData = async () => {
-      try {
-        const [usersRes, campsRes] = await Promise.allSettled([
-          api.get('/users?limit=100'),
-          api.get('/fundraising-campaigns'),
-        ]);
+  const buildChartData = useCallback(async () => {
+    try {
+      const [usersRes, campsRes] = await Promise.allSettled([
+        api.get('/users?limit=100'),
+        api.get('/fundraising-campaigns'),
+      ]);
 
-        const usersList: any[] = usersRes.status === 'fulfilled' ? (usersRes.value.data?.data?.data || usersRes.value.data?.data || usersRes.value.data || []) : [];
-        const campsList: any[] = campsRes.status === 'fulfilled' ? (campsRes.value.data?.data?.data || campsRes.value.data?.data || campsRes.value.data || []) : [];
+      const usersList: any[] = usersRes.status === 'fulfilled'
+        ? (usersRes.value.data?.data?.data || usersRes.value.data?.data || usersRes.value.data || [])
+        : [];
+      const campsList: any[] = campsRes.status === 'fulfilled'
+        ? (campsRes.value.data?.data?.data || campsRes.value.data?.data || campsRes.value.data || [])
+        : [];
 
-        const currentYear = new Date().getFullYear();
-        const monthlyUsers: number[] = new Array(12).fill(0);
-        const monthlyCamps: number[] = new Array(12).fill(0);
+      const currentYear = new Date().getFullYear();
+      const monthlyUsers: number[] = new Array(12).fill(0);
+      const monthlyCamps: number[] = new Array(12).fill(0);
 
-        if (Array.isArray(usersList)) {
-          usersList.forEach((u) => {
-            if (u.createdAt) {
-              const d = new Date(u.createdAt);
-              if (d.getFullYear() === currentYear) {
-                monthlyUsers[d.getMonth()]++;
-              }
+      if (Array.isArray(usersList)) {
+        usersList.forEach((u) => {
+          if (u.createdAt) {
+            const d = new Date(u.createdAt);
+            if (d.getFullYear() === currentYear) {
+              monthlyUsers[d.getMonth()]++;
             }
-          });
-        }
-
-        if (Array.isArray(campsList)) {
-          campsList.forEach((c) => {
-            if (c.createdAt) {
-              const d = new Date(c.createdAt);
-              if (d.getFullYear() === currentYear) {
-                monthlyCamps[d.getMonth()]++;
-              }
-            }
-          });
-        }
-
-        const chartPoints: ChartPoint[] = months.map((month, idx) => ({
-          month,
-          users: monthlyUsers[idx],
-          campaigns: monthlyCamps[idx],
-        }));
-
-        setData(chartPoints);
-      } catch (e) {
-        setData(months.map((m) => ({ month: m, users: 0, campaigns: 0 })));
+          }
+        });
       }
-    };
 
-    buildChartData();
+      if (Array.isArray(campsList)) {
+        campsList.forEach((c) => {
+          if (c.createdAt) {
+            const d = new Date(c.createdAt);
+            if (d.getFullYear() === currentYear) {
+              monthlyCamps[d.getMonth()]++;
+            }
+          }
+        });
+      }
+
+      const chartPoints: ChartPoint[] = months.map((month, idx) => ({
+        month,
+        users: monthlyUsers[idx],
+        campaigns: monthlyCamps[idx],
+      }));
+
+      setData(chartPoints);
+    } catch {
+      setData(months.map((m) => ({ month: m, users: 0, campaigns: 0 })));
+    }
   }, []);
+
+  useEffect(() => {
+    buildChartData();
+
+    // Auto-poll in background every 20s
+    const interval = setInterval(() => {
+      buildChartData();
+    }, 20000);
+
+    // Cross-tab real-time listener
+    const unsubscribe = subscribeToModerationUpdates(() => {
+      buildChartData();
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, [buildChartData]);
 
   return (
     <div className="h-[320px] w-full">

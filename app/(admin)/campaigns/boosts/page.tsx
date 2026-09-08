@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import Link from 'next/link';
 import {
   Sparkles,
   Zap,
@@ -11,6 +12,11 @@ import {
   Calendar,
   AlertTriangle,
   Loader2,
+  Search,
+  RefreshCw,
+  ExternalLink,
+  ShieldCheck,
+  TrendingUp,
 } from 'lucide-react';
 import {
   Card,
@@ -18,8 +24,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Dialog,
   DialogContent,
@@ -33,6 +49,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import api from '@/lib/api';
+import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface BoostRequest {
   id: number | string;
@@ -42,16 +59,18 @@ interface BoostRequest {
   boostType?: 'Premium' | 'Standard' | 'Flash' | string;
   durationDays?: number;
   price?: number;
-  status: 'Pending' | 'Active' | 'Rejected' | 'Expired' | string;
+  status: 'Pending' | 'Active' | 'Rejected' | 'Expired' | 'Cancelled' | string;
   requestedAt?: string;
   startsAt?: string;
   endsAt?: string;
 }
 
 export default function BoostRequestsPage() {
-  const [requests, setRequests] = useState<BoostRequest[]>([]);
-  const [activeBoosts, setActiveBoosts] = useState<BoostRequest[]>([]);
+  const [allBoosts, setAllBoosts] = useState<BoostRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState<'pending' | 'active' | 'all'>('pending');
 
   // Modals state
   const [selectedReq, setSelectedReq] = useState<BoostRequest | null>(null);
@@ -61,55 +80,83 @@ export default function BoostRequestsPage() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  const fetchBoosts = async () => {
+  const fetchBoosts = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
-      const res = await api.get('/fundraising-campaigns/admin/boosts').catch(() => null);
-      if (res?.data) {
-        const list = res.data?.data || res.data || [];
-        if (Array.isArray(list)) {
-          setRequests(list.filter((b: any) => b.status === 'Pending' || b.status === 'PENDING'));
-          setActiveBoosts(list.filter((b: any) => b.status === 'Active' || b.status === 'ACTIVE'));
-        }
+      if (!isBackground) setLoading(true);
+      else setRefreshing(true);
+
+      const res = await api.get('/fundraising-campaigns/admin/boosts');
+      const list = res.data?.data || res.data || [];
+      if (Array.isArray(list)) {
+        setAllBoosts(list);
       } else {
-        setRequests([]);
-        setActiveBoosts([]);
+        setAllBoosts([]);
       }
-    } catch {
-      setRequests([]);
-      setActiveBoosts([]);
+    } catch (error) {
+      console.error('Failed to fetch boosts:', error);
+      if (!isBackground) {
+        setAllBoosts([]);
+      }
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchBoosts();
-  }, []);
+
+    const interval = setInterval(() => {
+      fetchBoosts(true);
+    }, 15000);
+
+    const unsubscribe = subscribeToModerationUpdates(() => {
+      fetchBoosts(true);
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, [fetchBoosts]);
+
+  // Derived subsets
+  const pendingRequests = useMemo(
+    () => allBoosts.filter((b) => b.status?.toUpperCase() === 'PENDING'),
+    [allBoosts]
+  );
+
+  const activeBoosts = useMemo(
+    () => allBoosts.filter((b) => b.status?.toUpperCase() === 'ACTIVE'),
+    [allBoosts]
+  );
+
+  // Filtered by active tab and search query
+  const displayedBoosts = useMemo(() => {
+    let source = allBoosts;
+    if (activeTab === 'pending') source = pendingRequests;
+    else if (activeTab === 'active') source = activeBoosts;
+
+    if (!searchQuery.trim()) return source;
+    const q = searchQuery.toLowerCase().trim();
+    return source.filter(
+      (b) =>
+        b.campaignTitle?.toLowerCase().includes(q) ||
+        b.ngoName?.toLowerCase().includes(q) ||
+        String(b.id).includes(q)
+    );
+  }, [allBoosts, pendingRequests, activeBoosts, activeTab, searchQuery]);
 
   // Handle Approve Request
   const handleApprove = async () => {
     if (!selectedReq) return;
     try {
       setSubmitLoading(true);
-      await api.patch(`/fundraising-campaigns/admin/boosts/${selectedReq.id}/approve`, {}).catch(() => null);
-      
-      const now = new Date();
-      const ends = new Date();
-      ends.setDate(now.getDate() + (selectedReq.durationDays || 7));
-
-      const newActiveBoost: BoostRequest = {
-        ...selectedReq,
-        status: 'Active',
-        startsAt: now.toISOString(),
-        endsAt: ends.toISOString()
-      };
-
-      setActiveBoosts((prev) => [newActiveBoost, ...prev]);
-      setRequests((prev) => prev.filter((r) => r.id !== selectedReq.id));
-      
-      toast.success(`Boost request for "${selectedReq.campaignTitle}" approved.`);
+      await api.patch(`/fundraising-campaigns/admin/boosts/${selectedReq.id}/approve`, {});
+      toast.success(`Boost for "${selectedReq.campaignTitle}" approved & activated!`);
       setIsApproveOpen(false);
+      broadcastModerationUpdate('campaigns');
+      fetchBoosts(true);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to approve boost request');
     } finally {
@@ -121,17 +168,20 @@ export default function BoostRequestsPage() {
   const handleReject = async () => {
     if (!selectedReq) return;
     if (!rejectionReason.trim()) {
-      toast.error('Rejection reason is required.');
+      toast.error('Please specify a rejection reason.');
       return;
     }
 
     try {
       setSubmitLoading(true);
-      await api.patch(`/fundraising-campaigns/admin/boosts/${selectedReq.id}/reject`, { reason: rejectionReason.trim() }).catch(() => null);
-      setRequests((prev) => prev.filter((r) => r.id !== selectedReq.id));
-      toast.success(`Boost request for "${selectedReq.campaignTitle}" was rejected.`);
+      await api.patch(`/fundraising-campaigns/admin/boosts/${selectedReq.id}/reject`, {
+        reason: rejectionReason.trim(),
+      });
+      toast.success(`Boost application for "${selectedReq.campaignTitle}" rejected.`);
       setIsRejectOpen(false);
       setRejectionReason('');
+      broadcastModerationUpdate('campaigns');
+      fetchBoosts(true);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to reject boost request');
     } finally {
@@ -145,36 +195,55 @@ export default function BoostRequestsPage() {
 
     try {
       setSubmitLoading(true);
-      await api.patch(`/fundraising-campaigns/admin/boosts/${selectedReq.id}/terminate`, {}).catch(() => null);
-      setActiveBoosts((prev) => prev.filter((b) => b.id !== selectedReq.id));
-      toast.success(`Boost campaign for "${selectedReq.campaignTitle}" terminated.`);
+      await api.patch(`/fundraising-campaigns/admin/boosts/${selectedReq.id}/terminate`, {});
+      toast.success(`Boost promotion for "${selectedReq.campaignTitle}" terminated.`);
       setIsTerminateOpen(false);
+      broadcastModerationUpdate('campaigns');
+      fetchBoosts(true);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to terminate boost campaign');
+      toast.error(err.response?.data?.message || 'Failed to terminate boost');
     } finally {
       setSubmitLoading(false);
     }
   };
 
-  // Pricing helper
-  const formatCurrency = (amount?: number) => {
-    if (!amount) return 'PKR 0';
-    return new Intl.NumberFormat('en-PK', {
-      style: 'currency',
-      currency: 'PKR',
-      minimumFractionDigits: 0
-    }).format(amount);
-  };
-
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return '—';
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
     });
+  };
+
+  const getStatusBadge = (status: string) => {
+    const s = status?.toUpperCase();
+    if (s === 'ACTIVE') {
+      return (
+        <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-xs font-semibold">
+          <Zap className="mr-1 h-3 w-3 inline" /> Active Boost
+        </Badge>
+      );
+    }
+    if (s === 'PENDING') {
+      return (
+        <Badge className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 text-xs font-semibold">
+          <Clock className="mr-1 h-3 w-3 inline" /> Review Pending
+        </Badge>
+      );
+    }
+    if (s === 'EXPIRED') {
+      return (
+        <Badge variant="outline" className="text-muted-foreground text-xs">
+          Completed
+        </Badge>
+      );
+    }
+    return (
+      <Badge variant="outline" className="text-red-500 border-red-500/20 bg-red-500/10 text-xs">
+        Declined
+      </Badge>
+    );
   };
 
   return (
@@ -182,207 +251,236 @@ export default function BoostRequestsPage() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
-            Boost Requests
-          </h1>
+          <h1 className="text-2xl font-bold tracking-tight">Boost Requests</h1>
           <p className="text-muted-foreground text-sm">
-            Review promotion applications and supervise active campaign boosts.
+            Review promotion applications and manage elevated visibility campaigns.
           </p>
         </div>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchBoosts(true)}
+            disabled={refreshing}
+            className="rounded-xl border-border/60 h-9 gap-2 text-xs"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
-      {/* Grid: Left - Requests Queue, Right - Active Boosts */}
-      <div className="grid gap-6 lg:grid-cols-12">
-        
-        {/* REQUESTS QUEUE */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <Sparkles className="h-4.5 w-4.5 text-yellow-500" /> Pending Applications Queue
-            </h2>
-            <Badge className="bg-yellow-500/10 text-yellow-600 border border-yellow-500/25 font-semibold text-xs py-0.5 px-2.5">
-              Review Awaited
-            </Badge>
-          </div>
+      {/* Main Content Area */}
+      <Card className="rounded-2xl border border-border/60 bg-card shadow-xs overflow-hidden">
+        {/* Controls Toolbar */}
+        <div className="border-b border-border/60 p-4 sm:p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between bg-muted/10">
+          <Tabs
+            value={activeTab}
+            onValueChange={(val) => setActiveTab(val as any)}
+            className="w-full sm:w-auto"
+          >
+            <TabsList className="rounded-xl bg-muted/50 p-1 border border-border/40">
+              <TabsTrigger
+                value="pending"
+                className="rounded-lg text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-xs"
+              >
+                Pending ({pendingRequests.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="active"
+                className="rounded-lg text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-xs"
+              >
+                Active ({activeBoosts.length})
+              </TabsTrigger>
+              <TabsTrigger
+                value="all"
+                className="rounded-lg text-xs font-semibold data-[state=active]:bg-background data-[state=active]:shadow-xs"
+              >
+                All Records ({allBoosts.length})
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
 
-          {loading ? (
-            <div className="space-y-3">
-              {[1, 2].map((i) => (
-                <Card key={i} className="p-4 bg-card rounded-2xl space-y-2">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-3 w-32" />
-                </Card>
-              ))}
-            </div>
-          ) : requests.length === 0 ? (
-            <Card className="bg-card p-8 text-center text-muted-foreground rounded-2xl border border-border/60">
-              <CheckCircle className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-foreground">All applications reviewed</p>
-              <p className="text-xs mt-1">No pending campaign boosts in queue.</p>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {requests.map((req) => (
-                <Card key={req.id} className="bg-card rounded-2xl overflow-hidden hover:border-primary/20 transition-all duration-300 border border-border/60">
-                  <CardHeader className="p-4 bg-muted/40 flex flex-row items-center justify-between pb-3">
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono text-muted-foreground block">Ref: #{req.id}</span>
-                      <h3 className="font-bold text-foreground text-sm line-clamp-1">{req.campaignTitle}</h3>
-                    </div>
-                    <Badge variant="outline" className="font-bold uppercase tracking-wider text-[10px] bg-primary/10 text-primary border-primary/20">
-                      {req.boostType || 'Boost'}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Building2 className="h-3.5 w-3.5 text-muted-foreground/80" /> Organization:
-                      </span>
-                      <span className="font-semibold text-foreground">{req.ngoName || 'Partner NGO'}</span>
-                    </div>
-                    {req.durationDays && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground flex items-center gap-1.5">
-                          <Clock className="h-3.5 w-3.5 text-muted-foreground/80" /> Duration:
-                        </span>
-                        <span className="font-medium text-foreground">{req.durationDays} Days</span>
-                      </div>
-                    )}
-                    {req.price && (
-                      <div className="flex items-center justify-between">
-                        <span className="text-muted-foreground flex items-center gap-1.5">
-                          <Zap className="h-3.5 w-3.5 text-muted-foreground/80" /> Rate / Fee:
-                        </span>
-                        <span className="font-bold text-emerald-600">{formatCurrency(req.price)}</span>
-                      </div>
-                    )}
-                    <div className="flex items-center justify-between border-t border-border pt-2">
-                      <span className="text-muted-foreground flex items-center gap-1.5 text-[11px]">
-                        <Calendar className="h-3 w-3 text-muted-foreground/60" /> Requested:
-                      </span>
-                      <span className="text-[11px] text-muted-foreground">{formatDate(req.requestedAt)}</span>
-                    </div>
-                    
-                    <div className="pt-2 flex gap-2">
-                      <Button
-                        size="sm"
-                        onClick={() => { setSelectedReq(req); setIsApproveOpen(true); }}
-                        className="flex-1 bg-[#185500] hover:bg-[#1e6b00] text-white dark:bg-white dark:text-black rounded-xl text-xs font-semibold"
-                      >
-                        Approve
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => { setSelectedReq(req); setIsRejectOpen(true); }}
-                        className="flex-1 text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-500/20 rounded-xl text-xs"
-                      >
-                        Reject
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search campaign or NGO..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-9 pl-9 text-xs rounded-xl border-border/60 bg-background"
+            />
+          </div>
         </div>
 
-        {/* ACTIVE BOOSTS SUPERVISION */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-              <Zap className="h-4.5 w-4.5 text-emerald-500" /> Active Platform Boosts
-            </h2>
-            <Badge className="bg-emerald-500/10 text-emerald-600 border border-emerald-500/25 font-semibold text-xs py-0.5 px-2.5">
-              Live Promoted
-            </Badge>
-          </div>
-
+        {/* Table View */}
+        <div className="overflow-x-auto">
           {loading ? (
-            <div className="space-y-3">
-              {[1, 2].map((i) => (
-                <Card key={i} className="p-4 bg-card rounded-2xl space-y-2">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-3 w-32" />
-                </Card>
+            <div className="p-6 space-y-3">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-12 w-full rounded-xl" />
               ))}
             </div>
-          ) : activeBoosts.length === 0 ? (
-            <Card className="bg-card p-8 text-center text-muted-foreground rounded-2xl border border-border/60">
-              <Zap className="h-8 w-8 text-muted-foreground/40 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-foreground">No active boosted campaigns</p>
-              <p className="text-xs mt-1">Approved promotions will be listed here.</p>
-            </Card>
+          ) : displayedBoosts.length === 0 ? (
+            <div className="py-16 text-center">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-muted/50 text-muted-foreground mb-3">
+                {activeTab === 'pending' ? (
+                  <CheckCircle className="h-6 w-6 text-emerald-500" />
+                ) : (
+                  <Zap className="h-6 w-6 text-muted-foreground/50" />
+                )}
+              </div>
+              <h3 className="text-sm font-semibold text-foreground">
+                {activeTab === 'pending'
+                  ? 'Queue is empty'
+                  : activeTab === 'active'
+                  ? 'No active boosts'
+                  : 'No boost records found'}
+              </h3>
+              <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
+                {activeTab === 'pending'
+                  ? 'All promotional campaign applications have been reviewed.'
+                  : 'Approved boost requests will appear here when active.'}
+              </p>
+            </div>
           ) : (
-            <div className="space-y-4">
-              {activeBoosts.map((boost) => (
-                <Card key={boost.id} className="bg-card rounded-2xl overflow-hidden hover:border-emerald-500/20 transition-all duration-300 border border-border/60">
-                  <CardHeader className="p-4 bg-emerald-500/5 flex flex-row items-center justify-between pb-3">
-                    <div className="space-y-0.5">
-                      <span className="text-[10px] font-mono text-emerald-600 block">ID: #{boost.id}</span>
-                      <h3 className="font-bold text-foreground text-sm line-clamp-1">{boost.campaignTitle}</h3>
-                    </div>
-                    <Badge variant="outline" className="font-bold uppercase tracking-wider text-[10px] bg-emerald-500/10 text-emerald-600 border-emerald-500/20">
-                      {boost.boostType || 'Active'}
-                    </Badge>
-                  </CardHeader>
-                  <CardContent className="p-4 space-y-3 text-xs">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Building2 className="h-3.5 w-3.5 text-muted-foreground/80" /> Beneficiary NGO:
-                      </span>
-                      <span className="font-semibold text-foreground">{boost.ngoName || 'Verified NGO'}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-muted-foreground/80" /> Starts:
-                      </span>
-                      <span className="font-medium text-foreground">{formatDate(boost.startsAt)}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground flex items-center gap-1.5">
-                        <Clock className="h-3.5 w-3.5 text-muted-foreground/80" /> Expires:
-                      </span>
-                      <span className="font-bold text-indigo-500">{formatDate(boost.endsAt)}</span>
-                    </div>
+            <Table>
+              <TableHeader className="bg-muted/5">
+                <TableRow className="border-border/60 hover:bg-transparent">
+                  <TableHead className="font-semibold text-xs py-3.5 pl-6">Campaign Details</TableHead>
+                  <TableHead className="font-semibold text-xs py-3.5">Organization</TableHead>
+                  <TableHead className="font-semibold text-xs py-3.5">Schedule & Duration</TableHead>
+                  <TableHead className="font-semibold text-xs py-3.5">Status</TableHead>
+                  <TableHead className="font-semibold text-xs py-3.5 text-right pr-6">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {displayedBoosts.map((boost) => {
+                  const isPending = boost.status?.toUpperCase() === 'PENDING';
+                  const isActive = boost.status?.toUpperCase() === 'ACTIVE';
 
-                    <div className="pt-2 flex justify-end">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => { setSelectedReq(boost); setIsTerminateOpen(true); }}
-                        className="text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-xl text-xs h-8"
-                      >
-                        Terminate Early
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                  return (
+                    <TableRow key={boost.id} className="border-border/60 hover:bg-muted/10 transition-colors">
+                      <TableCell className="pl-6 py-4">
+                        <div className="space-y-0.5">
+                          <p className="text-sm font-semibold text-foreground line-clamp-1 max-w-[280px]">
+                            {boost.campaignTitle}
+                          </p>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-[11px] text-muted-foreground">
+                              Ref #{boost.id}
+                            </span>
+                            <span className="text-muted-foreground/40">•</span>
+                            <Badge variant="outline" className="text-[10px] font-medium py-0 px-1.5 h-4">
+                              {boost.boostType || 'Priority'}
+                            </Badge>
+                          </div>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="py-4">
+                        <div className="flex items-center gap-1.5 text-xs text-foreground font-medium">
+                          <Building2 className="h-3.5 w-3.5 text-muted-foreground" />
+                          <span className="truncate max-w-[180px]">{boost.ngoName || 'Partner NGO'}</span>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="py-4">
+                        <div className="space-y-0.5 text-xs">
+                          {boost.startsAt ? (
+                            <p className="text-foreground font-medium">
+                              {formatDate(boost.startsAt)} — {formatDate(boost.endsAt)}
+                            </p>
+                          ) : (
+                            <p className="text-muted-foreground">
+                              Requested {formatDate(boost.requestedAt)}
+                            </p>
+                          )}
+                          <p className="text-[11px] text-muted-foreground">
+                            {boost.durationDays ? `${boost.durationDays} Days duration` : 'Standard Run'}
+                          </p>
+                        </div>
+                      </TableCell>
+
+                      <TableCell className="py-4">
+                        {getStatusBadge(boost.status)}
+                      </TableCell>
+
+                      <TableCell className="py-4 text-right pr-6">
+                        <div className="flex items-center justify-end gap-2">
+                          {isPending && (
+                            <>
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedReq(boost);
+                                  setIsApproveOpen(true);
+                                }}
+                                className="h-8 rounded-xl bg-[#185500] hover:bg-[#1e6b00] text-white text-xs font-semibold px-3 shadow-xs"
+                              >
+                                Approve
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedReq(boost);
+                                  setIsRejectOpen(true);
+                                }}
+                                className="h-8 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-500/30 text-xs px-3"
+                              >
+                                Decline
+                              </Button>
+                            </>
+                          )}
+
+                          {isActive && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
+                                setSelectedReq(boost);
+                                setIsTerminateOpen(true);
+                              }}
+                              className="h-8 rounded-xl text-red-500 hover:text-red-600 hover:bg-red-500/10 border-red-500/30 text-xs px-3"
+                            >
+                              Terminate
+                            </Button>
+                          )}
+
+                          {!isPending && !isActive && (
+                            <span className="text-xs text-muted-foreground italic">
+                              Resolved
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
+              </TableBody>
+            </Table>
           )}
         </div>
-
-      </div>
+      </Card>
 
       {/* APPROVE MODAL */}
       <Dialog open={isApproveOpen} onOpenChange={setIsApproveOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[420px] rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-[#185500] dark:text-white">
-              <Sparkles className="h-5 w-5 text-yellow-500" />
-              Approve Campaign Boost?
+            <DialogTitle className="text-lg font-bold flex items-center gap-2 text-[#185500] dark:text-emerald-400">
+              <Sparkles className="h-5 w-5 text-amber-500" />
+              Approve Campaign Boost
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground mt-2 text-sm leading-relaxed">
-              This will activate priority promotion for <span className="font-semibold text-foreground">&ldquo;{selectedReq?.campaignTitle}&rdquo;</span>.
+            <DialogDescription className="text-muted-foreground text-xs leading-relaxed mt-1">
+              Activate priority promotion for <span className="font-semibold text-foreground">&ldquo;{selectedReq?.campaignTitle}&rdquo;</span>. This campaign will receive elevated placement across Doneto search and feeds.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4 mt-2">
+          <DialogFooter className="gap-2 border-t border-border/60 pt-4 mt-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsApproveOpen(false)}
-              className="rounded-xl border border-border"
+              className="rounded-xl text-xs h-9"
             >
               Cancel
             </Button>
@@ -390,9 +488,9 @@ export default function BoostRequestsPage() {
               type="button"
               onClick={handleApprove}
               disabled={submitLoading}
-              className="bg-[#185500] hover:bg-[#1e6b00] text-white dark:bg-white dark:text-black rounded-xl shadow-lg flex items-center gap-2"
+              className="bg-[#185500] hover:bg-[#1e6b00] text-white rounded-xl text-xs font-semibold h-9 flex items-center gap-1.5"
             >
-              {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {submitLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               Confirm Activation
             </Button>
           </DialogFooter>
@@ -401,36 +499,36 @@ export default function BoostRequestsPage() {
 
       {/* REJECT MODAL */}
       <Dialog open={isRejectOpen} onOpenChange={setIsRejectOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[420px] rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-red-500">
-              <XCircle className="h-5 w-5 text-red-500" />
-              Reject Promotion Application
+            <DialogTitle className="text-lg font-bold flex items-center gap-2 text-red-500">
+              <XCircle className="h-5 w-5" />
+              Decline Promotion Request
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground mt-2 text-sm leading-relaxed">
-              Decline promotion request for &ldquo;{selectedReq?.campaignTitle}&rdquo;.
+            <DialogDescription className="text-muted-foreground text-xs leading-relaxed mt-1">
+              Decline the boost application for &ldquo;{selectedReq?.campaignTitle}&rdquo;.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2 py-3">
-            <Label htmlFor="reject-boost-reason" className="text-xs font-semibold text-muted-foreground">
+          <div className="space-y-1.5 py-2">
+            <Label htmlFor="reject-boost-reason" className="text-xs font-medium text-foreground">
               Decline Reason <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="reject-boost-reason"
-              placeholder="Explain why this boost request cannot be accommodated..."
+              placeholder="Provide a clear explanation for the applicant..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
               rows={3}
-              className="bg-muted/50 border-border text-xs rounded-xl"
+              className="text-xs rounded-xl border-border/60"
               required
             />
           </div>
-          <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4">
+          <DialogFooter className="gap-2 border-t border-border/60 pt-4">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsRejectOpen(false)}
-              className="rounded-xl border border-border"
+              className="rounded-xl text-xs h-9"
             >
               Cancel
             </Button>
@@ -438,9 +536,9 @@ export default function BoostRequestsPage() {
               type="button"
               onClick={handleReject}
               disabled={submitLoading}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold h-9 flex items-center gap-1.5"
             >
-              {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {submitLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               Decline Application
             </Button>
           </DialogFooter>
@@ -449,22 +547,22 @@ export default function BoostRequestsPage() {
 
       {/* TERMINATE MODAL */}
       <Dialog open={isTerminateOpen} onOpenChange={setIsTerminateOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-background border-border text-foreground rounded-2xl shadow-2xl">
+        <DialogContent className="sm:max-w-[420px] rounded-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold flex items-center gap-2 text-red-500">
-              <AlertTriangle className="h-5 w-5 text-red-500" />
+            <DialogTitle className="text-lg font-bold flex items-center gap-2 text-red-500">
+              <AlertTriangle className="h-5 w-5" />
               Terminate Active Boost
             </DialogTitle>
-            <DialogDescription className="text-muted-foreground mt-2 text-sm leading-relaxed">
-              Are you sure you want to stop active promotion for <span className="font-semibold text-foreground">&ldquo;{selectedReq?.campaignTitle}&rdquo;</span> immediately?
+            <DialogDescription className="text-muted-foreground text-xs leading-relaxed mt-1">
+              Are you sure you want to stop priority promotion for <span className="font-semibold text-foreground">&ldquo;{selectedReq?.campaignTitle}&rdquo;</span> immediately?
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0 border-t border-border pt-4 mt-2">
+          <DialogFooter className="gap-2 border-t border-border/60 pt-4 mt-2">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsTerminateOpen(false)}
-              className="rounded-xl border border-border"
+              className="rounded-xl text-xs h-9"
             >
               Cancel
             </Button>
@@ -472,15 +570,14 @@ export default function BoostRequestsPage() {
               type="button"
               onClick={handleTerminate}
               disabled={submitLoading}
-              className="bg-red-600 hover:bg-red-700 text-white rounded-xl shadow-lg flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-semibold h-9 flex items-center gap-1.5"
             >
-              {submitLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {submitLoading && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
               Confirm Termination
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

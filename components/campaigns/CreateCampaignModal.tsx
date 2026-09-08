@@ -203,10 +203,10 @@ export function CreateCampaignModal({
       });
       const mediaRecord = confirmRes.data.data || confirmRes.data;
       return mediaRecord.id;
-    } catch (err) {
-      console.warn('Direct media upload fallback:', err);
-      // Generate standard reference fallback if mocked
-      return `media_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Failed to upload image asset. Please check network connection and try again.';
+      toast.error(msg);
+      throw err;
     }
   };
 

@@ -10,7 +10,6 @@ import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { LogoLoader } from '@/components/brand/logo-loader';
-import { createMockAdminToken } from '@/lib/jwt';
 
 export function LoginForm() {
   const router = useRouter();
@@ -24,8 +23,8 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const [email, setEmail] = useState('admin@example.com');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,16 +44,13 @@ export function LoginForm() {
         login(resData.accessToken, resData.refreshToken || resData.accessToken);
         return;
       }
+      throw new Error('No access token returned from server.');
     } catch (err: any) {
-      console.warn('Backend API connection unavailable, proceeding with admin session:', err);
+      const msg = err.response?.data?.message || err.message || 'Invalid credentials. Please verify your email and password.';
+      setError(Array.isArray(msg) ? msg.join(', ') : msg);
+    } finally {
+      setLoading(false);
     }
-
-    // Direct / Vercel preview sign in
-    const mockToken = createMockAdminToken(
-      email.trim() || 'admin@example.com',
-      email.toLowerCase().includes('doneto') ? 'Doneto Admin' : 'System Admin'
-    );
-    login(mockToken, mockToken);
   };
 
   return (

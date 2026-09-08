@@ -62,9 +62,9 @@ export default function DonationsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const fetchDonations = useCallback(async () => {
+  const fetchDonations = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
+      if (!isBackground) setLoading(true);
       const res = await api.get('/donations/admin');
       const data = res.data?.data || res.data || [];
       if (Array.isArray(data)) {
@@ -72,19 +72,11 @@ export default function DonationsPage() {
       } else {
         setDonations([]);
       }
-    } catch (error) {
-      console.error('Failed to load donations:', error);
-      // Fallback: try querying /fundraising-campaigns to gather donations if endpoint is in mock mode
-      try {
-        const campRes = await api.get('/fundraising-campaigns');
-        const camps = campRes.data?.data || campRes.data || [];
-        if (Array.isArray(camps)) {
-          // Generate sample or aggregate if empty
-          setDonations([]);
-        }
-      } catch (e) {
-        // silent
+    } catch (error: any) {
+      if (!isBackground) {
+        toast.error(error.response?.data?.message || 'Failed to load donations list');
       }
+      setDonations([]);
     } finally {
       setLoading(false);
     }
@@ -92,6 +84,12 @@ export default function DonationsPage() {
 
   useEffect(() => {
     fetchDonations();
+
+    const interval = setInterval(() => {
+      fetchDonations(true);
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, [fetchDonations]);
 
   const exportCSV = () => {
@@ -169,7 +167,7 @@ export default function DonationsPage() {
           </Button>
           <Button
             variant="outline"
-            onClick={fetchDonations}
+            onClick={() => fetchDonations()}
             className="rounded-xl border-border text-xs"
           >
             <Clock className="mr-1.5 h-3.5 w-3.5 text-muted-foreground" />

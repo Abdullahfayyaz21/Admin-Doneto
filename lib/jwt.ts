@@ -26,30 +26,3 @@ export function decodeJwt(token: string): JwtUser | null {
     return null;
   }
 }
-
-export function createMockAdminToken(
-  email = 'admin@example.com',
-  name = 'System Admin'
-): string {
-  const header = { alg: 'HS256', typ: 'JWT' };
-  const payload = {
-    id: '0c6e0503-dc6d-43bf-9033-dce131ac94fc',
-    email,
-    name,
-    role: 'Admin' as const,
-    accountStatus: 'Verified',
-    exp: Math.floor(Date.now() / 1000) + 10 * 365 * 24 * 60 * 60,
-  };
-
-  const toBase64Url = (obj: any) => {
-    const str = JSON.stringify(obj);
-    const b64 =
-      typeof window !== 'undefined'
-        ? btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))))
-        : Buffer.from(str).toString('base64');
-    return b64.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-  };
-
-  return `${toBase64Url(header)}.${toBase64Url(payload)}.doneto_mock_signature`;
-}
-

@@ -87,6 +87,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface Campaign {
   id: number;
@@ -263,6 +264,19 @@ export default function CampaignsPage() {
 
   useEffect(() => {
     fetchCampaignsAndStats();
+
+    const interval = setInterval(() => {
+      fetchCampaignsAndStats();
+    }, 15000);
+
+    const unsubscribe = subscribeToModerationUpdates(() => {
+      fetchCampaignsAndStats();
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
   }, []);
 
   // Filtered campaigns
@@ -362,6 +376,7 @@ export default function CampaignsPage() {
       });
       toast.success(`Campaign has been ${reviewStatus.toLowerCase()} successfully.`);
       setIsReviewOpen(false);
+      broadcastModerationUpdate('campaigns');
       fetchCampaignsAndStats();
     } catch (err: any) {
       console.error(err);
@@ -377,6 +392,7 @@ export default function CampaignsPage() {
       setSubmitLoading(true);
       await api.patch(`/fundraising-campaigns/${campaign.id}/pause`);
       toast.success(`Campaign status updated successfully.`);
+      broadcastModerationUpdate('campaigns');
       fetchCampaignsAndStats();
     } catch (err: any) {
       console.error(err);
@@ -392,6 +408,7 @@ export default function CampaignsPage() {
       setSubmitLoading(true);
       await api.patch(`/fundraising-campaigns/${campaign.id}/complete`);
       toast.success('Campaign marked as completed successfully.');
+      broadcastModerationUpdate('campaigns');
       fetchCampaignsAndStats();
     } catch (err: any) {
       console.error(err);

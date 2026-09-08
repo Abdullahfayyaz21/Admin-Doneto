@@ -56,6 +56,15 @@ export function broadcastKycUpdate() {
     } catch {
       // BroadcastChannel fallback
     }
+
+    try {
+      const modChannel = new BroadcastChannel('doneto_moderation_channel');
+      modChannel.postMessage({ type: 'kyc', timestamp: Date.now() });
+      modChannel.close();
+      window.dispatchEvent(new CustomEvent('doneto_moderation_updated', { detail: { type: 'kyc' } }));
+    } catch {
+      // fallback
+    }
   }
 }
 

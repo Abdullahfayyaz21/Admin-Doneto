@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Table,
   TableBody,
@@ -13,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShieldCheck, UserCheck, Building2, User as UserIcon } from 'lucide-react';
 import api from '@/lib/api';
+import { subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface UserActivity {
   id: string;
@@ -28,26 +29,41 @@ export function ActivityTable() {
   const [activities, setActivities] = useState<UserActivity[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchRecentUsers = async () => {
-      try {
-        setLoading(true);
-        const res = await api.get('/users?limit=6');
-        const list = res.data?.data?.data || res.data?.data || res.data || [];
-        if (Array.isArray(list)) {
-          setActivities(list);
-        } else {
-          setActivities([]);
-        }
-      } catch (err) {
+  const fetchRecentUsers = useCallback(async (isBackground = false) => {
+    try {
+      if (!isBackground) setLoading(true);
+      const res = await api.get('/users?limit=6');
+      const list = res.data?.data?.data || res.data?.data || res.data || [];
+      if (Array.isArray(list)) {
+        setActivities(list);
+      } else {
         setActivities([]);
-      } finally {
-        setLoading(false);
       }
-    };
-
-    fetchRecentUsers();
+    } catch {
+      setActivities([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => {
+    fetchRecentUsers();
+
+    // Auto-poll in background every 15s
+    const interval = setInterval(() => {
+      fetchRecentUsers(true);
+    }, 15000);
+
+    // Real-time listener for user or KYC changes
+    const unsubscribe = subscribeToModerationUpdates(() => {
+      fetchRecentUsers(true);
+    });
+
+    return () => {
+      clearInterval(interval);
+      unsubscribe();
+    };
+  }, [fetchRecentUsers]);
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'Recent';
