@@ -15,11 +15,79 @@ export type ModerationEventType =
   | 'campaigns'
   | 'all';
 
+// Singleton subscriber set and shared channels to prevent EventEmitter/stream leaks
+const subscribers = new Set<(type?: string) => void>();
+let isInitialized = false;
+let sharedModChannel: BroadcastChannel | null = null;
+let sharedKycChannel: BroadcastChannel | null = null;
+
+function ensureChannels() {
+  if (typeof window === 'undefined') return;
+
+  if (!isInitialized) {
+    isInitialized = true;
+
+    // Single window event listeners attached only ONCE for the application lifecycle
+    window.addEventListener('doneto_moderation_updated', (e: Event) => {
+      const detail = (e as CustomEvent)?.detail;
+      subscribers.forEach((cb) => {
+        try {
+          cb(detail?.type);
+        } catch (err) {
+          console.error('Error in moderation subscriber:', err);
+        }
+      });
+    });
+
+    window.addEventListener('doneto_kyc_updated', () => {
+      subscribers.forEach((cb) => {
+        try {
+          cb('kyc');
+        } catch (err) {
+          console.error('Error in kyc subscriber:', err);
+        }
+      });
+    });
+
+    // Single persistent BroadcastChannel instance (avoids rapid open/close port churn)
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        sharedModChannel = new BroadcastChannel('doneto_moderation_channel');
+        sharedModChannel.onmessage = (event) => {
+          const type = event.data?.type;
+          subscribers.forEach((cb) => {
+            try {
+              cb(type);
+            } catch (err) {
+              console.error('Error in broadcast subscriber:', err);
+            }
+          });
+        };
+
+        sharedKycChannel = new BroadcastChannel('doneto_kyc_channel');
+        sharedKycChannel.onmessage = () => {
+          subscribers.forEach((cb) => {
+            try {
+              cb('kyc');
+            } catch (err) {
+              console.error('Error in kyc broadcast subscriber:', err);
+            }
+          });
+        };
+      }
+    } catch {
+      // safe fallback if BroadcastChannel is unsupported or restricted
+    }
+  }
+}
+
 /**
  * Broadcasts an update event across the current window and all open browser tabs.
  */
 export function broadcastModerationUpdate(eventType: ModerationEventType = 'all') {
   if (typeof window === 'undefined') return;
+
+  ensureChannels();
 
   // 1. Dispatch custom events in the current window
   try {
@@ -33,19 +101,16 @@ export function broadcastModerationUpdate(eventType: ModerationEventType = 'all'
     // safe fallback
   }
 
-  // 2. Broadcast across browser tabs via BroadcastChannel
+  // 2. Broadcast across browser tabs via shared channel (without rapidly creating/closing channels)
   try {
-    if (typeof BroadcastChannel !== 'undefined') {
-      const modChannel = new BroadcastChannel('doneto_moderation_channel');
-      modChannel.postMessage({ type: eventType, timestamp: Date.now() });
-      modChannel.close();
-
-      const kycChannel = new BroadcastChannel('doneto_kyc_channel');
-      kycChannel.postMessage({ type: 'MODERATION_CHANGED', timestamp: Date.now() });
-      kycChannel.close();
+    if (sharedModChannel) {
+      sharedModChannel.postMessage({ type: eventType, timestamp: Date.now() });
+    }
+    if (sharedKycChannel) {
+      sharedKycChannel.postMessage({ type: 'MODERATION_CHANGED', timestamp: Date.now() });
     }
   } catch {
-    // safe fallback if BroadcastChannel is unsupported
+    // safe fallback
   }
 }
 
@@ -56,35 +121,10 @@ export function broadcastModerationUpdate(eventType: ModerationEventType = 'all'
 export function subscribeToModerationUpdates(callback: (type?: string) => void): () => void {
   if (typeof window === 'undefined') return () => {};
 
-  const handleCustomEvent = (e: Event) => {
-    const detail = (e as CustomEvent)?.detail;
-    callback(detail?.type);
-  };
-
-  window.addEventListener('doneto_moderation_updated', handleCustomEvent);
-  window.addEventListener('doneto_kyc_updated', handleCustomEvent);
-
-  let modChannel: BroadcastChannel | null = null;
-  try {
-    if (typeof BroadcastChannel !== 'undefined') {
-      modChannel = new BroadcastChannel('doneto_moderation_channel');
-      modChannel.onmessage = (event) => {
-        callback(event.data?.type);
-      };
-    }
-  } catch {
-    // safe fallback
-  }
+  ensureChannels();
+  subscribers.add(callback);
 
   return () => {
-    window.removeEventListener('doneto_moderation_updated', handleCustomEvent);
-    window.removeEventListener('doneto_kyc_updated', handleCustomEvent);
-    if (modChannel) {
-      try {
-        modChannel.close();
-      } catch {
-        // safe fallback
-      }
-    }
+    subscribers.delete(callback);
   };
 }

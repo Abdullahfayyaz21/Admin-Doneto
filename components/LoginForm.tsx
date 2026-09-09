@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Lock, Mail } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
@@ -12,7 +11,6 @@ import { useAuth } from '@/lib/auth-context';
 import { LogoLoader } from '@/components/brand/logo-loader';
 
 export function LoginForm() {
-  const router = useRouter();
   const { login } = useAuth();
   const { setTheme } = useTheme();
 
@@ -46,7 +44,10 @@ export function LoginForm() {
       }
       throw new Error('No access token returned from server.');
     } catch (err: any) {
-      const msg = err.response?.data?.message || err.message || 'Invalid credentials. Please verify your email and password.';
+      const msg =
+        err.response?.data?.message ||
+        err.message ||
+        'Invalid credentials. Please verify your email and password.';
       setError(Array.isArray(msg) ? msg.join(', ') : msg);
     } finally {
       setLoading(false);
@@ -70,7 +71,7 @@ export function LoginForm() {
           <Input
             id="email"
             type="email"
-            placeholder="admin@example.com"
+            placeholder="admin@doneto.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             className="h-12 rounded-xl pl-10"
@@ -137,7 +138,6 @@ export function LoginForm() {
           'Sign In'
         )}
       </Button>
-
     </form>
   );
 }
