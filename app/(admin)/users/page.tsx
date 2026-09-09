@@ -204,7 +204,13 @@ export default function UsersPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       fetchUsers();
-    }, 15000);
+    }, 8000);
+
+    const handleFocus = () => {
+      fetchUsers();
+    };
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
 
     const unsubscribe = subscribeToModerationUpdates(() => {
       fetchUsers();
@@ -212,6 +218,8 @@ export default function UsersPage() {
 
     return () => {
       clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
       unsubscribe();
     };
   }, [page, roleFilter, statusFilter]);
@@ -342,7 +350,8 @@ export default function UsersPage() {
         // silent if no separate KYC request record
       }
 
-      toast.success(`User "${user.name}" verified on platform & web app!`);
+      broadcastModerationUpdate('kyc');
+            toast.success(`User "${user.name}" verified on platform & web app!`);
       fetchUsers();
     } catch (err: any) {
       console.error(err);
@@ -366,7 +375,8 @@ export default function UsersPage() {
         payload.isVerifiedRecipient = false;
       }
       await api.patch(`/users/${user.id}`, payload);
-      toast.success(`User "${user.name}" marked as rejected/unverified.`);
+      broadcastModerationUpdate('kyc');
+            toast.success(`User "${user.name}" marked as rejected/unverified.`);
       fetchUsers();
     } catch (err: any) {
       console.error(err);
@@ -423,7 +433,8 @@ export default function UsersPage() {
       }
 
       await api.patch(`/users/${selectedUser.id}`, payload);
-      toast.success('User updated successfully!');
+      broadcastModerationUpdate('kyc');
+            toast.success('User updated successfully!');
       setIsEditOpen(false);
       fetchUsers();
     } catch (err: any) {

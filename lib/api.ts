@@ -8,7 +8,10 @@ const COOKIE_OPTIONS = {
 };
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3837/api',
+  baseURL: (() => {
+    const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3837/api').replace(/\/+$/, '');
+    return raw.endsWith('/api') ? raw : `${raw}/api`;
+  })(),
   headers: {
     'Content-Type': 'application/json',
   },
