@@ -93,41 +93,6 @@ export default function DonorsPage() {
     }
   }, []);
 
-  const handleVerifyDonor = async (donor: DonorUser) => {
-    try {
-      await api.patch(`/users/${donor.id}`, {
-        isVerified: true,
-        accountStatus: 'Verified',
-        emailVerified: true,
-        phoneVerified: true,
-      });
-      toast.success(`Donor "${donor.name}" verified for web app & platform!`);
-      broadcastModerationUpdate('kyc');
-      fetchDonors();
-      if (isDetailOpen) setIsDetailOpen(false);
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to verify donor.');
-    }
-  };
-
-  const handleUnverifyDonor = async (donor: DonorUser) => {
-    try {
-      await api.patch(`/users/${donor.id}`, {
-        isVerified: false,
-        accountStatus: 'Pending',
-        isVerifiedRecipient: false,
-      });
-      toast.success(`Donor "${donor.name}" status reverted to Pending Verification.`);
-      broadcastModerationUpdate('kyc');
-      fetchDonors();
-      if (isDetailOpen) setIsDetailOpen(false);
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to unverify donor.');
-    }
-  };
-
   useEffect(() => {
     fetchDonors();
 
@@ -295,27 +260,6 @@ export default function DonorsPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        {(!donor.isVerified || donor.accountStatus !== 'Verified') ? (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleVerifyDonor(donor)}
-                            className="h-8 rounded-lg px-2 text-xs font-semibold text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10"
-                          >
-                            <UserCheck className="h-3.5 w-3.5 mr-1" />
-                            Verify
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleUnverifyDonor(donor)}
-                            className="h-8 rounded-lg px-2 text-xs font-semibold text-amber-600 border-amber-500/30 hover:bg-amber-500/10"
-                          >
-                            <Shield className="h-3.5 w-3.5 mr-1" />
-                            Unverify
-                          </Button>
-                        )}
                         <Button
                           size="sm"
                           variant="ghost"
@@ -416,24 +360,6 @@ export default function DonorsPage() {
               </div>
 
               <DialogFooter className="flex flex-col sm:flex-row gap-2">
-                {(!selectedDonor.isVerified || selectedDonor.accountStatus !== 'Verified') ? (
-                  <Button
-                    onClick={() => handleVerifyDonor(selectedDonor)}
-                    className="bg-[#185500] hover:bg-[#1e6b00] text-white dark:bg-white dark:text-black rounded-xl flex-1 text-xs font-semibold"
-                  >
-                    <UserCheck className="h-3.5 w-3.5 mr-1" />
-                    Verify Donor
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => handleUnverifyDonor(selectedDonor)}
-                    variant="outline"
-                    className="border-amber-500/40 text-amber-600 hover:bg-amber-500/10 rounded-xl flex-1 text-xs font-semibold"
-                  >
-                    <Shield className="h-3.5 w-3.5 mr-1" />
-                    Unverify Donor
-                  </Button>
-                )}
                 <Button
                   variant="outline"
                   onClick={() => setIsDetailOpen(false)}

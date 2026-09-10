@@ -31,6 +31,9 @@ export const ApiConstants = {
   verifiedNgos: '/kyc/verified-ngos',
   publicNgoDetail: (id: string): string => `/kyc/public/${id}`,
   adminNgoCategoryById: (id: number | string): string => `/kyc/admin/categories/${id}`,
+  adminKycRequests: '/kyc/admin/requests',
+  adminKycRequestById: (id: string): string => `/kyc/admin/requests/${id}`,
+  reviewKycRequest: (id: string): string => `/kyc/admin/requests/${id}/review`,
 
   // ── Media ───────────────────────────────────────────────────────────────
   mediaUploadUrl: '/media/upload-url',

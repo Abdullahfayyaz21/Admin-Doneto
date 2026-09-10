@@ -213,47 +213,6 @@ export default function NGOsPage() {
     }
   }, []);
 
-  const handleVerifyNgo = async (ngo: NgoCreatorUser) => {
-    try {
-      await api.patch(`/users/${ngo.id}`, {
-        isVerified: true,
-        isVerifiedRecipient: true,
-        accountStatus: 'Verified',
-        emailVerified: true,
-        phoneVerified: true,
-      });
-
-      toast.success(`Organization / Creator "${ngo.ngoName || ngo.name}" verified!`);
-      broadcastModerationUpdate('kyc');
-      fetchNgosAndCampaigns(true);
-      if (isDetailOpen && selectedNgo?.id === ngo.id) {
-        setSelectedNgo((prev) => (prev ? { ...prev, isVerified: true, isVerifiedRecipient: true, accountStatus: 'Verified' } : null));
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to verify organization.');
-    }
-  };
-
-  const handleUnverifyNgo = async (ngo: NgoCreatorUser) => {
-    try {
-      await api.patch(`/users/${ngo.id}`, {
-        isVerified: false,
-        isVerifiedRecipient: false,
-        accountStatus: 'Pending',
-      });
-      toast.success(`Organization "${ngo.name}" marked as unverified (Pending verification).`);
-      broadcastModerationUpdate('kyc');
-      fetchNgosAndCampaigns(true);
-      if (isDetailOpen && selectedNgo?.id === ngo.id) {
-        setSelectedNgo((prev) => (prev ? { ...prev, isVerified: false, isVerifiedRecipient: false, accountStatus: 'Pending' } : null));
-      }
-    } catch (err: any) {
-      console.error(err);
-      toast.error('Failed to unverify organization.');
-    }
-  };
-
   useEffect(() => {
     fetchNgosAndCampaigns();
 
@@ -476,27 +435,17 @@ export default function NGOsPage() {
                     {/* Actions */}
                     <TableCell className="text-right pr-6 py-4">
                       <div className="flex items-center justify-end gap-1.5">
-                        {(!ngo.isVerified || ngo.accountStatus !== 'Verified') ? (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleVerifyNgo(ngo)}
-                            className="h-8 rounded-xl px-2.5 text-xs font-semibold text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10"
-                          >
+                        <Button
+                          asChild
+                          size="sm"
+                          variant="outline"
+                          className="h-8 rounded-xl px-2.5 text-xs font-semibold text-[#185500] border-[#185500]/30 hover:bg-[#185500]/10 dark:text-emerald-400 dark:border-emerald-500/30"
+                        >
+                          <Link href={`/users/kyc?search=${encodeURIComponent(ngo.ngoName || ngo.name || '')}`}>
                             <ShieldCheck className="h-3.5 w-3.5 mr-1" />
-                            Verify
-                          </Button>
-                        ) : (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => handleUnverifyNgo(ngo)}
-                            className="h-8 rounded-xl px-2.5 text-xs font-semibold text-amber-600 border-amber-500/30 hover:bg-amber-500/10"
-                          >
-                            <Shield className="h-3.5 w-3.5 mr-1" />
-                            Unverify
-                          </Button>
-                        )}
+                            KYC Verification
+                          </Link>
+                        </Button>
                         <Button
                           size="sm"
                           onClick={() => {
@@ -687,34 +636,16 @@ export default function NGOsPage() {
               </div>
 
               <DialogFooter className="flex flex-col sm:flex-row gap-2 border-t border-border/60 pt-4 mt-2">
-                {(!selectedNgo.isVerified || selectedNgo.accountStatus !== 'Verified') ? (
-                  <Button
-                    onClick={() => handleVerifyNgo(selectedNgo)}
-                    className="bg-[#185500] hover:bg-[#1e6b00] text-white rounded-xl text-xs font-semibold h-9"
-                  >
-                    <ShieldCheck className="h-3.5 w-3.5 mr-1" />
-                    Verify Organization
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => handleUnverifyNgo(selectedNgo)}
-                    variant="outline"
-                    className="border-amber-500/40 text-amber-600 hover:bg-amber-500/10 rounded-xl text-xs font-semibold h-9"
-                  >
-                    <Shield className="h-3.5 w-3.5 mr-1" />
-                    Unverify Organization
-                  </Button>
-                )}
-                <Button asChild variant="outline" className="rounded-xl text-xs h-9">
+                <Button asChild variant="outline" className="rounded-xl text-xs h-9 border-[#185500]/30 text-[#185500] hover:bg-[#185500]/10 dark:text-emerald-400 dark:border-emerald-500/30 flex-1">
                   <Link href={`/users/kyc?search=${encodeURIComponent(selectedNgo.ngoName || selectedNgo.name || '')}`}>
                     <ShieldCheck className="h-3.5 w-3.5 mr-1" />
-                    Audit KYC Docs
+                    Audit in KYC Verification
                   </Link>
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setIsDetailOpen(false)}
-                  className="rounded-xl text-xs h-9"
+                  className="rounded-xl text-xs h-9 sm:w-28"
                 >
                   Close
                 </Button>

@@ -87,6 +87,7 @@ export function Navbar() {
 
     const handleKycUpdated = () => {
       fetchUnreadCount();
+      fetchLatestNotifications();
     };
     window.addEventListener('doneto_kyc_updated', handleKycUpdated);
 

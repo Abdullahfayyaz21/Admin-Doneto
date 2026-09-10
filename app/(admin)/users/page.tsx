@@ -150,7 +150,7 @@ export default function UsersPage() {
   const [formCountryCode, setFormCountryCode] = useState('');
   const [formPassword, setFormPassword] = useState('');
   const [formRole, setFormRole] = useState<'Admin' | 'NGO' | 'Donor'>('Donor');
-  const [formStatus, setFormStatus] = useState<string>('Verified');
+  const [formStatus, setFormStatus] = useState<string>('Pending');
   const [formCnic, setFormCnic] = useState('');
   const [formAddress, setFormAddress] = useState('');
   const [formDescription, setFormDescription] = useState('');
@@ -249,7 +249,7 @@ export default function UsersPage() {
     setFormCountryCode('');
     setFormPassword('');
     setFormRole('Donor');
-    setFormStatus('Verified');
+    setFormStatus('Pending');
     setFormCnic('');
     setFormAddress('');
     setFormDescription('');
@@ -269,15 +269,15 @@ export default function UsersPage() {
     try {
       setSubmitLoading(true);
       const backendRole = formRole === 'NGO' ? 'Recipient' : formRole;
-      const backendStatus = formStatus === 'On Hold' ? 'Pending' : formStatus;
+      const backendStatus = formStatus === 'Verified' ? 'Pending' : (formStatus === 'On Hold' ? 'Pending' : formStatus);
       const payload: Record<string, any> = {
         name: formName.trim(),
         password: formPassword,
         role: backendRole,
         accountStatus: backendStatus,
-        isVerified: formStatus === 'Verified',
-        emailVerified: formEmailVerified || formStatus === 'Verified',
-        phoneVerified: formPhoneVerified || formStatus === 'Verified',
+        isVerified: false,
+        emailVerified: formEmailVerified,
+        phoneVerified: formPhoneVerified,
       };
 
       if (formEmail.trim()) payload.email = formEmail.trim();
@@ -288,7 +288,7 @@ export default function UsersPage() {
       if (formDescription.trim()) payload.description = formDescription.trim();
 
       if (formRole === 'NGO') {
-        payload.isVerifiedRecipient = formStatus === 'Verified';
+        payload.isVerifiedRecipient = false;
         if (formNgoName.trim()) payload.ngoName = formNgoName.trim();
         if (formNgoRegistrationNumber.trim()) payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim();
         if (formPositionInNgo.trim()) payload.positionInNgo = formPositionInNgo.trim();
@@ -332,80 +332,7 @@ export default function UsersPage() {
     setIsEditOpen(true);
   };
 
-  const handleQuickVerify = async (user: User) => {
-    try {
-      const payload: Record<string, any> = {
-        isVerified: true,
-        accountStatus: 'Verified',
-        emailVerified: true,
-        phoneVerified: true,
-      };
 
-      if (user.role === 'NGO' || (user.role as string) === 'Recipient' || user.ngoName) {
-        payload.isVerifiedRecipient = true;
-      }
-
-      await api.patch(ApiConstants.userById(user.id), payload);
-      broadcastModerationUpdate('kyc');
-      toast.success(`User "${user.name}" verified on platform & web app!`);
-      fetchUsers();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to verify user.');
-    }
-  };
-
-  const handleQuickUnverify = async (user: User) => {
-    try {
-      const payload: Record<string, any> = {
-        isVerified: false,
-        accountStatus: 'Pending',
-        isVerifiedRecipient: false,
-      };
-      await api.patch(ApiConstants.userById(user.id), payload);
-      broadcastModerationUpdate('kyc');
-      toast.success(`User "${user.name}" marked as unverified (Pending review).`);
-      fetchUsers();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to unverify user.');
-    }
-  };
-
-  const handleQuickReject = async (user: User) => {
-    try {
-      const payload: Record<string, any> = {
-        isVerified: false,
-        accountStatus: 'Rejected',
-      };
-      if (user.role === 'NGO' || (user.role as string) === 'Recipient') {
-        payload.isVerifiedRecipient = false;
-      }
-      await api.patch(ApiConstants.userById(user.id), payload);
-      broadcastModerationUpdate('kyc');
-      toast.success(`User "${user.name}" marked as rejected.`);
-      fetchUsers();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to update user status.');
-    }
-  };
-
-  const handleQuickHold = async (user: User) => {
-    try {
-      const payload: Record<string, any> = {
-        isVerified: false,
-        accountStatus: 'Pending',
-        description: `[ON HOLD] Application placed on hold for administrative audit.`,
-      };
-      await api.patch(ApiConstants.userById(user.id), payload);
-      toast.info(`User "${user.name}" placed on hold.`);
-      fetchUsers();
-    } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to put user on hold.');
-    }
-  };
 
   const handleEditUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -413,16 +340,12 @@ export default function UsersPage() {
 
     try {
       setSubmitLoading(true);
-      const isNowVerified = formStatus === 'Verified';
       const backendRole = formRole === 'NGO' ? 'Recipient' : formRole;
-      const backendStatus = formStatus === 'On Hold' ? 'Pending' : formStatus;
       const payload: Record<string, any> = {
         name: formName.trim() || selectedUser.name,
         role: backendRole,
-        accountStatus: backendStatus,
-        isVerified: isNowVerified,
-        emailVerified: isNowVerified ? true : formEmailVerified,
-        phoneVerified: isNowVerified ? true : formPhoneVerified,
+        emailVerified: formEmailVerified,
+        phoneVerified: formPhoneVerified,
       };
 
       if (formEmail.trim()) payload.email = formEmail.trim();
@@ -433,7 +356,6 @@ export default function UsersPage() {
       if (formDescription.trim()) payload.description = formDescription.trim();
 
       if (formRole === 'NGO') {
-        payload.isVerifiedRecipient = isNowVerified;
         if (formNgoName.trim()) payload.ngoName = formNgoName.trim();
         if (formNgoRegistrationNumber.trim()) payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim();
         if (formPositionInNgo.trim()) payload.positionInNgo = formPositionInNgo.trim();
@@ -735,17 +657,6 @@ export default function UsersPage() {
                       </TableCell>
                       <TableCell className="text-right pr-6 py-4">
                         <div className="flex items-center justify-end gap-1.5">
-                          {user.accountStatus !== 'Verified' && !user.isVerified && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleQuickVerify(user)}
-                              className="h-8 rounded-xl px-2.5 text-xs font-semibold text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-700 dark:text-emerald-400 dark:border-emerald-500/30"
-                            >
-                              <CheckCircle2 className="h-3.5 w-3.5 mr-1 text-emerald-600 dark:text-emerald-400" />
-                              Verify
-                            </Button>
-                          )}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -757,29 +668,7 @@ export default function UsersPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="rounded-xl shadow-lg border-border w-52">
-                              {user.accountStatus !== 'Verified' && !user.isVerified ? (
-                                <>
-                                  <DropdownMenuItem onClick={() => handleQuickVerify(user)} className="cursor-pointer gap-2 text-emerald-600 font-medium dark:text-emerald-400">
-                                    <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-                                    Verify User
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleQuickHold(user)} className="cursor-pointer gap-2 text-orange-600 font-medium">
-                                    <HelpCircle className="h-4 w-4 text-orange-600" />
-                                    Put on Hold
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem onClick={() => handleQuickReject(user)} className="cursor-pointer gap-2 text-red-600 font-medium">
-                                    <Shield className="h-4 w-4 text-red-600" />
-                                    Reject Application
-                                  </DropdownMenuItem>
-                                </>
-                              ) : (
-                                <DropdownMenuItem onClick={() => handleQuickUnverify(user)} className="cursor-pointer gap-2 text-amber-600 font-medium">
-                                  <Shield className="h-4 w-4 text-amber-600" />
-                                  Unverify User
-                                </DropdownMenuItem>
-                              )}
-
-                              {user.role === 'NGO' && (
+                              {(user.role === 'NGO' || (user.role as string) === 'Recipient' || user.ngoName) && (
                                 <DropdownMenuItem asChild className="cursor-pointer gap-2 text-primary font-medium">
                                   <Link href={`/users/kyc?search=${encodeURIComponent(user.ngoName || user.name)}`}>
                                     <ShieldCheck className="h-4 w-4" />
@@ -1019,10 +908,9 @@ export default function UsersPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Verified">Verified</SelectItem>
-                      <SelectItem value="Pending">Pending</SelectItem>
-                      <SelectItem value="Rejected">Rejected</SelectItem>
                       <SelectItem value="Not Verified">Not Verified</SelectItem>
+                      <SelectItem value="Pending">Pending Audit</SelectItem>
+                      <SelectItem value="Rejected">Rejected</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -1324,20 +1212,17 @@ export default function UsersPage() {
                   </Select>
                 </div>
 
-                {/* Verification Status */}
+                {/* Verification Status (Managed in KYC Verification) */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-foreground">Verification Status</Label>
-                  <Select value={formStatus} onValueChange={(val: any) => setFormStatus(val)}>
-                    <SelectTrigger className="rounded-xl h-11 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Verified">Verified</SelectItem>
-                      <SelectItem value="Pending">Pending</SelectItem>
-                      <SelectItem value="Rejected">Rejected</SelectItem>
-                      <SelectItem value="Not Verified">Not Verified</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label className="text-xs font-semibold text-foreground">KYC / Verification Status</Label>
+                  <div className="flex items-center justify-between h-11 px-3.5 rounded-xl border border-border/60 bg-muted/30">
+                    <Badge variant={statusVariant[selectedUser?.accountStatus || 'Not Verified'] || 'outline'} className="rounded-full px-2.5 py-0.5 text-xs font-semibold">
+                      {selectedUser?.accountStatus || 'Not Verified'}
+                    </Badge>
+                    <span className="text-[11px] text-muted-foreground">
+                      Audited in KYC Verification
+                    </span>
+                  </div>
                 </div>
 
                 {/* Verification Toggles */}

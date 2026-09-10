@@ -148,7 +148,6 @@ export default function KYCRequestsPage() {
     total,
     lastPage,
     lastUpdated,
-    counts,
     syncInterval,
     setSyncInterval,
     soundEnabled,
@@ -563,127 +562,17 @@ export default function KYCRequestsPage() {
         </div>
       </div>
 
-      {/* Real-time Status Metric Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-        
-        {/* Total Card */}
-        <Card
-          onClick={() => { setStatusFilter('ALL'); setPage(1); }}
-          className={`cursor-pointer transition-all border rounded-xl hover:shadow-md ${
-            statusFilter === 'ALL'
-              ? 'border-foreground/30 bg-muted/40 shadow-xs'
-              : 'border-border/60 bg-card hover:bg-muted/20'
-          }`}
-        >
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider block">Total Filed</span>
-              <span className="text-2xl font-black text-foreground">{counts.total}</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-muted/60 text-muted-foreground">
-              <ClipboardList className="h-5 w-5" />
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Pending Card (Pulsing) */}
-        <Card
-          onClick={() => { setStatusFilter(KycStatus.PENDING); setPage(1); }}
-          className={`cursor-pointer transition-all border rounded-xl hover:shadow-md relative overflow-hidden ${
-            statusFilter === KycStatus.PENDING
-              ? 'border-amber-500/50 bg-amber-500/10 shadow-xs ring-1 ring-amber-500/30'
-              : 'border-border/60 bg-card hover:bg-amber-500/5'
-          }`}
-        >
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Pending Audit</span>
-                {counts.pending > 0 && (
-                  <span className="inline-flex h-2 w-2 rounded-full bg-amber-500 animate-ping" />
-                )}
-              </div>
-              <span className="text-2xl font-black text-amber-600 dark:text-amber-400">{counts.pending}</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-              <Clock className="h-5 w-5" />
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* On Hold Card */}
-        <Card
-          onClick={() => { setStatusFilter('HOLD'); setPage(1); }}
-          className={`cursor-pointer transition-all border rounded-xl hover:shadow-md ${
-            statusFilter === 'HOLD'
-              ? 'border-orange-500/50 bg-orange-500/10 shadow-xs ring-1 ring-orange-500/30'
-              : 'border-border/60 bg-card hover:bg-orange-500/5'
-          }`}
-        >
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold text-orange-600 dark:text-orange-400 uppercase tracking-wider block">On Hold / In Review</span>
-              <span className="text-2xl font-black text-orange-600 dark:text-orange-400">{counts.hold}</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-orange-500/15 text-orange-600 dark:text-orange-400">
-              <HelpCircle className="h-5 w-5" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Approved Card */}
-        <Card
-          onClick={() => { setStatusFilter(KycStatus.APPROVED); setPage(1); }}
-          className={`cursor-pointer transition-all border rounded-xl hover:shadow-md ${
-            statusFilter === KycStatus.APPROVED
-              ? 'border-emerald-500/50 bg-emerald-500/10 shadow-xs ring-1 ring-emerald-500/30'
-              : 'border-border/60 bg-card hover:bg-emerald-500/5'
-          }`}
-        >
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Approved & Verified</span>
-              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{counts.approved}</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="h-5 w-5" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Rejected Card */}
-        <Card
-          onClick={() => { setStatusFilter(KycStatus.REJECTED); setPage(1); }}
-          className={`cursor-pointer transition-all border rounded-xl hover:shadow-md ${
-            statusFilter === KycStatus.REJECTED
-              ? 'border-red-500/50 bg-red-500/10 shadow-xs ring-1 ring-red-500/30'
-              : 'border-border/60 bg-card hover:bg-red-500/5'
-          }`}
-        >
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <span className="text-[11px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider block">Rejected / Incomplete</span>
-              <span className="text-2xl font-black text-red-600 dark:text-red-400">{counts.rejected}</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-red-500/15 text-red-600 dark:text-red-400">
-              <XCircle className="h-5 w-5" />
-            </div>
-          </CardContent>
-        </Card>
-
-      </div>
-
-      {/* Filter Row & Status Tabs */}
-      <div className="flex flex-col sm:flex-row gap-3.5 sm:items-center sm:justify-between bg-card border border-border/60 p-3.5 rounded-2xl shadow-xs">
-        
-        {/* Search Input */}
-        <div className="relative flex-1 max-w-md">
+      {/* Search Input */}
+      <div className="bg-card border border-border/60 p-3.5 rounded-2xl shadow-xs">
+        <div className="relative w-full">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search by NGO Name, Representative, CNIC, Reg #..."
+            placeholder="Search verification applicants by NGO Name, Representative, CNIC, Reg #..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="pl-9 pr-8 h-10 rounded-xl bg-muted/40 border-border text-sm placeholder:text-muted-foreground/70"
+            className="pl-9 pr-8 h-10 rounded-xl bg-muted/40 border-border text-sm placeholder:text-muted-foreground/70 w-full"
           />
           {search && (
             <button
@@ -693,65 +582,6 @@ export default function KYCRequestsPage() {
               <X className="h-3.5 w-3.5" />
             </button>
           )}
-        </div>
-
-        {/* Status Tab Filter Buttons */}
-        <div className="flex flex-wrap items-center gap-1.5 bg-muted/60 p-1.5 rounded-xl border border-border/50">
-          <Button
-            variant={statusFilter === 'ALL' ? 'default' : 'ghost'}
-            onClick={() => setStatusFilter('ALL')}
-            className={`rounded-lg py-1 px-3 h-7.5 text-xs font-semibold ${
-              statusFilter === 'ALL'
-                ? 'bg-[#185500] text-white dark:bg-white dark:text-black shadow-xs'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            All ({counts.total})
-          </Button>
-          <Button
-            variant={statusFilter === KycStatus.PENDING ? 'default' : 'ghost'}
-            onClick={() => setStatusFilter(KycStatus.PENDING)}
-            className={`rounded-lg py-1 px-3 h-7.5 text-xs font-semibold ${
-              statusFilter === KycStatus.PENDING
-                ? 'bg-amber-600 text-white shadow-xs'
-                : 'text-muted-foreground hover:text-amber-600 hover:bg-amber-500/10'
-            }`}
-          >
-            Pending ({counts.pending})
-          </Button>
-          <Button
-            variant={statusFilter === 'HOLD' ? 'default' : 'ghost'}
-            onClick={() => setStatusFilter('HOLD')}
-            className={`rounded-lg py-1 px-3 h-7.5 text-xs font-semibold ${
-              statusFilter === 'HOLD'
-                ? 'bg-orange-600 text-white shadow-xs'
-                : 'text-muted-foreground hover:text-orange-600 hover:bg-orange-500/10'
-            }`}
-          >
-            On Hold ({counts.hold})
-          </Button>
-          <Button
-            variant={statusFilter === KycStatus.APPROVED ? 'default' : 'ghost'}
-            onClick={() => setStatusFilter(KycStatus.APPROVED)}
-            className={`rounded-lg py-1 px-3 h-7.5 text-xs font-semibold ${
-              statusFilter === KycStatus.APPROVED
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-muted-foreground hover:text-emerald-600 hover:bg-emerald-500/10'
-            }`}
-          >
-            Approved ({counts.approved})
-          </Button>
-          <Button
-            variant={statusFilter === KycStatus.REJECTED ? 'default' : 'ghost'}
-            onClick={() => setStatusFilter(KycStatus.REJECTED)}
-            className={`rounded-lg py-1 px-3 h-7.5 text-xs font-semibold ${
-              statusFilter === KycStatus.REJECTED
-                ? 'bg-red-600 text-white shadow-xs'
-                : 'text-muted-foreground hover:text-red-600 hover:bg-red-500/10'
-            }`}
-          >
-            Rejected ({counts.rejected})
-          </Button>
         </div>
       </div>
 
@@ -839,7 +669,11 @@ export default function KYCRequestsPage() {
                   return (
                     <TableRow
                       key={req.id}
-                      className="border-b border-border hover:bg-muted/30 transition-all duration-150"
+                      className={`border-b border-border transition-all duration-150 ${
+                        displayStatus === KycStatus.PENDING
+                          ? 'bg-amber-500/[0.04] hover:bg-amber-500/[0.08] border-l-4 border-l-amber-500'
+                          : 'hover:bg-muted/30'
+                      }`}
                     >
                       {/* Checkbox */}
                       <TableCell className="px-4">
@@ -853,7 +687,11 @@ export default function KYCRequestsPage() {
                       {/* Organization Name & Registration */}
                       <TableCell className="py-4 font-semibold text-foreground">
                         <div className="flex items-center gap-3">
-                          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#185500] to-emerald-700 text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs">
+                          <div className={`h-10 w-10 rounded-xl text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-xs ${
+                            displayStatus === KycStatus.PENDING
+                              ? 'bg-gradient-to-br from-amber-600 to-orange-600'
+                              : 'bg-gradient-to-br from-[#185500] to-emerald-700'
+                          }`}>
                             {req.ngoName ? req.ngoName.charAt(0).toUpperCase() : 'N'}
                           </div>
                           <div className="min-w-0">
@@ -901,24 +739,32 @@ export default function KYCRequestsPage() {
 
                       {/* Status Badge */}
                       <TableCell>
-                        <Badge
-                          variant={statusVariants[displayStatus] || 'outline'}
-                          className={`text-[10px] px-2.5 py-1 border font-bold uppercase tracking-wider rounded-full flex items-center gap-1 w-fit ${
-                            displayStatus === KycStatus.APPROVED && 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
-                          } ${
-                            displayStatus === KycStatus.PENDING && 'bg-amber-500/10 text-amber-600 border-amber-500/20'
-                          } ${
-                            displayStatus === KycStatus.HOLD && 'bg-orange-500/10 text-orange-600 border-orange-500/20'
-                          } ${
-                            displayStatus === KycStatus.REJECTED && 'bg-red-500/10 text-red-600 border-red-500/20'
-                          }`}
-                        >
-                          {displayStatus === KycStatus.APPROVED && <Check className="h-3 w-3" />}
-                          {displayStatus === KycStatus.PENDING && <Clock className="h-3 w-3" />}
-                          {displayStatus === KycStatus.HOLD && <HelpCircle className="h-3 w-3" />}
-                          {displayStatus === KycStatus.REJECTED && <X className="h-3 w-3" />}
-                          <span>{statusLabels[displayStatus] || displayStatus}</span>
-                        </Badge>
+                        <div className="flex items-center gap-1.5">
+                          <Badge
+                            variant={statusVariants[displayStatus] || 'outline'}
+                            className={`text-[10px] px-2.5 py-1 border font-bold uppercase tracking-wider rounded-full flex items-center gap-1 w-fit ${
+                              displayStatus === KycStatus.APPROVED && 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                            } ${
+                              displayStatus === KycStatus.PENDING && 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30 font-extrabold'
+                            } ${
+                              displayStatus === KycStatus.HOLD && 'bg-orange-500/10 text-orange-600 border-orange-500/20'
+                            } ${
+                              displayStatus === KycStatus.REJECTED && 'bg-red-500/10 text-red-600 border-red-500/20'
+                            }`}
+                          >
+                            {displayStatus === KycStatus.APPROVED && <Check className="h-3 w-3" />}
+                            {displayStatus === KycStatus.PENDING && <Clock className="h-3 w-3 animate-pulse" />}
+                            {displayStatus === KycStatus.HOLD && <HelpCircle className="h-3 w-3" />}
+                            {displayStatus === KycStatus.REJECTED && <X className="h-3 w-3" />}
+                            <span>{statusLabels[displayStatus] || displayStatus}</span>
+                          </Badge>
+                          {displayStatus === KycStatus.PENDING && (
+                            <span className="relative flex h-2 w-2 shrink-0" title="Awaiting verification">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                            </span>
+                          )}
+                        </div>
                       </TableCell>
 
                       {/* Date */}
@@ -932,9 +778,21 @@ export default function KYCRequestsPage() {
                           {/* Primary Review Button */}
                           <Button
                             onClick={() => handleInspect(req.id)}
-                            className="text-xs font-bold py-1.5 px-3 rounded-lg shadow-xs bg-[#185500] text-white hover:bg-[#1e6b00] dark:bg-white dark:text-black dark:hover:bg-neutral-200 h-8"
+                            className={`text-xs font-bold py-1.5 px-3 rounded-lg shadow-xs h-8 ${
+                              displayStatus === KycStatus.PENDING
+                                ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                                : 'bg-[#185500] text-white hover:bg-[#1e6b00] dark:bg-white dark:text-black dark:hover:bg-neutral-200'
+                            }`}
                           >
-                            <Eye className="h-3.5 w-3.5 mr-1" /> Audit
+                            {displayStatus === KycStatus.PENDING ? (
+                              <>
+                                <ShieldCheck className="h-3.5 w-3.5 mr-1" /> Verify User
+                              </>
+                            ) : (
+                              <>
+                                <Eye className="h-3.5 w-3.5 mr-1" /> Audit
+                              </>
+                            )}
                           </Button>
 
                           {/* Quick Action Dropdown */}

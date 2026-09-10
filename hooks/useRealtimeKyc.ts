@@ -153,12 +153,8 @@ export function useRealtimeKyc(options: UseRealtimeKycOptions = {}) {
             if (soundEnabled) {
               playNotificationChime();
             }
-            newItems.forEach((item) => {
-              toast.info(`New Verification Request: ${item.ngoName || 'NGO Representative'}`, {
-                description: `CNIC: ${item.cnicNumber || 'Submitted for Audit'}`,
-                duration: 6000,
-              });
-            });
+            // Update notification bell in Navbar via broadcast instead of intrusive screen toast
+            broadcastKycUpdate();
           }
         }
         previousPendingIdsRef.current = currentPendingIds;
@@ -220,6 +216,24 @@ export function useRealtimeKyc(options: UseRealtimeKycOptions = {}) {
           );
         }
 
+        // Ensure newest PENDING requests are always pinned to the top of the queue for verification
+        dataList.sort((a, b) => {
+          const getPriority = (req: KycRequest) => {
+            const isHold = req.status === KycStatus.HOLD || req.rejectionReason?.startsWith('[ON HOLD]');
+            if (req.status === KycStatus.PENDING && !isHold) return 1; // Pending verification is on top
+            if (isHold || req.status === KycStatus.HOLD) return 2;     // Under review / on hold
+            return 3;                                                 // Decided
+          };
+
+          const pA = getPriority(a);
+          const pB = getPriority(b);
+          if (pA !== pB) return pA - pB;
+
+          const dateA = new Date(a.createdAt || a.updatedAt || 0).getTime();
+          const dateB = new Date(b.createdAt || b.updatedAt || 0).getTime();
+          return dateB - dateA; // Most recent on top
+        });
+
         setRequests(dataList);
         setTotal(statusFilter === 'HOLD' ? dataList.length : response.total || 0);
         setLastPage(response.lastPage || 1);
@@ -255,7 +269,7 @@ export function useRealtimeKyc(options: UseRealtimeKycOptions = {}) {
     return () => clearInterval(timer);
   }, [syncInterval, fetchRequests, fetchCounts]);
 
-  // Cross-tab and window event listener
+  // Cross-tab, focus, and moderation event listeners
   useEffect(() => {
     const handleCustomEvent = () => {
       fetchRequests(true);
@@ -263,23 +277,40 @@ export function useRealtimeKyc(options: UseRealtimeKycOptions = {}) {
     };
 
     window.addEventListener('doneto_kyc_updated', handleCustomEvent);
+    window.addEventListener('focus', handleCustomEvent);
+    document.addEventListener('visibilitychange', handleCustomEvent);
 
-    let channel: BroadcastChannel | null = null;
+    let kycChannel: BroadcastChannel | null = null;
+    let modChannel: BroadcastChannel | null = null;
+
     try {
-      channel = new BroadcastChannel('doneto_kyc_channel');
-      channel.onmessage = (event) => {
+      kycChannel = new BroadcastChannel('doneto_kyc_channel');
+      kycChannel.onmessage = (event) => {
         if (event.data?.type === 'KYC_STATE_CHANGED') {
           fetchRequests(true);
           fetchCounts();
         }
       };
     } catch {
-      // Ignore broadcast channel if unsupported
+      // ignore
+    }
+
+    try {
+      modChannel = new BroadcastChannel('doneto_moderation_channel');
+      modChannel.onmessage = () => {
+        fetchRequests(true);
+        fetchCounts();
+      };
+    } catch {
+      // ignore
     }
 
     return () => {
       window.removeEventListener('doneto_kyc_updated', handleCustomEvent);
-      if (channel) channel.close();
+      window.removeEventListener('focus', handleCustomEvent);
+      document.removeEventListener('visibilitychange', handleCustomEvent);
+      if (kycChannel) kycChannel.close();
+      if (modChannel) modChannel.close();
     };
   }, [fetchRequests, fetchCounts]);
 
