@@ -9,6 +9,7 @@
 export type ModerationEventType =
   | 'approvals'
   | 'kyc'
+  | 'users'
   | 'delete_requests'
   | 'reports'
   | 'withdrawals'

@@ -316,6 +316,50 @@ export async function getAdminKycRequestsApi(
       total = raw.length;
     }
 
+    // Merge users who have requested verification or are Pending from /users
+    try {
+      const usersRes = await api.get(ApiConstants.users, { params: { limit: 100 } });
+      const usersRaw = usersRes.data?.data || usersRes.data;
+      const allUsers: any[] = Array.isArray(usersRaw?.data)
+        ? usersRaw.data
+        : Array.isArray(usersRaw)
+        ? usersRaw
+        : [];
+
+      const existingUserIds = new Set(
+        itemsList.map((k: any) => k.userId || k.user?.id || k.id)
+      );
+
+      for (const u of allUsers) {
+        if (!existingUserIds.has(u.id)) {
+          const isPending = u.accountStatus === 'Pending';
+          const isNgoApplicant =
+            (u.role === 'Recipient' || u.role === 'NGO' || Boolean(u.ngoName)) && !u.isVerified;
+          if (isPending || isNgoApplicant) {
+            itemsList.push({
+              id: u.id,
+              userId: u.id,
+              ngoName: u.ngoName || u.name || 'Organization',
+              publicName: u.name,
+              ngoRegistrationNumber: u.ngoRegistrationNumber || null,
+              positionInNgo: u.positionInNgo || null,
+              directCorrespondentName: u.directCorrespondentName || u.name || null,
+              contactForAccreditation: u.contactForAccreditation || u.phoneNumber || null,
+              cnicNumber: u.cnicNumber || '',
+              status: isPending ? 'PENDING' : u.accountStatus === 'Rejected' ? 'REJECTED' : 'PENDING',
+              createdAt: u.createdAt || new Date().toISOString(),
+              updatedAt: u.updatedAt || u.createdAt || new Date().toISOString(),
+              user: u,
+            });
+            existingUserIds.add(u.id);
+            total += 1;
+          }
+        }
+      }
+    } catch (usersErr) {
+      console.warn('Fallback users query in KYC requests notice:', usersErr);
+    }
+
     const mapped = itemsList.map(mapBackendKycToRequest);
 
     // Prioritize pending verification requests on top, then sort by newest date first
@@ -406,7 +450,6 @@ export async function reviewKycRequestApi(
   if (statusStr === 'APPROVED') {
     userPayload.accountStatus = 'Verified';
     userPayload.isVerified = true;
-    userPayload.isVerifiedRecipient = true;
     userPayload.role = 'Recipient';
     if (data.adminNotes) {
       userPayload.description = data.adminNotes;
@@ -414,7 +457,6 @@ export async function reviewKycRequestApi(
   } else if (statusStr === 'REJECTED') {
     userPayload.accountStatus = 'Rejected';
     userPayload.isVerified = false;
-    userPayload.isVerifiedRecipient = false;
     if (data.rejectionReason) {
       userPayload.description = data.rejectionReason;
     }

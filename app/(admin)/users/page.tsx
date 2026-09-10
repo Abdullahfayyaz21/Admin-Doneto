@@ -77,6 +77,7 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import ApiConstants from '@/lib/api-constants';
 import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
+import { reviewKycRequestApi, KycStatus } from '@/lib/kyc';
 
 interface User {
   id: string;
@@ -288,7 +289,6 @@ export default function UsersPage() {
       if (formDescription.trim()) payload.description = formDescription.trim();
 
       if (formRole === 'NGO') {
-        payload.isVerifiedRecipient = false;
         if (formNgoName.trim()) payload.ngoName = formNgoName.trim();
         if (formNgoRegistrationNumber.trim()) payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim();
         if (formPositionInNgo.trim()) payload.positionInNgo = formPositionInNgo.trim();
@@ -332,7 +332,39 @@ export default function UsersPage() {
     setIsEditOpen(true);
   };
 
+  // Quick approve user action
+  const handleQuickApproveUser = async (user: User) => {
+    try {
+      setSubmitLoading(true);
+      const isNgo = user.role === 'NGO' || (user.role as string) === 'Recipient' || Boolean(user.ngoName);
+      const payload: Record<string, any> = {
+        accountStatus: 'Verified',
+        isVerified: true,
+      };
+      if (isNgo) {
+        payload.role = 'Recipient';
+      }
 
+      await api.patch(ApiConstants.userById(user.id), payload);
+
+      // Synchronize KYC review status
+      try {
+        await reviewKycRequestApi(user.id, { status: KycStatus.APPROVED }, user.id);
+      } catch (kycErr) {
+        console.warn('KYC review sync notice:', kycErr);
+      }
+
+      broadcastModerationUpdate('kyc');
+      broadcastModerationUpdate('users');
+      toast.success(`${user.name} has been approved and verified successfully!`);
+      fetchUsers();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to approve user.');
+    } finally {
+      setSubmitLoading(false);
+    }
+  };
 
   const handleEditUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -341,9 +373,14 @@ export default function UsersPage() {
     try {
       setSubmitLoading(true);
       const backendRole = formRole === 'NGO' ? 'Recipient' : formRole;
+      const isApproving = formStatus === 'Verified';
+      const backendStatus = formStatus === 'On Hold' ? 'Pending' : formStatus;
+
       const payload: Record<string, any> = {
         name: formName.trim() || selectedUser.name,
         role: backendRole,
+        accountStatus: backendStatus,
+        isVerified: isApproving ? true : (formStatus === 'Rejected' ? false : selectedUser.isVerified),
         emailVerified: formEmailVerified,
         phoneVerified: formPhoneVerified,
       };
@@ -355,7 +392,7 @@ export default function UsersPage() {
       if (formAddress.trim()) payload.address = formAddress.trim();
       if (formDescription.trim()) payload.description = formDescription.trim();
 
-      if (formRole === 'NGO') {
+      if (formRole === 'NGO' || isApproving) {
         if (formNgoName.trim()) payload.ngoName = formNgoName.trim();
         if (formNgoRegistrationNumber.trim()) payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim();
         if (formPositionInNgo.trim()) payload.positionInNgo = formPositionInNgo.trim();
@@ -365,7 +402,38 @@ export default function UsersPage() {
       }
 
       await api.patch(ApiConstants.userById(selectedUser.id), payload);
+
+      // Sync KYC review status
+      if (isApproving) {
+        try {
+          await reviewKycRequestApi(selectedUser.id, { status: KycStatus.APPROVED }, selectedUser.id);
+        } catch (kycErr) {
+          console.warn('KYC review sync notice:', kycErr);
+        }
+      } else if (formStatus === 'Rejected') {
+        try {
+          await reviewKycRequestApi(
+            selectedUser.id,
+            { status: KycStatus.REJECTED, rejectionReason: 'Rejected by administrator' },
+            selectedUser.id
+          );
+        } catch (kycErr) {
+          console.warn('KYC review sync notice:', kycErr);
+        }
+      } else if (formStatus === 'On Hold') {
+        try {
+          await reviewKycRequestApi(
+            selectedUser.id,
+            { status: KycStatus.HOLD, holdReason: 'Application put on hold by administrator' },
+            selectedUser.id
+          );
+        } catch (kycErr) {
+          console.warn('KYC review sync notice:', kycErr);
+        }
+      }
+
       broadcastModerationUpdate('kyc');
+      broadcastModerationUpdate('users');
       toast.success('User updated successfully!');
       setIsEditOpen(false);
       fetchUsers();
@@ -657,6 +725,19 @@ export default function UsersPage() {
                       </TableCell>
                       <TableCell className="text-right pr-6 py-4">
                         <div className="flex items-center justify-end gap-1.5">
+                          {user.accountStatus !== 'Verified' && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleQuickApproveUser(user)}
+                              disabled={submitLoading}
+                              className="h-8 px-2.5 text-xs font-medium text-primary hover:text-primary hover:bg-primary/10 border-primary/30 dark:border-primary/40 rounded-xl gap-1.5 transition-all shadow-xs"
+                              title="Approve & Verify User"
+                            >
+                              <CheckCircle2 className="h-3.5 w-3.5" />
+                              <span className="hidden sm:inline">Approve</span>
+                            </Button>
+                          )}
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button
@@ -668,6 +749,16 @@ export default function UsersPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end" className="rounded-xl shadow-lg border-border w-52">
+                              {user.accountStatus !== 'Verified' && (
+                                <DropdownMenuItem
+                                  onClick={() => handleQuickApproveUser(user)}
+                                  className="cursor-pointer gap-2 text-primary font-semibold focus:text-primary focus:bg-primary/10"
+                                >
+                                  <CheckCircle2 className="h-4 w-4 text-primary" />
+                                  Approve & Verify User
+                                </DropdownMenuItem>
+                              )}
+
                               {(user.role === 'NGO' || (user.role as string) === 'Recipient' || user.ngoName) && (
                                 <DropdownMenuItem asChild className="cursor-pointer gap-2 text-primary font-medium">
                                   <Link href={`/users/kyc?search=${encodeURIComponent(user.ngoName || user.name)}`}>
@@ -1212,17 +1303,63 @@ export default function UsersPage() {
                   </Select>
                 </div>
 
-                {/* Verification Status (Managed in KYC Verification) */}
+                {/* Verification Status */}
                 <div className="space-y-1.5">
-                  <Label className="text-xs font-semibold text-foreground">KYC / Verification Status</Label>
-                  <div className="flex items-center justify-between h-11 px-3.5 rounded-xl border border-border/60 bg-muted/30">
-                    <Badge variant={statusVariant[selectedUser?.accountStatus || 'Not Verified'] || 'outline'} className="rounded-full px-2.5 py-0.5 text-xs font-semibold">
-                      {selectedUser?.accountStatus || 'Not Verified'}
-                    </Badge>
-                    <span className="text-[11px] text-muted-foreground">
-                      Audited in KYC Verification
-                    </span>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="edit-status" className="text-xs font-semibold text-foreground">
+                      Verification / KYC Status
+                    </Label>
+                    {formStatus !== 'Verified' && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setFormStatus('Verified');
+                          toast.info('Status set to Verified. Click "Update User" or save to confirm approval.');
+                        }}
+                        className="text-[11px] font-semibold text-primary hover:underline flex items-center gap-1"
+                      >
+                        <CheckCircle2 className="h-3 w-3" />
+                        Quick Mark Verified
+                      </button>
+                    )}
                   </div>
+                  <Select value={formStatus} onValueChange={setFormStatus}>
+                    <SelectTrigger id="edit-status" className="rounded-xl h-11 text-sm">
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Verified">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-emerald-500" />
+                          <span>Verified (Approved)</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Pending">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-amber-500" />
+                          <span>Pending Review</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="On Hold">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-orange-500" />
+                          <span>On Hold</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Not Verified">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-slate-400" />
+                          <span>Not Verified</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="Rejected">
+                        <div className="flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-red-500" />
+                          <span>Rejected</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 {/* Verification Toggles */}
@@ -1355,23 +1492,44 @@ export default function UsersPage() {
               </div>
             </div>
 
-            <DialogFooter className="gap-2 sm:gap-2 pt-4 border-t border-border/60 mt-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setIsEditOpen(false)}
-                className="rounded-xl h-11 px-5"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                disabled={submitLoading}
-                className="rounded-xl h-11 px-5"
-              >
-                {submitLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
-                Update User
-              </Button>
+            <DialogFooter className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-border/60 mt-2">
+              <div className="w-full sm:w-auto">
+                {selectedUser && selectedUser.accountStatus !== 'Verified' && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={submitLoading}
+                    onClick={() => {
+                      if (selectedUser) {
+                        handleQuickApproveUser(selectedUser);
+                        setIsEditOpen(false);
+                      }
+                    }}
+                    className="w-full sm:w-auto rounded-xl h-11 px-4 text-xs font-semibold text-primary border-primary/30 hover:bg-primary/10 gap-1.5 transition-all"
+                  >
+                    <CheckCircle2 className="h-4 w-4 text-primary" />
+                    Approve User Immediately
+                  </Button>
+                )}
+              </div>
+              <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setIsEditOpen(false)}
+                  className="rounded-xl h-11 px-5 flex-1 sm:flex-initial"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={submitLoading}
+                  className="rounded-xl h-11 px-5 flex-1 sm:flex-initial"
+                >
+                  {submitLoading ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+                  Update User
+                </Button>
+              </div>
             </DialogFooter>
           </form>
         </DialogContent>
