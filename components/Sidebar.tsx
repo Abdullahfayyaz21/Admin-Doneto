@@ -29,6 +29,7 @@ import { useAuth } from '@/lib/auth-context';
 import Cookies from 'js-cookie';
 import { useTheme } from 'next-themes';
 import api from '@/lib/api';
+import ApiConstants from '@/lib/api-constants';
 import { subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface NavItem {
@@ -108,7 +109,7 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
         const [pendingRes, delReqRes, kycRes, reportsRes, withdrawRes] = await Promise.allSettled([
           api.get('/fundraising-campaigns/admin/pending'),
           api.get('/fundraising-campaigns/admin/delete-requests'),
-          api.get('/kyc/admin/requests', { params: { status: 'PENDING', limit: 1 } }),
+          api.get(ApiConstants.users, { params: { accountStatus: 'Pending', limit: 1 } }),
           api.get('/fundraising-campaigns/admin/reports', { params: { limit: 1 } }),
           api.get('/fundraising-campaigns/admin/withdraw-requests'),
         ]);
@@ -124,13 +125,13 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
           counts.deleteRequests = Array.isArray(list) ? list.length : 0;
         }
         if (kycRes.status === 'fulfilled') {
-          const resData = kycRes.value.data;
-          const total = typeof resData?.total === 'number' 
-            ? resData.total 
-            : Array.isArray(resData?.data) 
-              ? resData.data.length 
-              : Array.isArray(resData) 
-                ? resData.length 
+          const raw = kycRes.value.data?.data || kycRes.value.data;
+          const total = typeof raw?.total === 'number' 
+            ? raw.total 
+            : Array.isArray(raw?.data) 
+              ? raw.data.length 
+              : Array.isArray(raw) 
+                ? raw.length 
                 : 0;
           counts.pendingKyc = total;
         }

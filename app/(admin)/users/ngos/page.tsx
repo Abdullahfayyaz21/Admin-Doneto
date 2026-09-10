@@ -223,12 +223,6 @@ export default function NGOsPage() {
         phoneVerified: true,
       });
 
-      try {
-        await api.patch(`/kyc/admin/requests/${ngo.id}/review`, { status: 'APPROVED' });
-      } catch {
-        // silent if no separate KYC request record
-      }
-
       toast.success(`Organization / Creator "${ngo.ngoName || ngo.name}" verified!`);
       broadcastModerationUpdate('kyc');
       fetchNgosAndCampaigns(true);
@@ -238,6 +232,25 @@ export default function NGOsPage() {
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.message || 'Failed to verify organization.');
+    }
+  };
+
+  const handleUnverifyNgo = async (ngo: NgoCreatorUser) => {
+    try {
+      await api.patch(`/users/${ngo.id}`, {
+        isVerified: false,
+        isVerifiedRecipient: false,
+        accountStatus: 'Pending',
+      });
+      toast.success(`Organization "${ngo.name}" marked as unverified (Pending verification).`);
+      broadcastModerationUpdate('kyc');
+      fetchNgosAndCampaigns(true);
+      if (isDetailOpen && selectedNgo?.id === ngo.id) {
+        setSelectedNgo((prev) => (prev ? { ...prev, isVerified: false, isVerifiedRecipient: false, accountStatus: 'Pending' } : null));
+      }
+    } catch (err: any) {
+      console.error(err);
+      toast.error('Failed to unverify organization.');
     }
   };
 
@@ -463,7 +476,7 @@ export default function NGOsPage() {
                     {/* Actions */}
                     <TableCell className="text-right pr-6 py-4">
                       <div className="flex items-center justify-end gap-1.5">
-                        {!ngo.isVerified && (
+                        {(!ngo.isVerified || ngo.accountStatus !== 'Verified') ? (
                           <Button
                             size="sm"
                             variant="outline"
@@ -472,6 +485,16 @@ export default function NGOsPage() {
                           >
                             <ShieldCheck className="h-3.5 w-3.5 mr-1" />
                             Verify
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUnverifyNgo(ngo)}
+                            className="h-8 rounded-xl px-2.5 text-xs font-semibold text-amber-600 border-amber-500/30 hover:bg-amber-500/10"
+                          >
+                            <Shield className="h-3.5 w-3.5 mr-1" />
+                            Unverify
                           </Button>
                         )}
                         <Button
@@ -664,13 +687,22 @@ export default function NGOsPage() {
               </div>
 
               <DialogFooter className="flex flex-col sm:flex-row gap-2 border-t border-border/60 pt-4 mt-2">
-                {!selectedNgo.isVerified && (
+                {(!selectedNgo.isVerified || selectedNgo.accountStatus !== 'Verified') ? (
                   <Button
                     onClick={() => handleVerifyNgo(selectedNgo)}
                     className="bg-[#185500] hover:bg-[#1e6b00] text-white rounded-xl text-xs font-semibold h-9"
                   >
                     <ShieldCheck className="h-3.5 w-3.5 mr-1" />
                     Verify Organization
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleUnverifyNgo(selectedNgo)}
+                    variant="outline"
+                    className="border-amber-500/40 text-amber-600 hover:bg-amber-500/10 rounded-xl text-xs font-semibold h-9"
+                  >
+                    <Shield className="h-3.5 w-3.5 mr-1" />
+                    Unverify Organization
                   </Button>
                 )}
                 <Button asChild variant="outline" className="rounded-xl text-xs h-9">

@@ -1,4 +1,5 @@
 import api from './api';
+import ApiConstants from './api-constants';
 
 export enum KycStatus {
   PENDING = 'PENDING',
@@ -86,10 +87,77 @@ export interface KycPaginatedResponse {
 }
 
 /**
- * Submit NGO KYC registration details and 5 required files
+ * Maps a backend User record to the standardized KycRequest representation
+ */
+export function mapUserToKycRequest(user: any): KycRequest {
+  const desc = user.description || '';
+  const isHold = typeof desc === 'string' && desc.startsWith('[ON HOLD]');
+
+  let status: KycStatus = KycStatus.PENDING;
+  if (user.accountStatus === 'Verified' && user.isVerified) {
+    status = KycStatus.APPROVED;
+  } else if (user.accountStatus === 'Rejected') {
+    status = KycStatus.REJECTED;
+  } else if (isHold) {
+    status = KycStatus.HOLD;
+  } else if (user.accountStatus === 'Pending') {
+    status = KycStatus.PENDING;
+  } else {
+    // If user has CNIC or NGO info but Not Verified yet, treat as Pending review
+    status = KycStatus.PENDING;
+  }
+
+  return {
+    id: user.id,
+    userId: user.id,
+    ngoName: user.ngoName || user.name || 'Organization',
+    publicName: user.name,
+    ngoRegistrationNumber: user.ngoRegistrationNumber || null,
+    registrationAuthority: user.registrationAuthority || null,
+    registrationType: user.registrationType || null,
+    yearEstablished: user.yearEstablished || null,
+    representativeFullName: user.directCorrespondentName || user.name || null,
+    representativeDesignation:
+      user.positionInNgo || (user.role === 'Recipient' ? 'NGO Representative' : 'User'),
+    positionInNgo: user.positionInNgo || null,
+    contactForAccreditation: user.contactForAccreditation || user.phoneNumber || null,
+    cnicNumber: user.cnicNumber || '',
+    registrationCertificate: user.registrationCertificate || null,
+    ntnCertificate: user.ntnCertificate || null,
+    proofOfAffiliation: user.proofOfAffiliation || null,
+    cnicFrontImage: user.cnicFrontImage || null,
+    cnicBackImage: user.cnicBackImage || null,
+    selfieImage: typeof user.profileImage === 'string' ? user.profileImage : null,
+    missionStatement: user.description || null,
+    organizationDescription: user.description || null,
+    categories: Array.isArray(user.categories) ? user.categories : [],
+    status,
+    rejectionReason: user.accountStatus === 'Rejected' ? desc : null,
+    adminNotes: desc,
+    holdReason: isHold ? desc.replace(/^\[ON HOLD\]\s*/, '') : null,
+    reviewedBy: null,
+    reviewedAt: user.updatedAt || user.createdAt,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt || user.createdAt,
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      countryCode: user.countryCode,
+      role: user.role,
+      accountStatus: user.accountStatus,
+      isVerified: Boolean(user.isVerified),
+      address: user.address,
+    },
+  };
+}
+
+/**
+ * Submit NGO KYC registration details (POST /kyc/submit)
  */
 export async function submitKycApi(formData: FormData): Promise<KycRequest> {
-  const response = await api.post('/kyc/submit', formData, {
+  const response = await api.post(ApiConstants.submitNgoVerification, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -98,117 +166,137 @@ export async function submitKycApi(formData: FormData): Promise<KycRequest> {
 }
 
 /**
- * Get current logged-in user's KYC verification status and request details
+ * Get current logged-in user's KYC verification status (GET /kyc/my-status)
  */
 export async function getMyKycStatusApi(): Promise<MyKycStatusResponse> {
-  const response = await api.get('/kyc/my-status');
+  const response = await api.get(ApiConstants.myKycStatus);
   return response.data?.data || response.data;
 }
 
 /**
- * Get current logged-in user's detailed submitted KYC request record
+ * Get current logged-in user's detailed submitted KYC request (GET /kyc/my-request)
  */
 export async function getMyKycRequestApi(): Promise<KycRequest> {
-  const response = await api.get('/kyc/my-request');
+  const response = await api.get(ApiConstants.myKycRequest);
   return response.data?.data || response.data;
 }
 
 /**
- * Admin: Get paginated list of KYC verification requests (GET /api/kyc/admin/requests)
+ * Admin: Get paginated list of KYC verification requests from users (GET /users)
+ * Complies with the backend NestJS whitelist: page, limit, search, accountStatus, role.
  */
 export async function getAdminKycRequestsApi(
-  params?: KycQueryDto,
+  params?: KycQueryDto
 ): Promise<KycPaginatedResponse> {
-  const response = await api.get('/kyc/admin/requests', { params });
-  const raw = response.data;
-  
-  if (raw && typeof raw === 'object' && Array.isArray(raw.data)) {
-    return {
-      data: raw.data,
-      total: raw.total ?? raw.data.length,
-      page: raw.page ?? 1,
-      lastPage: raw.lastPage ?? 1,
-    };
+  const query: Record<string, any> = {
+    page: params?.page || 1,
+    limit: params?.limit || 20,
+  };
+
+  if (params?.search && params.search.trim()) {
+    query.search = params.search.trim();
   }
 
-  if (Array.isArray(raw)) {
+  // Map requested status to backend accountStatus enum
+  if (params?.status) {
+    if (params.status === KycStatus.PENDING || params.status === 'PENDING') {
+      query.accountStatus = 'Pending';
+    } else if (params.status === KycStatus.APPROVED || params.status === 'APPROVED') {
+      query.accountStatus = 'Verified';
+    } else if (params.status === KycStatus.REJECTED || params.status === 'REJECTED') {
+      query.accountStatus = 'Rejected';
+    } else if (params.status === KycStatus.HOLD || params.status === 'HOLD') {
+      query.accountStatus = 'Pending';
+    }
+  }
+
+  try {
+    const response = await api.get(ApiConstants.users, { params: query });
+    const raw = response.data?.data || response.data;
+
+    let usersList: any[] = [];
+    let total = 0;
+    let page = query.page;
+    let lastPage = 1;
+
+    if (raw && typeof raw === 'object' && Array.isArray(raw.data)) {
+      usersList = raw.data;
+      total = raw.total ?? raw.data.length;
+      page = raw.page ?? query.page;
+      lastPage = raw.lastPage ?? 1;
+    } else if (Array.isArray(raw)) {
+      usersList = raw;
+      total = raw.length;
+    }
+
+    const mapped = usersList.map(mapUserToKycRequest);
+
     return {
-      data: raw,
-      total: raw.length,
+      data: mapped,
+      total,
+      page,
+      lastPage,
+    };
+  } catch (error) {
+    console.error('Failed to fetch verification requests from /users:', error);
+    return {
+      data: [],
+      total: 0,
       page: 1,
       lastPage: 1,
     };
   }
-
-  return {
-    data: [],
-    total: 0,
-    page: 1,
-    lastPage: 1,
-  };
 }
 
 /**
- * Admin: Get detailed KYC request by ID (GET /api/kyc/admin/requests/{id})
+ * Admin: Get detailed KYC request by User ID (GET /users/{id})
  */
 export async function getAdminKycRequestByIdApi(id: string): Promise<KycRequest> {
-  const response = await api.get(`/kyc/admin/requests/${id}`);
-  return response.data?.data || response.data;
+  const response = await api.get(ApiConstants.userById(id));
+  const rawUser = response.data?.data || response.data;
+  return mapUserToKycRequest(rawUser);
 }
 
 /**
- * Admin: Accept, Reject, Hold, or Re-evaluate a KYC request
+ * Admin: Accept, Reject, Hold, or Re-evaluate a KYC request via PATCH /users/{id}
+ * Instantly synchronizes user status so web and mobile apps receive the update immediately.
  */
 export async function reviewKycRequestApi(
   requestId: string,
   data: ReviewKycDto,
   userId?: string
 ): Promise<KycRequest> {
-  try {
-    const response = await api.patch(`/kyc/admin/requests/${requestId}/review`, data);
-    
-    // Also synchronize user profile status
-    if (userId) {
-      if (data.status === 'APPROVED') {
-        await api.patch(`/users/${userId}`, {
-          isVerified: true,
-          accountStatus: 'Verified',
-          isVerifiedRecipient: true,
-        }).catch(() => {});
-      } else if (data.status === 'REJECTED') {
-        await api.patch(`/users/${userId}`, {
-          isVerified: false,
-          accountStatus: 'Rejected',
-          isVerifiedRecipient: false,
-        }).catch(() => {});
-      } else if (data.status === 'HOLD' || data.status === 'UNDER_REVIEW') {
-        await api.patch(`/users/${userId}`, {
-          accountStatus: 'Pending',
-          isVerified: false,
-        }).catch(() => {});
-      }
-    }
+  const targetId = userId || requestId;
+  const payload: Record<string, any> = {};
+  const statusStr = String(data.status);
 
-    return response.data?.data || response.data;
-  } catch (err: any) {
-    // If backend rejects custom HOLD status on review endpoint, handle via user status & metadata note
-    if (data.status === 'HOLD' || data.status === 'UNDER_REVIEW') {
-      const holdNote = `[ON HOLD] ${data.holdReason || data.rejectionReason || 'Application under administrative review'}`;
-      if (userId) {
-        await api.patch(`/users/${userId}`, {
-          accountStatus: 'Pending',
-          isVerified: false,
-          description: holdNote,
-        }).catch(() => {});
-      }
-      return {
-        id: requestId,
-        status: KycStatus.HOLD,
-        rejectionReason: holdNote,
-      } as unknown as KycRequest;
+  if (statusStr === 'APPROVED') {
+    payload.accountStatus = 'Verified';
+    payload.isVerified = true;
+    payload.isVerifiedRecipient = true;
+  } else if (statusStr === 'REJECTED') {
+    payload.accountStatus = 'Rejected';
+    payload.isVerified = false;
+    payload.isVerifiedRecipient = false;
+    if (data.rejectionReason) {
+      payload.description = data.rejectionReason;
     }
-    throw err;
+  } else if (statusStr === 'HOLD' || statusStr === 'UNDER_REVIEW') {
+    payload.accountStatus = 'Pending';
+    payload.isVerified = false;
+    const holdMsg = data.holdReason || data.rejectionReason || 'Application under administrative review';
+    payload.description = `[ON HOLD] ${holdMsg}`;
+  } else if (statusStr === 'PENDING') {
+    payload.accountStatus = 'Pending';
+    payload.isVerified = false;
+    if (data.rejectionReason === '') {
+      payload.description = '';
+    }
   }
+
+  const response = await api.patch(ApiConstants.userById(targetId), payload);
+  const updatedUser = response.data?.data || response.data;
+  return mapUserToKycRequest(updatedUser);
 }
 
 /**
@@ -224,7 +312,7 @@ export async function holdKycRequestApi(
     {
       status: KycStatus.HOLD,
       holdReason,
-      rejectionReason: `[ON HOLD] ${holdReason}`,
+      rejectionReason: holdReason,
     },
     userId
   );
@@ -246,4 +334,3 @@ export async function reopenKycRequestApi(
     userId
   );
 }
-

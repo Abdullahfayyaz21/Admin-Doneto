@@ -75,6 +75,7 @@ import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import api from '@/lib/api';
+import ApiConstants from '@/lib/api-constants';
 import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface User {
@@ -174,10 +175,10 @@ export default function UsersPage() {
         limit,
       };
       if (search.trim()) params.search = search.trim();
-      if (roleFilter !== 'ALL') params.role = roleFilter;
-      if (statusFilter !== 'ALL') params.accountStatus = statusFilter;
+      if (roleFilter !== 'ALL') params.role = roleFilter === 'NGO' ? 'Recipient' : roleFilter;
+      if (statusFilter !== 'ALL') params.accountStatus = statusFilter === 'On Hold' ? 'Pending' : statusFilter;
 
-      const response = await api.get('/users', { params });
+      const response = await api.get(ApiConstants.users, { params });
       
       const resData = response.data.data || response.data;
       setUsers(resData.data || []);
@@ -267,11 +268,13 @@ export default function UsersPage() {
     e.preventDefault();
     try {
       setSubmitLoading(true);
+      const backendRole = formRole === 'NGO' ? 'Recipient' : formRole;
+      const backendStatus = formStatus === 'On Hold' ? 'Pending' : formStatus;
       const payload: Record<string, any> = {
         name: formName.trim(),
         password: formPassword,
-        role: formRole,
-        accountStatus: formStatus,
+        role: backendRole,
+        accountStatus: backendStatus,
         isVerified: formStatus === 'Verified',
         emailVerified: formEmailVerified || formStatus === 'Verified',
         phoneVerified: formPhoneVerified || formStatus === 'Verified',
@@ -285,6 +288,7 @@ export default function UsersPage() {
       if (formDescription.trim()) payload.description = formDescription.trim();
 
       if (formRole === 'NGO') {
+        payload.isVerifiedRecipient = formStatus === 'Verified';
         if (formNgoName.trim()) payload.ngoName = formNgoName.trim();
         if (formNgoRegistrationNumber.trim()) payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim();
         if (formPositionInNgo.trim()) payload.positionInNgo = formPositionInNgo.trim();
@@ -293,7 +297,7 @@ export default function UsersPage() {
         if (formProofOfAffiliation.trim()) payload.proofOfAffiliation = formProofOfAffiliation.trim();
       }
 
-      await api.post('/users', payload);
+      await api.post(ApiConstants.users, payload);
       toast.success('User created successfully!');
       setIsCreateOpen(false);
       fetchUsers();
@@ -337,31 +341,34 @@ export default function UsersPage() {
         phoneVerified: true,
       };
 
-      if (user.role === 'NGO') {
+      if (user.role === 'NGO' || (user.role as string) === 'Recipient' || user.ngoName) {
         payload.isVerifiedRecipient = true;
       }
 
-      await api.patch(`/users/${user.id}`, payload);
-      
-      // Also approve KYC request if one exists for this user/NGO
-      try {
-        await api.patch(`/kyc/admin/requests/${user.id}/review`, { status: 'APPROVED' });
-      } catch {
-        // silent if no separate KYC request record
-      }
-
+      await api.patch(ApiConstants.userById(user.id), payload);
       broadcastModerationUpdate('kyc');
-            toast.success(`User "${user.name}" verified on platform & web app!`);
+      toast.success(`User "${user.name}" verified on platform & web app!`);
       fetchUsers();
     } catch (err: any) {
       console.error(err);
-      try {
-        await api.patch(`/kyc/admin/requests/${user.id}/review`, { status: 'APPROVED' });
-        toast.success(`User "${user.name}" verified on platform & web app!`);
-        fetchUsers();
-      } catch {
-        toast.error(err.response?.data?.message || 'Failed to verify user.');
-      }
+      toast.error(err.response?.data?.message || 'Failed to verify user.');
+    }
+  };
+
+  const handleQuickUnverify = async (user: User) => {
+    try {
+      const payload: Record<string, any> = {
+        isVerified: false,
+        accountStatus: 'Pending',
+        isVerifiedRecipient: false,
+      };
+      await api.patch(ApiConstants.userById(user.id), payload);
+      broadcastModerationUpdate('kyc');
+      toast.success(`User "${user.name}" marked as unverified (Pending review).`);
+      fetchUsers();
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to unverify user.');
     }
   };
 
@@ -371,12 +378,12 @@ export default function UsersPage() {
         isVerified: false,
         accountStatus: 'Rejected',
       };
-      if (user.role === 'NGO') {
+      if (user.role === 'NGO' || (user.role as string) === 'Recipient') {
         payload.isVerifiedRecipient = false;
       }
-      await api.patch(`/users/${user.id}`, payload);
+      await api.patch(ApiConstants.userById(user.id), payload);
       broadcastModerationUpdate('kyc');
-            toast.success(`User "${user.name}" marked as rejected/unverified.`);
+      toast.success(`User "${user.name}" marked as rejected.`);
       fetchUsers();
     } catch (err: any) {
       console.error(err);
@@ -391,7 +398,7 @@ export default function UsersPage() {
         accountStatus: 'Pending',
         description: `[ON HOLD] Application placed on hold for administrative audit.`,
       };
-      await api.patch(`/users/${user.id}`, payload);
+      await api.patch(ApiConstants.userById(user.id), payload);
       toast.info(`User "${user.name}" placed on hold.`);
       fetchUsers();
     } catch (err: any) {
@@ -407,10 +414,12 @@ export default function UsersPage() {
     try {
       setSubmitLoading(true);
       const isNowVerified = formStatus === 'Verified';
+      const backendRole = formRole === 'NGO' ? 'Recipient' : formRole;
+      const backendStatus = formStatus === 'On Hold' ? 'Pending' : formStatus;
       const payload: Record<string, any> = {
         name: formName.trim() || selectedUser.name,
-        role: formRole,
-        accountStatus: formStatus,
+        role: backendRole,
+        accountStatus: backendStatus,
         isVerified: isNowVerified,
         emailVerified: isNowVerified ? true : formEmailVerified,
         phoneVerified: isNowVerified ? true : formPhoneVerified,
@@ -424,6 +433,7 @@ export default function UsersPage() {
       if (formDescription.trim()) payload.description = formDescription.trim();
 
       if (formRole === 'NGO') {
+        payload.isVerifiedRecipient = isNowVerified;
         if (formNgoName.trim()) payload.ngoName = formNgoName.trim();
         if (formNgoRegistrationNumber.trim()) payload.ngoRegistrationNumber = formNgoRegistrationNumber.trim();
         if (formPositionInNgo.trim()) payload.positionInNgo = formPositionInNgo.trim();
@@ -432,9 +442,9 @@ export default function UsersPage() {
         if (formProofOfAffiliation.trim()) payload.proofOfAffiliation = formProofOfAffiliation.trim();
       }
 
-      await api.patch(`/users/${selectedUser.id}`, payload);
+      await api.patch(ApiConstants.userById(selectedUser.id), payload);
       broadcastModerationUpdate('kyc');
-            toast.success('User updated successfully!');
+      toast.success('User updated successfully!');
       setIsEditOpen(false);
       fetchUsers();
     } catch (err: any) {
@@ -459,7 +469,7 @@ export default function UsersPage() {
     if (!selectedUser) return;
     try {
       setSubmitLoading(true);
-      await api.delete(`/users/${selectedUser.id}`);
+      await api.delete(ApiConstants.userById(selectedUser.id));
       toast.success('User soft-deleted successfully!');
       setIsDeleteOpen(false);
       fetchUsers();
@@ -763,9 +773,9 @@ export default function UsersPage() {
                                   </DropdownMenuItem>
                                 </>
                               ) : (
-                                <DropdownMenuItem onClick={() => handleQuickReject(user)} className="cursor-pointer gap-2 text-amber-600 font-medium">
+                                <DropdownMenuItem onClick={() => handleQuickUnverify(user)} className="cursor-pointer gap-2 text-amber-600 font-medium">
                                   <Shield className="h-4 w-4 text-amber-600" />
-                                  Unverify Account
+                                  Unverify User
                                 </DropdownMenuItem>
                               )}
 

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import ApiConstants from './api-constants';
 
 const COOKIE_OPTIONS = {
   secure: process.env.NODE_ENV === 'production',
@@ -8,10 +9,7 @@ const COOKIE_OPTIONS = {
 };
 
 const api = axios.create({
-  baseURL: (() => {
-    const raw = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3837/api').replace(/\/+$/, '');
-    return raw.endsWith('/api') ? raw : `${raw}/api`;
-  })(),
+  baseURL: ApiConstants.baseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -52,7 +50,10 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     // Avoid infinite loop if refresh token request itself fails with 401
-    if (error.response?.status === 401 && originalRequest.url?.includes('/auth/refresh')) {
+    if (
+      error.response?.status === 401 &&
+      originalRequest.url?.includes(ApiConstants.refreshToken)
+    ) {
       handleLogout();
       return Promise.reject(error);
     }
@@ -83,12 +84,12 @@ api.interceptors.response.use(
 
       try {
         const response = await axios.post(
-          `${api.defaults.baseURL}/auth/refresh`,
+          `${api.defaults.baseURL}${ApiConstants.refreshToken}`,
           {},
           {
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${refreshToken}`,
+              Authorization: `Bearer ${refreshToken}`,
             },
           }
         );
@@ -132,4 +133,3 @@ function handleLogout() {
 }
 
 export default api;
-

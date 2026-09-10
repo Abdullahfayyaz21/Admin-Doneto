@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import api from '@/lib/api';
+import ApiConstants from '@/lib/api-constants';
 import { useAuth } from '@/lib/auth-context';
 import { LogoLoader } from '@/components/brand/logo-loader';
 
@@ -32,7 +33,7 @@ export function LoginForm() {
     setError('');
 
     try {
-      const response = await api.post('/auth/login', {
+      const response = await api.post(ApiConstants.login, {
         identifier: email.trim(),
         password,
       });

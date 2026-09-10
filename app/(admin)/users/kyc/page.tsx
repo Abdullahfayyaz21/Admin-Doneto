@@ -93,6 +93,7 @@ import {
   KycStatus,
   KycRequest,
 } from '@/lib/kyc';
+import ApiConstants from '@/lib/api-constants';
 import {
   useRealtimeKyc,
   broadcastKycUpdate,
@@ -412,7 +413,7 @@ export default function KYCRequestsPage() {
   const getFileUrl = (path: string | null | undefined) => {
     if (!path) return '#';
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3837/api';
+    const baseUrl = ApiConstants.baseUrl;
     const serverBase = baseUrl.replace('/api', '');
     return `${serverBase}${path.startsWith('/') ? '' : '/'}${path}`;
   };

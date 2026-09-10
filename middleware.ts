@@ -26,7 +26,9 @@ async function refreshTokens(refreshToken: string) {
     return null;
   }
 
-  const rawUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3837/api';
+  const rawUrl =
+    process.env.NEXT_PUBLIC_API_URL ||
+    'https://doneto-backend-production-93dc.up.railway.app/api';
   const cleanUrl = rawUrl.replace(/\/+$/, '');
   const apiUrl = cleanUrl.endsWith('/api') ? cleanUrl : `${cleanUrl}/api`;
 

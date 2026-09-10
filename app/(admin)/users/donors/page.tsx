@@ -111,6 +111,23 @@ export default function DonorsPage() {
     }
   };
 
+  const handleUnverifyDonor = async (donor: DonorUser) => {
+    try {
+      await api.patch(`/users/${donor.id}`, {
+        isVerified: false,
+        accountStatus: 'Pending',
+        isVerifiedRecipient: false,
+      });
+      toast.success(`Donor "${donor.name}" status reverted to Pending Verification.`);
+      broadcastModerationUpdate('kyc');
+      fetchDonors();
+      if (isDetailOpen) setIsDetailOpen(false);
+    } catch (err: any) {
+      console.error(err);
+      toast.error(err.response?.data?.message || 'Failed to unverify donor.');
+    }
+  };
+
   useEffect(() => {
     fetchDonors();
 
@@ -147,7 +164,7 @@ export default function DonorsPage() {
     currentPage * itemsPerPage
   );
 
-  const verifiedCount = donors.filter((d) => d.isVerified || d.emailVerified).length;
+  const verifiedCount = donors.filter((d) => d.isVerified && d.accountStatus === 'Verified').length;
 
   return (
     <div className="space-y-6">
@@ -263,7 +280,7 @@ export default function DonorsPage() {
                       <span className="text-xs text-muted-foreground">{donor.phoneNumber || 'Not provided'}</span>
                     </TableCell>
                     <TableCell>
-                      {donor.isVerified || donor.emailVerified ? (
+                      {donor.isVerified && donor.accountStatus === 'Verified' ? (
                         <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-xs font-medium rounded-lg">
                           <CheckCircle2 className="h-3 w-3 mr-1" /> Verified
                         </Badge>
@@ -278,7 +295,7 @@ export default function DonorsPage() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1.5">
-                        {!donor.isVerified && !donor.emailVerified && (
+                        {(!donor.isVerified || donor.accountStatus !== 'Verified') ? (
                           <Button
                             size="sm"
                             variant="outline"
@@ -287,6 +304,16 @@ export default function DonorsPage() {
                           >
                             <UserCheck className="h-3.5 w-3.5 mr-1" />
                             Verify
+                          </Button>
+                        ) : (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUnverifyDonor(donor)}
+                            className="h-8 rounded-lg px-2 text-xs font-semibold text-amber-600 border-amber-500/30 hover:bg-amber-500/10"
+                          >
+                            <Shield className="h-3.5 w-3.5 mr-1" />
+                            Unverify
                           </Button>
                         )}
                         <Button
@@ -389,13 +416,22 @@ export default function DonorsPage() {
               </div>
 
               <DialogFooter className="flex flex-col sm:flex-row gap-2">
-                {!selectedDonor.isVerified && !selectedDonor.emailVerified && (
+                {(!selectedDonor.isVerified || selectedDonor.accountStatus !== 'Verified') ? (
                   <Button
                     onClick={() => handleVerifyDonor(selectedDonor)}
                     className="bg-[#185500] hover:bg-[#1e6b00] text-white dark:bg-white dark:text-black rounded-xl flex-1 text-xs font-semibold"
                   >
                     <UserCheck className="h-3.5 w-3.5 mr-1" />
-                    Verify Donor (Web App)
+                    Verify Donor
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleUnverifyDonor(selectedDonor)}
+                    variant="outline"
+                    className="border-amber-500/40 text-amber-600 hover:bg-amber-500/10 rounded-xl flex-1 text-xs font-semibold"
+                  >
+                    <Shield className="h-3.5 w-3.5 mr-1" />
+                    Unverify Donor
                   </Button>
                 )}
                 <Button
