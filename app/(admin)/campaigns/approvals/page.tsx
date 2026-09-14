@@ -49,6 +49,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import api from '@/lib/api';
+import { ApiConstants } from '@/lib/api-constants';
 import { toast } from 'sonner';
 import { TableSkeleton } from '@/components/brand/states';
 import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
@@ -100,7 +101,14 @@ export default function ApprovalsQueuePage() {
       if (!isBackground) setLoading(true);
       else setIsSyncing(true);
 
-      const res = await api.get('/fundraising-campaigns/admin/pending');
+      let res;
+      try {
+        res = await api.get(ApiConstants.fundraisingCampaigns, {
+          params: { approvalStatus: 'Pending' },
+        });
+      } catch (fetchErr) {
+        res = await api.get('/fundraising-campaigns/admin/pending');
+      }
       const data = res.data?.data || res.data || [];
       if (Array.isArray(data)) {
         setCampaigns(data);
@@ -149,8 +157,9 @@ export default function ApprovalsQueuePage() {
     try {
       setIsSubmitting(true);
       const isApproved = reviewAction === 'Approve';
-      await api.patch(`/fundraising-campaigns/${selectedCampaign.id}/review`, {
-        approved: isApproved,
+      await api.patch(ApiConstants.fundraisingCampaignById(selectedCampaign.id), {
+        approvalStatus: isApproved ? 'Approved' : 'Rejected',
+        campaignStatus: isApproved ? 'Active' : 'Paused',
         rejectionReason: !isApproved ? rejectionReason.trim() : undefined,
       });
 

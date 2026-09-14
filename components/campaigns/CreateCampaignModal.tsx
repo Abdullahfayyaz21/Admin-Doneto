@@ -50,6 +50,7 @@ import { toast } from 'sonner';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { useVerification } from '@/hooks/useVerification';
+import { cn } from '@/lib/utils';
 
 interface Category {
   id: number;
@@ -61,6 +62,7 @@ interface CreateCampaignModalProps {
   onOpenChange: (open: boolean) => void;
   categories: Category[];
   onSuccess: () => void;
+  initialNgoName?: string;
 }
 
 const PROVINCES = [
@@ -88,6 +90,7 @@ export function CreateCampaignModal({
   onOpenChange,
   categories,
   onSuccess,
+  initialNgoName,
 }: CreateCampaignModalProps) {
   const { user } = useAuth();
   const { canCreateCampaign, isVerified, statusLabel } = useVerification();
@@ -118,9 +121,20 @@ export function CreateCampaignModal({
   const [beneficiaryCity, setBeneficiaryCity] = useState('');
   const [beneficiaryProvince, setBeneficiaryProvince] = useState('Punjab');
   const [beneficiaryCount, setBeneficiaryCount] = useState('');
-  const [contactPerson, setContactPerson] = useState(user?.name || '');
-  const [contactEmail, setContactEmail] = useState(user?.email || '');
-  const [contactPhone, setContactPhone] = useState(user?.phoneNumber || '');
+  const [contactPerson, setContactPerson] = useState(user?.role !== 'Admin' ? user?.name || '' : '');
+  const [contactEmail, setContactEmail] = useState(user?.role !== 'Admin' ? user?.email || '' : '');
+  const [contactPhone, setContactPhone] = useState(user?.role !== 'Admin' ? user?.phoneNumber || '' : '');
+  const [ngoName, setNgoName] = useState(initialNgoName || user?.ngoName || '');
+  const [suggestedNgos, setSuggestedNgos] = useState<string[]>([
+    'Edhi Foundation',
+    'Shaukat Khanum Memorial Cancer Hospital',
+    'Saylani Welfare International Trust',
+    'Alkhidmat Foundation Pakistan',
+    'Chhipa Welfare Association',
+    'Indus Hospital & Health Network',
+    'The Citizens Foundation (TCF)',
+    'Akhuwat Foundation',
+  ]);
 
   // Step 4: Media & Documents
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
@@ -128,14 +142,41 @@ export function CreateCampaignModal({
   const [docFiles, setDocFiles] = useState<File[]>([]);
   const [termsAgreed, setTermsAgreed] = useState(false);
 
-  // Sync user info on open
+  // Fetch verified NGOs to populate suggestion options
   useEffect(() => {
-    if (open && user) {
-      if (!contactPerson && user.name) setContactPerson(user.name);
-      if (!contactEmail && user.email) setContactEmail(user.email);
-      if (!contactPhone && user.phoneNumber) setContactPhone(user.phoneNumber);
+    if (open) {
+      api
+        .get('/kyc/verified-ngos?limit=100')
+        .then((res) => {
+          const list = res.data?.data || res.data || [];
+          if (Array.isArray(list)) {
+            const names: string[] = list
+              .map((n: any) => (n.publicName || n.ngoName || n.legalName || '').trim())
+              .filter(Boolean);
+            if (names.length > 0) {
+              setSuggestedNgos((prev) => Array.from(new Set([...names, ...prev])));
+            }
+          }
+        })
+        .catch(() => {});
     }
-  }, [open, user, contactPerson, contactEmail, contactPhone]);
+  }, [open]);
+
+  // Sync user & initial info on open
+  useEffect(() => {
+    if (open) {
+      if (initialNgoName) {
+        setNgoName(initialNgoName);
+      } else if (user?.ngoName && !ngoName) {
+        setNgoName(user.ngoName);
+      }
+      if (user && user.role !== 'Admin') {
+        if (!contactPerson && user.name) setContactPerson(user.name);
+        if (!contactEmail && user.email) setContactEmail(user.email);
+        if (!contactPhone && user.phoneNumber) setContactPhone(user.phoneNumber);
+      }
+    }
+  }, [open, user, initialNgoName]);
 
   // Clean preview URLs on unmount
   useEffect(() => {
@@ -307,6 +348,7 @@ export function CreateCampaignModal({
     setCoverPreviewUrl(null);
     setDocFiles([]);
     setTermsAgreed(false);
+    setNgoName(initialNgoName || user?.ngoName || '');
   };
 
   const handleSubmitCampaign = async (e: React.FormEvent) => {
@@ -368,6 +410,12 @@ export function CreateCampaignModal({
         contactPerson: contactPerson.trim() || undefined,
         contactEmail: contactEmail.trim() || undefined,
         contactPhone: contactPhone.trim() || undefined,
+        ngoName:
+          ngoName.trim() ||
+          (beneficiaryType === 'Organization' || beneficiaryType === 'Non-Profit Organization'
+            ? beneficiaryName.trim()
+            : undefined) ||
+          undefined,
         campaignImageId: campaignImageId || undefined,
         supportingDocuments: supportingDocuments.length > 0 ? supportingDocuments : undefined,
       };
@@ -528,6 +576,73 @@ export function CreateCampaignModal({
                       {shortSummary.length}/160
                     </span>
                   </div>
+                </div>
+
+                {/* Associated NGO / Organization in Step 1 */}
+                <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/20 p-3.5">
+                  <Label htmlFor="step1NgoName" className="text-xs font-semibold flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-foreground">
+                      <Building2 className="h-3.5 w-3.5 text-[#185500] dark:text-emerald-400" />
+                      Associated NGO / Organization
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-normal">
+                      Select existing or enter new
+                    </span>
+                  </Label>
+                  <div className="relative">
+                    <Input
+                      id="step1NgoName"
+                      list="campaign-ngo-datalist"
+                      placeholder="e.g. Edhi Foundation, Shaukat Khanum, Saylani Welfare..."
+                      value={ngoName}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setNgoName(val);
+                        if (
+                          (beneficiaryType === 'Organization' ||
+                            beneficiaryType === 'Non-Profit Organization') &&
+                          (!beneficiaryName || beneficiaryName === ngoName)
+                        ) {
+                          setBeneficiaryName(val);
+                        }
+                      }}
+                      className="rounded-xl bg-background"
+                    />
+                    <datalist id="campaign-ngo-datalist">
+                      {suggestedNgos.map((n) => (
+                        <option key={n} value={n} />
+                      ))}
+                    </datalist>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] text-muted-foreground font-medium">Quick Select:</span>
+                    {suggestedNgos.slice(0, 5).map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          setNgoName(name);
+                          if (
+                            beneficiaryType === 'Organization' ||
+                            beneficiaryType === 'Non-Profit Organization'
+                          ) {
+                            setBeneficiaryName(name);
+                          }
+                        }}
+                        className={cn(
+                          'text-[10px] px-2 py-0.5 rounded-lg border transition-all cursor-pointer',
+                          ngoName === name
+                            ? 'bg-[#185500] text-white border-[#185500] dark:bg-emerald-600'
+                            : 'bg-muted/50 border-border/70 text-muted-foreground hover:text-foreground hover:bg-muted'
+                        )}
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Assigning an NGO allows this campaign to be tracked under that organization in the NGOs Directory.
+                  </p>
                 </div>
 
                 <div className="space-y-2">
@@ -694,7 +809,19 @@ export function CreateCampaignModal({
                     <Label htmlFor="benType" className="text-xs font-semibold">
                       Beneficiary Type
                     </Label>
-                    <Select value={beneficiaryType} onValueChange={setBeneficiaryType}>
+                    <Select
+                      value={beneficiaryType}
+                      onValueChange={(val) => {
+                        setBeneficiaryType(val);
+                        if (
+                          (val === 'Organization' || val === 'Non-Profit Organization') &&
+                          ngoName &&
+                          !beneficiaryName
+                        ) {
+                          setBeneficiaryName(ngoName);
+                        }
+                      }}
+                    >
                       <SelectTrigger id="benType" className="rounded-xl">
                         <SelectValue />
                       </SelectTrigger>
@@ -716,10 +843,77 @@ export function CreateCampaignModal({
                       id="benName"
                       placeholder="e.g. Village Al-Huda Residents or Patient Ali Raza"
                       value={beneficiaryName}
-                      onChange={(e) => setBeneficiaryName(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setBeneficiaryName(val);
+                        if (
+                          (beneficiaryType === 'Organization' ||
+                            beneficiaryType === 'Non-Profit Organization') &&
+                          (!ngoName || ngoName === beneficiaryName)
+                        ) {
+                          setNgoName(val);
+                        }
+                      }}
                       className="rounded-xl"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2 rounded-2xl border border-border/60 bg-muted/20 p-3.5">
+                  <Label htmlFor="campNgoName" className="text-xs font-semibold flex items-center justify-between">
+                    <span className="flex items-center gap-1.5 text-foreground">
+                      <Building2 className="h-3.5 w-3.5 text-[#185500] dark:text-emerald-400" />
+                      Associated NGO / Organization Name
+                    </span>
+                    <span className="text-[10px] text-muted-foreground font-normal">Optional</span>
+                  </Label>
+                  <Input
+                    id="campNgoName"
+                    list="campaign-ngo-datalist"
+                    placeholder="e.g. Edhi Foundation, Shaukat Khanum, Saylani..."
+                    value={ngoName}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setNgoName(val);
+                      if (
+                        (beneficiaryType === 'Organization' ||
+                          beneficiaryType === 'Non-Profit Organization') &&
+                        (!beneficiaryName || beneficiaryName === ngoName)
+                      ) {
+                        setBeneficiaryName(val);
+                      }
+                    }}
+                    className="rounded-xl bg-background"
+                  />
+                  <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                    <span className="text-[10px] text-muted-foreground font-medium">Quick Select:</span>
+                    {suggestedNgos.slice(0, 5).map((name) => (
+                      <button
+                        key={name}
+                        type="button"
+                        onClick={() => {
+                          setNgoName(name);
+                          if (
+                            beneficiaryType === 'Organization' ||
+                            beneficiaryType === 'Non-Profit Organization'
+                          ) {
+                            setBeneficiaryName(name);
+                          }
+                        }}
+                        className={cn(
+                          'text-[10px] px-2 py-0.5 rounded-lg border transition-all cursor-pointer',
+                          ngoName === name
+                            ? 'bg-[#185500] text-white border-[#185500] dark:bg-emerald-600'
+                            : 'bg-muted/50 border-border/70 text-muted-foreground hover:text-foreground hover:bg-muted'
+                        )}
+                      >
+                        {name}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-muted-foreground">
+                    Assign this campaign to an NGO listing so all initiatives under this organization appear in the NGOs directory.
+                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -1005,9 +1199,20 @@ export function CreateCampaignModal({
                         </span>
                       </div>
                       <div>
-                        <span className="text-muted-foreground block text-[10px] uppercase font-bold">Organizer</span>
+                        <span className="text-muted-foreground block text-[10px] uppercase font-bold">Associated NGO</span>
+                        <span className="font-semibold text-emerald-600 dark:text-emerald-400 truncate block">
+                          {ngoName ||
+                            (beneficiaryType === 'Organization' || beneficiaryType === 'Non-Profit Organization'
+                              ? beneficiaryName
+                              : null) ||
+                            user?.ngoName ||
+                            'Direct Campaign'}
+                        </span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground block text-[10px] uppercase font-bold">Organizer User</span>
                         <span className="font-semibold text-foreground truncate block">
-                          {user?.ngoName || user?.name || 'Verified User'}
+                          {user?.name || 'Verified User'}
                         </span>
                       </div>
                     </div>
