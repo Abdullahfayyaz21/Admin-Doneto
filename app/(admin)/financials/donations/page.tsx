@@ -65,16 +65,64 @@ export default function DonationsPage() {
   const fetchDonations = useCallback(async (isBackground = false) => {
     try {
       if (!isBackground) setLoading(true);
-      const res = await api.get('/donations/admin');
-      const data = res.data?.data || res.data || [];
-      if (Array.isArray(data)) {
-        setDonations(data);
-      } else {
-        setDonations([]);
+
+      // Attempt /donations or campaign funding metrics
+      const [campsRes, myDonationsRes] = await Promise.allSettled([
+        api.get('/campaigns'),
+        api.get('/donations/me'),
+      ]);
+
+      const items: DonationItem[] = [];
+
+      // Add user personal donations if present
+      if (myDonationsRes.status === 'fulfilled') {
+        const myData = myDonationsRes.value.data?.data || myDonationsRes.value.data || [];
+        if (Array.isArray(myData)) {
+          myData.forEach((d: any, idx: number) => {
+            items.push({
+              id: Number(d.id) || idx + 1000,
+              campaignId: String(d.campaignId || d.campaign_id || ''),
+              campaignTitle: d.campaignTitle || d.campaign?.title || 'Direct Donation',
+              donorId: String(d.donorId || d.userId || ''),
+              donorName: d.donorName || 'Registered Donor',
+              donorEmail: d.donorEmail || '',
+              amount: Number(d.amount) || 0,
+              isAnonymous: Boolean(d.isAnonymous),
+              message: d.message || '',
+              createdAt: d.createdAt || new Date().toISOString(),
+            });
+          });
+        }
       }
+
+      // Populate campaign financial records from campaigns with collected amounts
+      if (campsRes.status === 'fulfilled') {
+        const campList = campsRes.value.data?.data || campsRes.value.data || [];
+        if (Array.isArray(campList)) {
+          campList.forEach((c: any, index: number) => {
+            const raised = Number(c.collectedAmount) || 0;
+            if (raised > 0) {
+              items.push({
+                id: index + 1,
+                campaignId: String(c.id),
+                campaignTitle: c.title || 'Campaign Contribution',
+                donorId: c.createdById || '',
+                donorName: c.contactPerson || c.creator?.name || c.ngoName || 'Public Backers',
+                donorEmail: c.contactEmail || c.creator?.email || '',
+                amount: raised,
+                isAnonymous: Boolean(c.allowAnonymousDonations),
+                message: c.shortSummary || `Funding for ${c.title}`,
+                createdAt: c.createdAt || new Date().toISOString(),
+              });
+            }
+          });
+        }
+      }
+
+      setDonations(items);
     } catch (error: any) {
       if (!isBackground) {
-        toast.error(error.response?.data?.message || 'Failed to load donations list');
+        toast.error('Failed to load donations ledger');
       }
       setDonations([]);
     } finally {

@@ -85,10 +85,32 @@ export default function DeleteRequestsPage() {
       if (!isBackground) setLoading(true);
       else setIsSyncing(true);
 
-      const res = await api.get('/fundraising-campaigns/admin/delete-requests');
-      const data = res.data?.data || res.data || [];
-      if (Array.isArray(data)) {
-        setRequests(data);
+      const res = await api.get('/campaigns');
+      const list = res.data?.data || res.data || [];
+
+      if (Array.isArray(list)) {
+        const deleteReqs = list
+          .filter((c: any) => c.deleteRequested === true)
+          .map((c: any) => ({
+            id: String(c.id),
+            title: c.title,
+            description: c.description,
+            deleteReason: c.deleteRequestReason || 'Deletion requested by creator',
+            collectedAmount: c.collectedAmount || 0,
+            targetAmount: c.goalAmount || 0,
+            donorCount: c.donorCount || 0,
+            createdBy: {
+              id: c.createdById || '',
+              name: c.creator?.name || c.contactPerson || 'Creator',
+              email: c.creator?.email || c.contactEmail || '',
+              ngoName: c.ngoName || c.creator?.ngoName || '',
+            },
+            coverImageUrl: c.imageUrl,
+            createdAt: c.createdAt,
+            deleteRequestedAt: c.deleteRequestedAt || c.updatedAt || c.createdAt,
+            status: c.campaignStatus || 'Active',
+          }));
+        setRequests(deleteReqs);
       } else {
         setRequests([]);
       }
@@ -128,15 +150,25 @@ export default function DeleteRequestsPage() {
     try {
       setIsSubmitting(true);
       const isApprove = actionType === 'Approve';
-      await api.patch(
-        `/fundraising-campaigns/admin/delete-requests/${selectedCampaign.id}/review`,
-        { approve: isApprove }
-      );
+
+      if (isApprove) {
+        // Mark campaign as Cancelled and remove deletion pending flag
+        await api.patch(`/fundraising-campaigns/${selectedCampaign.id}`, {
+          campaignStatus: 'Cancelled',
+          deleteRequested: false,
+        });
+      } else {
+        // Reject deletion request: restore normal status and clear reason
+        await api.patch(`/fundraising-campaigns/${selectedCampaign.id}`, {
+          deleteRequested: false,
+          deleteRequestReason: null,
+        });
+      }
 
       toast.success(
         isApprove
-          ? `Campaign deletion approved and processed.`
-          : `Campaign deletion request rejected.`
+          ? `Campaign deletion approved. Campaign has been cancelled.`
+          : `Campaign deletion request rejected. Campaign remains active.`
       );
 
       setIsConfirmOpen(false);

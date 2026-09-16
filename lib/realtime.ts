@@ -11,9 +11,9 @@ export type ModerationEventType =
   | 'kyc'
   | 'users'
   | 'delete_requests'
-  | 'reports'
-  | 'withdrawals'
+  | 'donations'
   | 'campaigns'
+  | 'notifications'
   | 'all';
 
 // Singleton subscriber set and shared channels to prevent EventEmitter/stream leaks

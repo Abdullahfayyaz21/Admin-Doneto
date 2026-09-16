@@ -8,17 +8,15 @@ import {
   CheckSquare,
   ShieldCheck,
   AlertTriangle,
-  Flag,
   Heart,
   Users,
   Building2,
   UserCheck,
-  Sparkles,
   Image as ImageIcon,
   DollarSign,
-  Wallet,
   Tag,
   Layers,
+  Bell,
   Settings,
   LogOut,
   PanelLeftClose,
@@ -57,7 +55,6 @@ const navSections: NavSection[] = [
       { label: 'Approvals Queue', href: '/campaigns/approvals', icon: CheckSquare, badgeKey: 'pendingCampaigns' },
       { label: 'KYC Verifications', href: '/users/kyc', icon: ShieldCheck, badgeKey: 'pendingKyc' },
       { label: 'Deletion Requests', href: '/campaigns/delete-requests', icon: AlertTriangle, badgeKey: 'deleteRequests' },
-      { label: 'Reported Campaigns', href: '/campaigns/reports', icon: Flag, badgeKey: 'reports' },
     ],
   },
   {
@@ -67,15 +64,13 @@ const navSections: NavSection[] = [
       { label: 'All Users', href: '/users', icon: Users },
       { label: 'NGOs', href: '/users/ngos', icon: Building2 },
       { label: 'Donors', href: '/users/donors', icon: UserCheck },
-      { label: 'Boost Requests', href: '/campaigns/boosts', icon: Sparkles },
       { label: 'Media Assets', href: '/media', icon: ImageIcon },
     ],
   },
   {
-    title: 'Finances & Payouts',
+    title: 'Finances',
     items: [
-      { label: 'Donations', href: '/financials/donations', icon: DollarSign },
-      { label: 'Withdrawals', href: '/financials/withdrawals', icon: Wallet, badgeKey: 'pendingWithdrawals' },
+      { label: 'Donations & Funds', href: '/financials/donations', icon: DollarSign },
     ],
   },
   {
@@ -83,6 +78,7 @@ const navSections: NavSection[] = [
     items: [
       { label: 'Campaign Categories', href: '/campaigns/categories', icon: Tag },
       { label: 'NGO Categories', href: '/users/kyc-categories', icon: Layers },
+      { label: 'Notifications', href: '/notifications', icon: Bell, badgeKey: 'unreadNotifications' },
       { label: 'Settings', href: '/settings', icon: Settings },
     ],
   },
@@ -103,52 +99,55 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
   useEffect(() => {
     setMounted(true);
 
-    // Fetch badges/counts in background
+    // Fetch badges/counts using only real, verified backend endpoints
     const fetchCounters = async () => {
       try {
-        const [pendingRes, delReqRes, kycRes, reportsRes, withdrawRes] = await Promise.allSettled([
+        const [pendingRes, campsRes, kycRes, notifRes] = await Promise.allSettled([
           api.get('/fundraising-campaigns/admin/pending'),
-          api.get('/fundraising-campaigns/admin/delete-requests'),
+          api.get(ApiConstants.campaigns),
           api.get(ApiConstants.users, { params: { accountStatus: 'Pending', limit: 1 } }),
-          api.get('/fundraising-campaigns/admin/reports', { params: { limit: 1 } }),
-          api.get('/fundraising-campaigns/admin/withdraw-requests'),
+          api.get(ApiConstants.notificationsUnreadCount),
         ]);
 
         const counts: { [key: string]: number } = {};
 
+        // Pending Campaigns Queue
         if (pendingRes.status === 'fulfilled') {
           const list = pendingRes.value.data?.data || pendingRes.value.data || [];
           counts.pendingCampaigns = Array.isArray(list) ? list.length : 0;
+        } else if (campsRes.status === 'fulfilled') {
+          const raw = campsRes.value.data?.data || campsRes.value.data || [];
+          if (Array.isArray(raw)) {
+            counts.pendingCampaigns = raw.filter((c: any) => c.approvalStatus === 'Pending').length;
+          }
         }
-        if (delReqRes.status === 'fulfilled') {
-          const list = delReqRes.value.data?.data || delReqRes.value.data || [];
-          counts.deleteRequests = Array.isArray(list) ? list.length : 0;
+
+        // Deletion Requests: campaigns where deleteRequested is true
+        if (campsRes.status === 'fulfilled') {
+          const raw = campsRes.value.data?.data || campsRes.value.data || [];
+          if (Array.isArray(raw)) {
+            counts.deleteRequests = raw.filter((c: any) => c.deleteRequested === true).length;
+          }
         }
+
+        // Pending KYC requests
         if (kycRes.status === 'fulfilled') {
           const raw = kycRes.value.data?.data || kycRes.value.data;
-          const total = typeof raw?.total === 'number' 
-            ? raw.total 
-            : Array.isArray(raw?.data) 
-              ? raw.data.length 
-              : Array.isArray(raw) 
-                ? raw.length 
-                : 0;
+          const total =
+            typeof raw?.total === 'number'
+              ? raw.total
+              : Array.isArray(raw?.data)
+              ? raw.data.length
+              : Array.isArray(raw)
+              ? raw.length
+              : 0;
           counts.pendingKyc = total;
         }
-        if (reportsRes.status === 'fulfilled') {
-          const resData = reportsRes.value.data?.data || reportsRes.value.data || [];
-          const total = typeof reportsRes.value.data?.total === 'number'
-            ? reportsRes.value.data.total
-            : Array.isArray(resData)
-              ? resData.length
-              : 0;
-          counts.reports = total;
-        }
-        if (withdrawRes.status === 'fulfilled') {
-          const raw = withdrawRes.value.data?.data || withdrawRes.value.data || [];
-          const list = Array.isArray(raw) ? raw : [];
-          const pendingW = list.filter((w: any) => w.status === 'Pending' || w.status === 'PENDING').length;
-          counts.pendingWithdrawals = pendingW;
+
+        // Unread Notifications
+        if (notifRes.status === 'fulfilled') {
+          const val = notifRes.value.data?.unreadCount ?? notifRes.value.data?.data?.unreadCount ?? 0;
+          counts.unreadNotifications = Number(val) || 0;
         }
 
         setBadgeCounts(counts);

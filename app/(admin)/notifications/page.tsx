@@ -133,9 +133,9 @@ export default function NotificationsPage() {
   const getTargetLink = (n: NotificationItem) => {
     const action = n.data?.actionType;
     if (action === 'kyc') return '/users/kyc';
-    if (action === 'campaign_detail' || action === 'campaigns') return '/campaigns';
-    if (action === 'withdrawals') return '/financials/withdrawals';
-    if (action === 'reports') return '/campaigns/reports';
+    if (action === 'campaign_detail' || action === 'campaigns' || action === 'reports') return '/campaigns';
+    if (action === 'withdrawals' || action === 'donations') return '/financials/donations';
+    if (action === 'delete_requests') return '/campaigns/delete-requests';
     return null;
   };
 

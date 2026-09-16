@@ -240,20 +240,25 @@ export default function CampaignsPage() {
   const fetchCampaignsAndStats = async () => {
     try {
       setLoading(true);
-      // Fetch Campaigns
-      const campResponse = await api.get('/fundraising-campaigns');
-      const campData = campResponse.data.data || campResponse.data;
-      setCampaigns(campData || []);
-
-      // Fetch Stats
-      const statsResponse = await api.get('/fundraising-campaigns/stats');
-      const statsData = statsResponse.data.data || statsResponse.data;
-      setStats(statsData);
+      // Fetch Campaigns with fallback
+      let campList: Campaign[] = [];
+      try {
+        const campResponse = await api.get('/fundraising-campaigns');
+        campList = campResponse.data.data || campResponse.data || [];
+      } catch {
+        const campFallback = await api.get('/campaigns');
+        campList = campFallback.data.data || campFallback.data || [];
+      }
+      setCampaigns(Array.isArray(campList) ? campList : []);
 
       // Fetch Categories for Edit Selection
-      const catResponse = await api.get('/campaign-categories');
-      const catData = catResponse.data.data || catResponse.data;
-      setCategories(catData || []);
+      try {
+        const catResponse = await api.get('/campaign-categories');
+        const catData = catResponse.data.data || catResponse.data;
+        setCategories(Array.isArray(catData) ? catData : []);
+      } catch {
+        // silent
+      }
     } catch (err: any) {
       console.error(err);
       toast.error(err.response?.data?.message || 'Failed to retrieve fundraising campaigns.');
@@ -390,8 +395,11 @@ export default function CampaignsPage() {
   const handleTogglePause = async (campaign: Campaign) => {
     try {
       setSubmitLoading(true);
-      await api.patch(`/fundraising-campaigns/${campaign.id}/pause`);
-      toast.success(`Campaign status updated successfully.`);
+      const newStatus = campaign.campaignStatus === 'Active' ? 'Paused' : 'Active';
+      await api.patch(`/fundraising-campaigns/${campaign.id}`, {
+        campaignStatus: newStatus,
+      });
+      toast.success(`Campaign status set to ${newStatus}.`);
       broadcastModerationUpdate('campaigns');
       fetchCampaignsAndStats();
     } catch (err: any) {
@@ -406,7 +414,9 @@ export default function CampaignsPage() {
   const handleCompleteCampaign = async (campaign: Campaign) => {
     try {
       setSubmitLoading(true);
-      await api.patch(`/fundraising-campaigns/${campaign.id}/complete`);
+      await api.patch(`/fundraising-campaigns/${campaign.id}`, {
+        campaignStatus: 'Completed',
+      });
       toast.success('Campaign marked as completed successfully.');
       broadcastModerationUpdate('campaigns');
       fetchCampaignsAndStats();
@@ -552,15 +562,10 @@ export default function CampaignsPage() {
     return Math.min(Math.round((c / g) * 100), 100);
   };
 
-  // Derived stats
-  const pendingCount = stats?.statusCounts?.filter((s: any) => s.approvalStatus === 'Pending')
-    .reduce((sum: number, s: any) => sum + s.count, 0) || 0;
-
-  const activeCount = stats?.statusCounts?.filter((s: any) => s.campaignStatus === 'Active' && s.approvalStatus === 'Approved')
-    .reduce((sum: number, s: any) => sum + s.count, 0) || 0;
-
-  const completedCount = stats?.statusCounts?.filter((s: any) => s.campaignStatus === 'Completed')
-    .reduce((sum: number, s: any) => sum + s.count, 0) || 0;
+  // Derived stats directly from active campaigns state
+  const pendingCount = campaigns.filter((c) => c.approvalStatus === 'Pending').length;
+  const activeCount = campaigns.filter((c) => c.campaignStatus === 'Active' && c.approvalStatus === 'Approved').length;
+  const completedCount = campaigns.filter((c) => c.campaignStatus === 'Completed').length;
 
   return (
     <div className="space-y-6 animate-in fade-in-30 duration-300">

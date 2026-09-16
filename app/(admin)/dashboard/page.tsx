@@ -47,10 +47,11 @@ export default function DashboardPage() {
     try {
       if (!isBackground) setLoading(true);
 
-      const [usersRes, campsRes, donationsRes] = await Promise.allSettled([
-        api.get('/users?limit=100'),
+      const [usersRes, campsRes, fundraisingRes, verifiedNgosRes] = await Promise.allSettled([
+        api.get('/users?limit=200'),
+        api.get('/campaigns'),
         api.get('/fundraising-campaigns'),
-        api.get('/donations/admin'),
+        api.get('/kyc/verified-ngos'),
       ]);
 
       if (usersRes.status === 'fulfilled') {
@@ -67,35 +68,38 @@ export default function DashboardPage() {
         setVerifiedUsers(verified);
       }
 
-      if (campsRes.status === 'fulfilled') {
-        const raw = campsRes.value.data;
-        const campList: any[] = Array.isArray(raw?.data?.data)
-          ? raw.data.data
-          : Array.isArray(raw?.data)
-          ? raw.data
-          : Array.isArray(raw)
-          ? raw
-          : [];
-        setTotalCampaigns(typeof raw?.total === 'number' ? raw.total : campList.length);
+      // Aggregate campaigns from /campaigns and /fundraising-campaigns
+      const campaignMap = new Map<string, any>();
+      const addCampaigns = (res: PromiseSettledResult<any>) => {
+        if (res.status === 'fulfilled') {
+          const raw = res.value.data?.data || res.value.data || [];
+          if (Array.isArray(raw)) {
+            raw.forEach((c) => {
+              const cid = String(c.id || c.campaign_id || '');
+              if (cid && !campaignMap.has(cid)) {
+                campaignMap.set(cid, c);
+              }
+            });
+          }
+        }
+      };
+      addCampaigns(campsRes);
+      addCampaigns(fundraisingRes);
 
-        const sumRaised = campList.reduce((acc: number, c: any) => acc + (Number(c.collectedAmount) || 0), 0);
-        setTotalFunds(`PKR ${sumRaised.toLocaleString()}`);
+      const campList = Array.from(campaignMap.values());
+      if (campList.length > 0) {
+        setTotalCampaigns(campList.length);
+        const sumRaised = campList.reduce(
+          (acc: number, c: any) => acc + (Number(c.collectedAmount) || 0),
+          0
+        );
+        setTotalFunds(`PKR ${Math.round(sumRaised).toLocaleString('en-PK')}`);
       }
 
-      if (donationsRes.status === 'fulfilled') {
-        const raw = donationsRes.value.data;
-        const donList: any[] = Array.isArray(raw?.data?.data)
-          ? raw.data.data
-          : Array.isArray(raw?.data)
-          ? raw.data
-          : Array.isArray(raw)
-          ? raw
-          : [];
-        if (donList.length > 0) {
-          const sumDon = donList.reduce((sum: number, d: any) => sum + (Number(d.amount) || 0), 0);
-          if (sumDon > 0) {
-            setTotalFunds(`PKR ${sumDon.toLocaleString()}`);
-          }
+      if (verifiedNgosRes.status === 'fulfilled') {
+        const list = verifiedNgosRes.value.data?.data || verifiedNgosRes.value.data || [];
+        if (Array.isArray(list) && list.length > 0) {
+          setVerifiedUsers((prev) => Math.max(prev, list.length));
         }
       }
     } catch {

@@ -138,12 +138,12 @@ export function Navbar() {
     const action = notif.data?.actionType;
     if (action === 'kyc') {
       router.push('/users/kyc');
-    } else if (action === 'withdrawals') {
-      router.push('/financials/withdrawals');
-    } else if (action === 'campaign_detail' || action === 'campaigns') {
+    } else if (action === 'withdrawals' || action === 'donations') {
+      router.push('/financials/donations');
+    } else if (action === 'campaign_detail' || action === 'campaigns' || action === 'reports') {
       router.push('/campaigns');
-    } else if (action === 'reports') {
-      router.push('/campaigns/reports');
+    } else if (action === 'delete_requests') {
+      router.push('/campaigns/delete-requests');
     } else {
       router.push('/notifications');
     }
