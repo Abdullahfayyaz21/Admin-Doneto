@@ -21,6 +21,7 @@ export function LoginForm() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,6 +41,7 @@ export function LoginForm() {
 
       const resData = response.data?.data || response.data;
       if (resData?.accessToken) {
+        setIsSuccess(true);
         login(resData.accessToken, resData.refreshToken || resData.accessToken);
         return;
       }
@@ -50,7 +52,6 @@ export function LoginForm() {
         err.message ||
         'Invalid credentials. Please verify your email and password.';
       setError(Array.isArray(msg) ? msg.join(', ') : msg);
-    } finally {
       setLoading(false);
     }
   };
@@ -127,10 +128,15 @@ export function LoginForm() {
       {/* Login Button */}
       <Button
         type="submit"
-        disabled={loading}
-        className="h-12 w-full rounded-xl text-base font-semibold"
+        disabled={loading || isSuccess}
+        className="h-12 w-full rounded-xl text-base font-semibold transition-all duration-200"
       >
-        {loading ? (
+        {isSuccess ? (
+          <span className="flex items-center justify-center gap-2">
+            <LogoLoader size="sm" heartOnly variant="white" />
+            <span>Redirecting to Dashboard...</span>
+          </span>
+        ) : loading ? (
           <span className="flex items-center justify-center gap-2">
             <LogoLoader size="sm" heartOnly variant="white" />
             <span>Signing In...</span>

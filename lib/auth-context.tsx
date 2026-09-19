@@ -61,7 +61,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     Cookies.set('accessToken', accessToken, COOKIE_OPTIONS);
     Cookies.set('refreshToken', refreshToken, COOKIE_OPTIONS);
     await loadUserFromToken();
-    window.location.href = '/dashboard';
+    router.push('/dashboard');
+    router.refresh();
   };
 
   const logout = () => {
@@ -72,9 +73,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     Cookies.remove('accessToken');
     Cookies.remove('refreshToken');
     setUser(null);
-    if (typeof window !== 'undefined' && window.location.pathname !== '/') {
-      window.location.href = '/';
-    }
+    router.push('/');
+    router.refresh();
   };
 
   const refreshUser = async () => {

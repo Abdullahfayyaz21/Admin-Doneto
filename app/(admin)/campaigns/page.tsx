@@ -90,7 +90,7 @@ import { useAuth } from '@/lib/auth-context';
 import { broadcastModerationUpdate, subscribeToModerationUpdates } from '@/lib/realtime';
 
 interface Campaign {
-  id: number;
+  id: string | number;
   createdById: string;
   categoryId: number;
   categoryName: string;
@@ -134,7 +134,7 @@ interface Donor {
 
 interface WithdrawalRequest {
   id: number;
-  campaignId: number;
+  campaignId: string | number;
   amount: string;
   status: 'Pending' | 'Approved' | 'Rejected';
   rejectionReason: string | null;
@@ -149,6 +149,10 @@ interface Category {
   id: number;
   name: string;
 }
+
+// Global in-memory cache for instant route navigation
+let inMemoryCampaignsCache: Campaign[] | null = null;
+let inMemoryCategoriesCache: Category[] | null = null;
 
 export default function CampaignsPage() {
   const { user } = useAuth();
@@ -174,7 +178,8 @@ export default function CampaignsPage() {
     }
   };
 
-  // Core campaigns lists and stats
+  // Hydration-safe mounting & core states
+  const [mounted, setMounted] = useState(false);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [stats, setStats] = useState<any>(null);
@@ -237,52 +242,111 @@ export default function CampaignsPage() {
   const [withdrawReviewStatus, setWithdrawReviewStatus] = useState<'Approved' | 'Rejected'>('Approved');
   const [withdrawRejectionReason, setWithdrawRejectionReason] = useState('');
 
-  const fetchCampaignsAndStats = async () => {
+  const fetchCampaignsAndStats = useCallback(async (isBackground = false) => {
     try {
-      setLoading(true);
-      // Fetch Campaigns with fallback
-      let campList: Campaign[] = [];
-      try {
-        const campResponse = await api.get('/fundraising-campaigns');
-        campList = campResponse.data.data || campResponse.data || [];
-      } catch {
-        const campFallback = await api.get('/campaigns');
-        campList = campFallback.data.data || campFallback.data || [];
+      if (!isBackground && (!inMemoryCampaignsCache || inMemoryCampaignsCache.length === 0)) {
+        setLoading(true);
       }
-      setCampaigns(Array.isArray(campList) ? campList : []);
 
-      // Fetch Categories for Edit Selection
-      try {
-        const catResponse = await api.get('/campaign-categories');
-        const catData = catResponse.data.data || catResponse.data;
-        setCategories(Array.isArray(catData) ? catData : []);
-      } catch {
-        // silent
+      // Parallel fetch for campaigns and categories
+      const [campPromise, catPromise] = await Promise.allSettled([
+        api.get('/fundraising-campaigns').catch(() => api.get('/campaigns')),
+        api.get('/campaign-categories'),
+      ]);
+
+      if (campPromise.status === 'fulfilled') {
+        const campRes = campPromise.value;
+        const campData = campRes.data?.data || campRes.data || [];
+        const campList = Array.isArray(campData)
+          ? campData
+          : Array.isArray((campRes.data as any)?.campaigns)
+          ? (campRes.data as any).campaigns
+          : [];
+
+        if (Array.isArray(campList) && campList.length > 0) {
+          setCampaigns(campList);
+          inMemoryCampaignsCache = campList;
+          try {
+            sessionStorage.setItem('doneto_cached_campaigns', JSON.stringify(campList));
+          } catch {}
+        }
+      }
+
+      if (catPromise.status === 'fulfilled') {
+        const catRes = catPromise.value;
+        const catData = catRes.data?.data || catRes.data || [];
+        if (Array.isArray(catData) && catData.length > 0) {
+          setCategories(catData);
+          inMemoryCategoriesCache = catData;
+          try {
+            sessionStorage.setItem('doneto_cached_categories', JSON.stringify(catData));
+          } catch {}
+        }
       }
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to retrieve fundraising campaigns.');
+      if (!inMemoryCampaignsCache || inMemoryCampaignsCache.length === 0) {
+        toast.error(err.response?.data?.message || 'Failed to retrieve fundraising campaigns.');
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    fetchCampaignsAndStats();
+    setMounted(true);
+    let hasCache = false;
+
+    // Load from memory or session storage on client mount
+    if (inMemoryCampaignsCache && inMemoryCampaignsCache.length > 0) {
+      setCampaigns(inMemoryCampaignsCache);
+      setLoading(false);
+      hasCache = true;
+    } else {
+      try {
+        const saved = sessionStorage.getItem('doneto_cached_campaigns');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCampaigns(parsed);
+            inMemoryCampaignsCache = parsed;
+            setLoading(false);
+            hasCache = true;
+          }
+        }
+      } catch {}
+    }
+
+    if (inMemoryCategoriesCache && inMemoryCategoriesCache.length > 0) {
+      setCategories(inMemoryCategoriesCache);
+    } else {
+      try {
+        const saved = sessionStorage.getItem('doneto_cached_categories');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setCategories(parsed);
+            inMemoryCategoriesCache = parsed;
+          }
+        }
+      } catch {}
+    }
+
+    fetchCampaignsAndStats(hasCache);
 
     const interval = setInterval(() => {
-      fetchCampaignsAndStats();
+      fetchCampaignsAndStats(true);
     }, 15000);
 
     const unsubscribe = subscribeToModerationUpdates(() => {
-      fetchCampaignsAndStats();
+      fetchCampaignsAndStats(true);
     });
 
     return () => {
       clearInterval(interval);
       unsubscribe();
     };
-  }, []);
+  }, [fetchCampaignsAndStats]);
 
   // Filtered campaigns
   const filteredCampaigns = campaigns.filter((camp) => {
@@ -298,44 +362,67 @@ export default function CampaignsPage() {
   });
 
   // Fetch campaign donors
-  const fetchDonors = async (campaignId: number, pageNum: number) => {
+  const fetchDonors = async (campaignId: string | number, pageNum: number) => {
     try {
       setDonorsLoading(true);
       const res = await api.get(`/fundraising-campaigns/${campaignId}/donors`, {
         params: { page: pageNum, limit: 5 }
       });
-      const data = res.data.data || res.data;
-      setDonors(data.data || []);
-      setDonorTotal(data.total || 0);
+      const data = res.data?.data || res.data;
+      setDonors(data?.data || (Array.isArray(data) ? data : []));
+      setDonorTotal(data?.total || 0);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to load donors.');
+      console.error('Failed to load donors:', err);
+      const isNotFound = err.response?.status === 404 || 
+                         err.response?.data?.statusCode === 404 || 
+                         (typeof err.response?.data?.message === 'string' && err.response.data.message.includes('Cannot GET'));
+      if (!isNotFound) {
+        toast.error(err.response?.data?.message || 'Failed to load donors.');
+      }
+      setDonors([]);
+      setDonorTotal(0);
     } finally {
       setDonorsLoading(false);
     }
   };
 
   // Fetch campaign withdrawal requests
-  const fetchWithdrawals = async (campaignId: number) => {
+  const fetchWithdrawals = async (campaignId: string | number) => {
     try {
       setWithdrawalsLoading(true);
       const res = await api.get(`/fundraising-campaigns/${campaignId}/withdraw-requests`);
-      const data = res.data.data || res.data;
-      setWithdrawals(data || []);
+      const data = res.data?.data || res.data;
+      setWithdrawals(Array.isArray(data) ? data : []);
     } catch (err: any) {
-      console.error(err);
-      toast.error(err.response?.data?.message || 'Failed to load withdrawal requests.');
+      console.error('Failed to load withdrawal requests:', err);
+      const isNotFound = err.response?.status === 404 || 
+                         err.response?.data?.statusCode === 404 || 
+                         (typeof err.response?.data?.message === 'string' && err.response.data.message.includes('Cannot GET'));
+      if (!isNotFound) {
+        toast.error(err.response?.data?.message || 'Failed to load withdrawal requests.');
+      }
+      setWithdrawals([]);
     } finally {
       setWithdrawalsLoading(false);
     }
   };
 
-  const handleOpenDetails = (campaign: Campaign) => {
+  const handleOpenDetails = async (campaign: Campaign) => {
     setSelectedCampaign(campaign);
     setIsDetailsOpen(true);
     setActiveTab('general');
     fetchDonors(campaign.id, 1);
     fetchWithdrawals(campaign.id);
+
+    try {
+      const res = await api.get(`/fundraising-campaigns/${campaign.id}`);
+      const fullData = res.data?.data || res.data;
+      if (fullData && fullData.id) {
+        setSelectedCampaign((prev) => prev ? { ...prev, ...fullData } : fullData);
+      }
+    } catch {
+      // Retain the current campaign details from the list
+    }
   };
 
   const handleOpenReview = (campaign: Campaign) => {
@@ -688,7 +775,7 @@ export default function CampaignsPage() {
       </Card>
 
       {/* Campaigns Listing */}
-      {loading ? (
+      {!mounted || loading ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {[...Array(6)].map((_, i) => (
             <Card key={i} className="bg-card p-4 space-y-4">
@@ -741,7 +828,8 @@ export default function CampaignsPage() {
             return (
               <Card 
                 key={camp.id} 
-                className="group relative overflow-hidden bg-card shadow-sm rounded-2xl flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300"
+                onClick={() => handleOpenDetails(camp)}
+                className="group relative overflow-hidden bg-card shadow-sm rounded-2xl flex flex-col justify-between hover:-translate-y-1.5 transition-all duration-300 cursor-pointer hover:border-primary/50 hover:shadow-md"
               >
                 {/* Cover Image */}
                 <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
@@ -814,18 +902,24 @@ export default function CampaignsPage() {
                 <div className="p-5 pt-4 flex items-center justify-between border-t border-border bg-muted/20">
                   <Button 
                     variant="ghost" 
-                    onClick={() => handleOpenDetails(camp)} 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenDetails(camp);
+                    }} 
                     className="text-xs hover:text-primary flex items-center gap-1.5 py-0 px-2 h-9 text-muted-foreground hover:bg-muted rounded-xl"
                   >
                     <Eye className="h-4 w-4" />
                     View Details
                   </Button>
 
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                     {/* Action Quickbuttons */}
                     {isAdmin && camp.approvalStatus === 'Pending' && (
                       <Button
-                        onClick={() => handleOpenReview(camp)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenReview(camp);
+                        }}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white text-[11px] h-8 rounded-xl px-3 flex items-center gap-1 shadow-sm"
                       >
                         <Sparkles className="h-3.5 w-3.5" />
@@ -906,7 +1000,11 @@ export default function CampaignsPage() {
             </TableHeader>
             <TableBody>
               {filteredCampaigns.map((camp) => (
-                <TableRow key={camp.id} className="border-b border-border hover:bg-muted/50 text-muted-foreground">
+                <TableRow 
+                  key={camp.id} 
+                  onClick={() => handleOpenDetails(camp)}
+                  className="border-b border-border hover:bg-muted/50 text-muted-foreground cursor-pointer transition-colors"
+                >
                   <TableCell className="font-semibold text-foreground max-w-xs truncate">{camp.title}</TableCell>
                   <TableCell>{camp.categoryName}</TableCell>
                   <TableCell>{formatCurrency(camp.goalAmount)}</TableCell>
@@ -940,12 +1038,28 @@ export default function CampaignsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell>{formatDate(camp.createdAt)}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="flex justify-end items-center gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => handleOpenDetails(camp)} className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenDetails(camp);
+                        }} 
+                        className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleOpenEdit(camp)} className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenEdit(camp);
+                        }} 
+                        className="h-8 w-8 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground"
+                      >
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <DropdownMenu>

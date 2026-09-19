@@ -251,6 +251,7 @@ export function Sidebar({ initialCollapsed = false }: SidebarProps) {
                     <Link
                       key={item.href}
                       href={item.href}
+                      prefetch={true}
                       className={cn(
                         'group flex items-center justify-between rounded-xl px-3.5 py-2.5 text-sm transition-all duration-150 antialiased shadow-none',
                         active

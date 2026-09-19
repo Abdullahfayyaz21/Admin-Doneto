@@ -15,7 +15,7 @@ export default function AdminLayout({
       <Sidebar initialCollapsed={sidebarCollapsed} />
       <div className="flex flex-1 flex-col overflow-hidden">
         <Navbar />
-        <main className="flex-1 overflow-y-auto p-6 no-scrollbar">
+        <main className="flex-1 overflow-y-auto p-6 no-scrollbar animate-in fade-in duration-200">
           {children}
         </main>
       </div>

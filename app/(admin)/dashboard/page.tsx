@@ -94,6 +94,9 @@ export default function DashboardPage() {
           0
         );
         setTotalFunds(`PKR ${Math.round(sumRaised).toLocaleString('en-PK')}`);
+        try {
+          sessionStorage.setItem('doneto_cached_campaigns', JSON.stringify(campList));
+        } catch {}
       }
 
       if (verifiedNgosRes.status === 'fulfilled') {
